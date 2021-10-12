@@ -16,7 +16,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
 
 
-    MODIFY ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY Travel
         EXECUTE ReCalcTotalPrice
         FROM CORRESPONDING #( keys )

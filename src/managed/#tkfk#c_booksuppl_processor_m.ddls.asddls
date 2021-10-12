@@ -8,8 +8,8 @@
                                        value: 'BookingSupplementID' } } }
 @Search.searchable: true
 
-define view entity /TKFK/C_BookSuppl_Processor_M
-  as projection on /TKFK/I_BookSuppl_M
+define view entity ZTKFK_C_BookSuppl_Processor_M
+  as projection on ZTKFK_I_BookSuppl_M
 {
       @UI.facet: [ { id:              'BookingSupplement',
                      purpose:         #STANDARD,
@@ -29,7 +29,7 @@ define view entity /TKFK/C_BookSuppl_Processor_M
 
       @UI: { lineItem:       [ { position: 20, importance: #HIGH } ],
              identification: [ { position: 20 } ] }
-      @Consumption.valueHelpDefinition: [ {entity: {name: '/TKFK/I_SUPPLEMENT', element: 'SupplementID' } ,
+      @Consumption.valueHelpDefinition: [ {entity: {name: 'ZTKFK_I_SUPPLEMENT', element: 'SupplementID' } ,
                                            additionalBinding: [ { localElement: 'Price',  element: 'Price' },
                                                                 { localElement: 'CurrencyCode', element: 'CurrencyCode' }] }]
       @ObjectModel.text.element: ['SupplementDescription']
@@ -48,7 +48,7 @@ define view entity /TKFK/C_BookSuppl_Processor_M
       last_changed_at             as LastChangedAt,
 
       /* Associations */
-      _Travel  : redirected to /TKFK/C_Travel_Processor_M,
-      _Booking : redirected to parent /TKFK/C_Booking_Processor_M,
+      _Travel  : redirected to ZTKFK_C_Travel_Processor_M,
+      _Booking : redirected to parent ZTKFK_C_Booking_Processor_M,
       _Product
 }

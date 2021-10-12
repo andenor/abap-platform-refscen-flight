@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>/TKFK/CL_DATA_GENERATOR_MANAGED</CLSNAME>
+    <CLSNAME>ZTKFK_CL_DATA_GENERATOR_MANAGED</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>Data Generator for Managed Package</DESCRIPT>
     <STATE>1</STATE>

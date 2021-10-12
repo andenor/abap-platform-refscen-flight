@@ -3,13 +3,13 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <ATTRIBUTES>
-    <OBJECT>/TKFK/TRV_M</OBJECT>
-    <DOMLEN>/TKFK/TRAVEL_ID</DOMLEN>
+    <OBJECT>ZTKFK_TRV_M</OBJECT>
+    <DOMLEN>ZTKFK_TRAVEL_ID</DOMLEN>
     <PERCENTAGE>10.0</PERCENTAGE>
     <ABAP_LANGUAGE_VERSION>5</ABAP_LANGUAGE_VERSION>
    </ATTRIBUTES>
    <TEXT>
-    <OBJECT>/TKFK/TRV_M</OBJECT>
+    <OBJECT>ZTKFK_TRV_M</OBJECT>
     <TXT>Travel_ID number range object</TXT>
     <TXTSHORT>Travel_ID number...</TXTSHORT>
    </TEXT>

@@ -6,9 +6,9 @@
 
 @Search.searchable: true
 
-define root view entity /TKFK/C_Travel_Approver_M
+define root view entity ZTKFK_C_Travel_Approver_M
   provider contract transactional_query
-  as projection on /TKFK/I_Travel_M
+  as projection on ZTKFK_I_Travel_M
 {
       @UI.facet: [ { id:              'Travel',
                      purpose:         #STANDARD,
@@ -32,7 +32,7 @@ define root view entity /TKFK/C_Travel_Approver_M
           lineItem:       [ { position: 20, importance: #HIGH } ],
           identification: [ { position: 20 } ],
           selectionField: [ { position: 20 } ] }
-      @Consumption.valueHelpDefinition: [ { entity : {name: '/TKFK/I_Agency', element: 'AgencyID'  } } ]
+      @Consumption.valueHelpDefinition: [ { entity : {name: 'ZTKFK_I_Agency', element: 'AgencyID'  } } ]
 
       @ObjectModel.text.element: ['AgencyName']
       @Search.defaultSearchElement: true
@@ -43,7 +43,7 @@ define root view entity /TKFK/C_Travel_Approver_M
           lineItem:       [ { position: 30, importance: #HIGH } ],
           identification: [ { position: 30 } ],
           selectionField: [ { position: 30 } ] }
-      @Consumption.valueHelpDefinition: [ { entity : {name: '/TKFK/I_Customer', element: 'CustomerID'  } } ]
+      @Consumption.valueHelpDefinition: [ { entity : {name: 'ZTKFK_I_Customer', element: 'CustomerID'  } } ]
 
       @ObjectModel.text.element: ['CustomerName']
       @Search.defaultSearchElement: true
@@ -83,7 +83,7 @@ define root view entity /TKFK/C_Travel_Approver_M
           textArrangement: #TEXT_ONLY,
           selectionField: [ { position: 40 } ] }
       @EndUserText.label: 'Overall Status'
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/TKFK/I_Overall_Status_VH', element: 'OverallStatus' }}]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'ZTKFK_I_Overall_Status_VH', element: 'OverallStatus' }}]
       @ObjectModel.text.element: ['OverallStatusText'] 
       overall_status     as OverallStatus,
       
@@ -101,7 +101,7 @@ define root view entity /TKFK/C_Travel_Approver_M
 
 
       /* Associations */
-      _Booking : redirected to composition child /TKFK/C_Booking_Approver_M,
+      _Booking : redirected to composition child ZTKFK_C_Booking_Approver_M,
       _Agency,
       _Customer,
       _OverallStatus

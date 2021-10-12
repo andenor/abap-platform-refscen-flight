@@ -8,16 +8,16 @@ PUBLIC SECTION.
   METHODS insert_test_data_in_doubles
             CHANGING co_environment TYPE REF TO if_cds_test_environment.
   METHODS get_agency_data
-            RETURNING VALUE(rs_agency) TYPE /TKFK/agency.
+            RETURNING VALUE(rs_agency) TYPE ZTKFK_agency.
   METHODS get_customer_data
-            RETURNING VALUE(rs_customer) TYPE /TKFK/customer.
+            RETURNING VALUE(rs_customer) TYPE ZTKFK_customer.
   METHODS get_carrier_data
-            RETURNING VALUE(rs_carrier) TYPE /TKFK/carrier.
+            RETURNING VALUE(rs_carrier) TYPE ZTKFK_carrier.
 
 PRIVATE SECTION.
-   class-data gt_agency TYPE STANDARD TABLE OF /TKFK/agency.
-   class-data gt_customer TYPE STANDARD TABLE OF /TKFK/customer.
-   class-data gt_carrier TYPE STANDARD TABLE OF /TKFK/carrier.
+   class-data gt_agency TYPE STANDARD TABLE OF ZTKFK_agency.
+   class-data gt_customer TYPE STANDARD TABLE OF ZTKFK_customer.
+   class-data gt_carrier TYPE STANDARD TABLE OF ZTKFK_carrier.
 
 ENDCLASS.
 

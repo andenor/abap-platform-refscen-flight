@@ -1,8 +1,8 @@
-"!@testing SRVB:/TKFK/UI_TRAVEL_PROC_M_O2
+"!@testing SRVB:ZTKFK_UI_TRAVEL_PROC_M_O2
 "! End-to-end testing of a complete service
 "! Uses CDS and OSQL Test Environment to stub database dependencies
 "! Uses Local OData CLient Proxy to execute OData Calls against local service
-CLASS /TKFK/tc_travel_proc_m_o2_odata DEFINITION
+CLASS ZTKFK_tc_travel_proc_m_o2_odata DEFINITION
   FOR TESTING
   RISK LEVEL HARMLESS
   DURATION SHORT
@@ -16,13 +16,13 @@ CLASS /TKFK/tc_travel_proc_m_o2_odata DEFINITION
     CLASS-DATA: mo_client_proxy      TYPE REF TO /iwbep/if_cp_client_proxy,
                 cds_test_environment TYPE REF TO if_cds_test_environment,
                 sql_test_environment TYPE REF TO if_osql_test_environment,
-                begin_date           TYPE /TKFK/begin_date,
-                end_date             TYPE /TKFK/end_date,
-                agency_mock_data     TYPE STANDARD TABLE OF /TKFK/agency,
-                customer_mock_data   TYPE STANDARD TABLE OF /TKFK/customer,
-                carrier_mock_data    TYPE STANDARD TABLE OF /TKFK/carrier,
-                flight_mock_data     TYPE STANDARD TABLE OF /TKFK/flight,
-                supplement_mock_data TYPE STANDARD TABLE OF /TKFK/supplement.
+                begin_date           TYPE ZTKFK_begin_date,
+                end_date             TYPE ZTKFK_end_date,
+                agency_mock_data     TYPE STANDARD TABLE OF ZTKFK_agency,
+                customer_mock_data   TYPE STANDARD TABLE OF ZTKFK_customer,
+                carrier_mock_data    TYPE STANDARD TABLE OF ZTKFK_carrier,
+                flight_mock_data     TYPE STANDARD TABLE OF ZTKFK_flight,
+                supplement_mock_data TYPE STANDARD TABLE OF ZTKFK_supplement.
 
     CLASS-METHODS :
       class_setup RAISING cx_static_check,
@@ -42,29 +42,29 @@ CLASS /TKFK/tc_travel_proc_m_o2_odata DEFINITION
 
 ENDCLASS.
 
-CLASS /TKFK/tc_travel_proc_m_o2_odata  IMPLEMENTATION.
+CLASS ZTKFK_tc_travel_proc_m_o2_odata  IMPLEMENTATION.
 
   METHOD class_setup.
 
-    mo_client_proxy = create_local_client_proxy( VALUE #( service_id      = '/TKFK/UI_TRAVEL_PROC_M_O2'
+    mo_client_proxy = create_local_client_proxy( VALUE #( service_id      = 'ZTKFK_UI_TRAVEL_PROC_M_O2'
                                                           service_version = '0001' )  ).
 
     " Create the stubs/doubles for the underlying CDS entities
     cds_test_environment = cl_cds_test_environment=>create_for_multiple_cds(
                       i_for_entities = VALUE #(
-                        ( i_for_entity = '/TKFK/C_TRAVEL_PROCESSOR_M'    i_select_base_dependencies = abap_true )
-                        ( i_for_entity = '/TKFK/C_BOOKING_PROCESSOR_M'   i_select_base_dependencies = abap_true )
-                        ( i_for_entity = '/TKFK/C_BOOKSUPPL_PROCESSOR_M' i_select_base_dependencies = abap_true ) ) ).
+                        ( i_for_entity = 'ZTKFK_C_TRAVEL_PROCESSOR_M'    i_select_base_dependencies = abap_true )
+                        ( i_for_entity = 'ZTKFK_C_BOOKING_PROCESSOR_M'   i_select_base_dependencies = abap_true )
+                        ( i_for_entity = 'ZTKFK_C_BOOKSUPPL_PROCESSOR_M' i_select_base_dependencies = abap_true ) ) ).
 
     " Create the stubs/doubles for referenced and additional used tables.
     sql_test_environment = cl_osql_test_environment=>create( i_dependency_list = VALUE #(
-*        ( '/TKFK/AGENCY' )      "already mocked by cds_test_environment above
-*        ( '/TKFK/CUSTOMER' )    "already mocked by cds_test_environment above
-*        ( '/TKFK/CARRIER' )     "already mocked by cds_test_environment above
-        ( '/TKFK/FLIGHT' )
-        ( '/TKFK/SUPPLEMENT' )
+*        ( 'ZTKFK_AGENCY' )      "already mocked by cds_test_environment above
+*        ( 'ZTKFK_CUSTOMER' )    "already mocked by cds_test_environment above
+*        ( 'ZTKFK_CARRIER' )     "already mocked by cds_test_environment above
+        ( 'ZTKFK_FLIGHT' )
+        ( 'ZTKFK_SUPPLEMENT' )
 
-        ( '/TKFK/LOG_TRAVEL' )
+        ( 'ZTKFK_LOG_TRAVEL' )
     ) ).
 
 
@@ -104,7 +104,7 @@ CLASS /TKFK/tc_travel_proc_m_o2_odata  IMPLEMENTATION.
     " call a simple create operation and check if the data is available via EML and in the database
 
     " Prepare business data i.e. the travel instance test data
-    DATA(ls_business_data) = VALUE /TKFK/c_travel_processor_m(
+    DATA(ls_business_data) = VALUE ZTKFK_c_travel_processor_m(
         agencyid = agency_mock_data[ 1 ]-agency_id
         customerid = customer_mock_data[  1 ]-customer_id
         begindate = begin_date
@@ -126,13 +126,13 @@ CLASS /TKFK/tc_travel_proc_m_o2_odata  IMPLEMENTATION.
 
     cl_abap_unit_assert=>assert_not_initial( lo_response ).
 
-    DATA ls_response_data TYPE /TKFK/c_travel_processor_m.
+    DATA ls_response_data TYPE ZTKFK_c_travel_processor_m.
     lo_response->get_business_data( IMPORTING es_business_data = ls_response_data ).
 
     cl_abap_unit_assert=>assert_equals( msg = 'description' exp = ls_business_data-description act = ls_response_data-description ).
 
     " Read the created travel entity - the number is now calculated by a number range, so we can't predict it
-    READ ENTITIES OF /TKFK/c_travel_processor_m
+    READ ENTITIES OF ZTKFK_c_travel_processor_m
       ENTITY travelprocessor
         FIELDS ( description )
           WITH VALUE #( (  travelid = ls_response_data-travelid ) )
@@ -144,12 +144,12 @@ CLASS /TKFK/tc_travel_proc_m_o2_odata  IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( msg = 'description' exp = ls_business_data-description act = lt_read_travel[ 1 ]-description ).
 
     " check data also from Database
-    SELECT single @abap_true FROM /TKFK/i_travel_m INTO @DATA(lv_travel). "#EC CI_NOWHERE
+    SELECT single @abap_true FROM ZTKFK_i_travel_m INTO @DATA(lv_travel). "#EC CI_NOWHERE
     cl_abap_unit_assert=>assert_true( msg = 'travel from db' act = lv_travel ).
 
     " check also log written by "additional save" functionality
-    SELECT single @abap_true FROM /TKFK/log_travel INTO @DATA(log_travel). "#EC CI_NOWHERE
-    cl_abap_unit_assert=>assert_true( msg = '/TKFK/LOG_TRAVEL' act = log_travel ).
+    SELECT single @abap_true FROM ZTKFK_log_travel INTO @DATA(log_travel). "#EC CI_NOWHERE
+    cl_abap_unit_assert=>assert_true( msg = 'ZTKFK_LOG_TRAVEL' act = log_travel ).
 
   ENDMETHOD.
 

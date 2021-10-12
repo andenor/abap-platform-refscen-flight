@@ -7,9 +7,9 @@
 
 @Search.searchable: true
 
-define root view entity /TKFK/C_Travel_Processor_M
+define root view entity ZTKFK_C_Travel_Processor_M
   provider contract transactional_query
-  as projection on /TKFK/I_Travel_M
+  as projection on ZTKFK_I_Travel_M
 {
       @UI.facet: [ { id:              'Travel',
                      purpose:         #STANDARD,
@@ -35,7 +35,7 @@ define root view entity /TKFK/C_Travel_Processor_M
           lineItem:       [ { position: 20, importance: #HIGH } ],
           identification: [ { position: 20 } ],
           selectionField: [ { position: 20 } ] }
-      @Consumption.valueHelpDefinition: [{ entity : {name: '/TKFK/I_Agency', element: 'AgencyID'  } }]
+      @Consumption.valueHelpDefinition: [{ entity : {name: 'ZTKFK_I_Agency', element: 'AgencyID'  } }]
       @ObjectModel.text.element: ['AgencyName']
       @Search.defaultSearchElement: true
       agency_id          as AgencyID,
@@ -45,7 +45,7 @@ define root view entity /TKFK/C_Travel_Processor_M
           lineItem:       [ { position: 30, importance: #HIGH } ],
           identification: [ { position: 30 } ],
           selectionField: [ { position: 30 } ] }
-      @Consumption.valueHelpDefinition: [{ entity : {name: '/TKFK/I_Customer', element: 'CustomerID'  } }]
+      @Consumption.valueHelpDefinition: [{ entity : {name: 'ZTKFK_I_Customer', element: 'CustomerID'  } }]
       @ObjectModel.text.element: ['CustomerName']
       @Search.defaultSearchElement: true
       customer_id        as CustomerID,
@@ -82,7 +82,7 @@ define root view entity /TKFK/C_Travel_Processor_M
           selectionField: [{ position: 40 }],
           textArrangement: #TEXT_ONLY
            }
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/TKFK/I_Overall_Status_VH', element: 'OverallStatus' }}]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'ZTKFK_I_Overall_Status_VH', element: 'OverallStatus' }}]
       @ObjectModel.text.element: ['OverallStatusText']    
       overall_status     as OverallStatus,
       
@@ -97,7 +97,7 @@ define root view entity /TKFK/C_Travel_Processor_M
       last_changed_at    as LastChangedAt,
 
       /* Associations */
-      _Booking : redirected to composition child /TKFK/C_Booking_Processor_M,
+      _Booking : redirected to composition child ZTKFK_C_Booking_Processor_M,
       _Agency,
       _Customer,
       _OverallStatus

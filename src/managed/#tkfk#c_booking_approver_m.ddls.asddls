@@ -10,8 +10,8 @@
 
 @Search.searchable: true
 
-define view entity /TKFK/C_Booking_Approver_M
-  as projection on /TKFK/I_Booking_M
+define view entity ZTKFK_C_Booking_Approver_M
+  as projection on ZTKFK_I_Booking_M
 {
       @UI.facet: [ { id:            'Booking',
                      purpose:       #STANDARD,
@@ -65,7 +65,7 @@ define view entity /TKFK/C_Booking_Approver_M
       @UI: { lineItem:       [ { position: 90, importance: #HIGH, label: 'Status' } ],
              identification: [ { position: 90, label: 'Status' } ],
              textArrangement: #TEXT_ONLY }
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/TKFK/I_Booking_Status_VH', element: 'BookingStatus' }}]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'ZTKFK_I_Booking_Status_VH', element: 'BookingStatus' }}]
       @ObjectModel.text.element: ['BookingStatusText']
       booking_status     as BookingStatus,
       
@@ -78,7 +78,7 @@ define view entity /TKFK/C_Booking_Approver_M
 
 
       /* Associations */
-      _Travel : redirected to parent /TKFK/C_Travel_Approver_M,
+      _Travel : redirected to parent ZTKFK_C_Travel_Approver_M,
       _Customer,
       _Carrier,
       _BookingStatus

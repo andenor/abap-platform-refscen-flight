@@ -2,17 +2,17 @@
 //@Metadata.ignorePropagatedAnnotations:true
 @EndUserText.label: 'Booking view'
 
-define view entity /TKFK/I_Booking_M
-  as select from /TKFK/booking_m as Booking
+define view entity ZTKFK_I_Booking_M
+  as select from ZTKFK_booking_m as Booking
 
-  association        to parent /TKFK/I_Travel_M   as _Travel        on  $projection.travel_id = _Travel.travel_id
-  composition [0..*] of /TKFK/I_BookSuppl_M       as _BookSupplement
+  association        to parent ZTKFK_I_Travel_M   as _Travel        on  $projection.travel_id = _Travel.travel_id
+  composition [0..*] of ZTKFK_I_BookSuppl_M       as _BookSupplement
 
-  association [1..1] to /TKFK/I_Customer          as _Customer      on  $projection.customer_id = _Customer.CustomerID
-  association [1..1] to /TKFK/I_Carrier           as _Carrier       on  $projection.carrier_id = _Carrier.AirlineID
-  association [1..1] to /TKFK/I_Connection        as _Connection    on  $projection.carrier_id    = _Connection.AirlineID
+  association [1..1] to ZTKFK_I_Customer          as _Customer      on  $projection.customer_id = _Customer.CustomerID
+  association [1..1] to ZTKFK_I_Carrier           as _Carrier       on  $projection.carrier_id = _Carrier.AirlineID
+  association [1..1] to ZTKFK_I_Connection        as _Connection    on  $projection.carrier_id    = _Connection.AirlineID
                                                                    and $projection.connection_id = _Connection.ConnectionID
-  association [1..1] to /TKFK/I_Booking_Status_VH as _BookingStatus on  $projection.booking_status = _BookingStatus.BookingStatus
+  association [1..1] to ZTKFK_I_Booking_Status_VH as _BookingStatus on  $projection.booking_status = _BookingStatus.BookingStatus
 
 {
   key travel_id,

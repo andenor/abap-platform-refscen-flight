@@ -5,7 +5,7 @@ CLASS lhc_travel DEFINITION INHERITING FROM cl_abap_behavior_handler
 
   PRIVATE SECTION.
 
-    TYPES tt_travel_update TYPE TABLE FOR UPDATE /TKFK/I_Travel_M.
+    TYPES tt_travel_update TYPE TABLE FOR UPDATE ZTKFK_I_Travel_M.
 
     METHODS validate_customer FOR VALIDATE ON SAVE
       IMPORTING keys FOR travel~validatecustomer.
@@ -53,13 +53,13 @@ CLASS lhc_travel IMPLEMENTATION.
 **********************************************************************
   METHOD validate_customer.
     " Read relevant travel instance data
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
     ENTITY travel
      FIELDS ( customer_id )
      WITH CORRESPONDING #(  keys )
     RESULT DATA(travels).
 
-    DATA customers TYPE SORTED TABLE OF /TKFK/customer WITH UNIQUE KEY customer_id.
+    DATA customers TYPE SORTED TABLE OF ZTKFK_customer WITH UNIQUE KEY customer_id.
 
     " Optimization of DB select: extract distinct non-initial customer IDs
     customers = CORRESPONDING #( travels DISCARDING DUPLICATES MAPPING customer_id = customer_id EXCEPT * ).
@@ -67,7 +67,7 @@ CLASS lhc_travel IMPLEMENTATION.
     IF customers IS NOT INITIAL.
 
       " Check if customer ID exists
-      SELECT FROM /TKFK/customer FIELDS customer_id
+      SELECT FROM ZTKFK_customer FIELDS customer_id
         FOR ALL ENTRIES IN @customers
         WHERE customer_id = @customers-customer_id
         INTO TABLE @DATA(customers_db).
@@ -79,9 +79,9 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #(  travel_id = travel-travel_id ) TO failed-travel.
         APPEND VALUE #(  travel_id = travel-travel_id
-                         %msg      = NEW /TKFK/cm_flight_messages(
+                         %msg      = NEW ZTKFK_cm_flight_messages(
                                                      customer_id = travel-customer_id
-                                                     textid      = /TKFK/cm_flight_messages=>customer_unkown
+                                                     textid      = ZTKFK_cm_flight_messages=>customer_unkown
                                                      severity    = if_abap_behv_message=>severity-error )
                          %element-customer_id = if_abap_behv=>mk-on
                       ) TO reported-travel.
@@ -98,13 +98,13 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD validate_agency.
     " Read relevant travel instance data
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
     ENTITY travel
      FIELDS ( agency_id )
      WITH CORRESPONDING #(  keys )
     RESULT DATA(travels).
 
-    DATA agencies TYPE SORTED TABLE OF /TKFK/agency WITH UNIQUE KEY agency_id.
+    DATA agencies TYPE SORTED TABLE OF ZTKFK_agency WITH UNIQUE KEY agency_id.
 
     " Optimization of DB select: extract distinct non-initial agency IDs
     agencies = CORRESPONDING #(  travels DISCARDING DUPLICATES MAPPING agency_id = agency_id EXCEPT * ).
@@ -112,7 +112,7 @@ CLASS lhc_travel IMPLEMENTATION.
     IF  agencies IS NOT INITIAL.
 
       " check if agency ID exist
-      SELECT FROM /TKFK/agency FIELDS agency_id
+      SELECT FROM ZTKFK_agency FIELDS agency_id
         FOR ALL ENTRIES IN @agencies
         WHERE agency_id = @agencies-agency_id
         INTO TABLE @DATA(agencies_db).
@@ -125,8 +125,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #(  travel_id = travel-travel_id ) TO failed-travel.
         APPEND VALUE #(  travel_id = travel-travel_id
-                         %msg      = NEW /TKFK/cm_flight_messages(
-                                          textid    = /TKFK/cm_flight_messages=>agency_unkown
+                         %msg      = NEW ZTKFK_cm_flight_messages(
+                                          textid    = ZTKFK_cm_flight_messages=>agency_unkown
                                           agency_id = travel-agency_id
                                           severity  = if_abap_behv_message=>severity-error )
                          %element-agency_id = if_abap_behv=>mk-on
@@ -143,7 +143,7 @@ CLASS lhc_travel IMPLEMENTATION.
 **********************************************************************
   METHOD validate_dates.
 
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY travel
         FIELDS ( begin_date end_date )
         WITH CORRESPONDING #( keys )
@@ -157,8 +157,8 @@ CLASS lhc_travel IMPLEMENTATION.
                         travel_id   = travel-travel_id ) TO failed-travel.
 
         APPEND VALUE #( %key     = travel-%key
-                        %msg = NEW /TKFK/cm_flight_messages(
-                                         textid     = /TKFK/cm_flight_messages=>begin_date_bef_end_date
+                        %msg = NEW ZTKFK_cm_flight_messages(
+                                         textid     = ZTKFK_cm_flight_messages=>begin_date_bef_end_date
                                          severity   = if_abap_behv_message=>severity-error
                                          begin_date = travel-begin_date
                                          end_date   = travel-end_date
@@ -174,8 +174,8 @@ CLASS lhc_travel IMPLEMENTATION.
                       ) TO failed-travel.
 
         APPEND VALUE #( %key = travel-%key
-                        %msg = NEW /TKFK/cm_flight_messages(
-                               textid = /TKFK/cm_flight_messages=>begin_date_on_or_bef_sysdate
+                        %msg = NEW ZTKFK_cm_flight_messages(
+                               textid = ZTKFK_cm_flight_messages=>begin_date_on_or_bef_sysdate
                                severity = if_abap_behv_message=>severity-error )
                         %element-begin_date = if_abap_behv=>mk-on
                         %element-end_date   = if_abap_behv=>mk-on
@@ -193,7 +193,7 @@ CLASS lhc_travel IMPLEMENTATION.
 **********************************************************************
   METHOD validate_travel_status.
 
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
         ENTITY travel
           FIELDS ( overall_status )
           WITH CORRESPONDING #( keys )
@@ -209,8 +209,8 @@ CLASS lhc_travel IMPLEMENTATION.
           APPEND VALUE #( %key = travel-%key ) TO failed-travel.
 
           APPEND VALUE #( %key = travel-%key
-                          %msg = NEW /TKFK/cm_flight_messages(
-                               textid = /TKFK/cm_flight_messages=>status_invalid
+                          %msg = NEW ZTKFK_cm_flight_messages(
+                               textid = ZTKFK_cm_flight_messages=>status_invalid
                                severity = if_abap_behv_message=>severity-error
                                status = travel-overall_status )
                           %element-overall_status = if_abap_behv=>mk-on
@@ -229,23 +229,23 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD copyTravel.
 
     DATA:
-      travels       TYPE TABLE FOR CREATE /TKFK/I_Travel_M\\travel,
-      bookings_cba  TYPE TABLE FOR CREATE /TKFK/I_Travel_M\\travel\_booking,
-      booksuppl_cba TYPE TABLE FOR CREATE /TKFK/I_Travel_M\\booking\_booksupplement.
+      travels       TYPE TABLE FOR CREATE ZTKFK_I_Travel_M\\travel,
+      bookings_cba  TYPE TABLE FOR CREATE ZTKFK_I_Travel_M\\travel\_booking,
+      booksuppl_cba TYPE TABLE FOR CREATE ZTKFK_I_Travel_M\\booking\_booksupplement.
 
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY travel
        ALL FIELDS WITH CORRESPONDING #( keys )
                   RESULT DATA(travel_read_result)
      FAILED    failed
      REPORTED  reported.
 
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY travel BY \_booking
         ALL FIELDS WITH CORRESPONDING #( travel_read_result )
                    RESULT DATA(book_read_result).
 
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY booking BY \_booksupplement
        ALL FIELDS WITH CORRESPONDING #( book_read_result )
                   RESULT DATA(booksuppl_read_result).
@@ -274,7 +274,7 @@ CLASS lhc_travel IMPLEMENTATION.
       ENDLOOP.
     ENDLOOP.
 
-    MODIFY ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY travel
         CREATE FIELDS ( agency_id customer_id begin_date end_date booking_fee total_price currency_code overall_status description )
           WITH travels
@@ -291,7 +291,7 @@ CLASS lhc_travel IMPLEMENTATION.
     reported-travel = CORRESPONDING #( BASE ( reported-travel ) reported_create-travel MAPPING travel_id = %cid EXCEPT %cid ).
 
 
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
        ENTITY travel
          ALL FIELDS WITH CORRESPONDING #( mapped-travel )
          RESULT DATA(read_created_result).
@@ -312,7 +312,7 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD set_status_accepted.
 
     " Modify in local mode: BO-related updates that are not relevant for authorization checks
-    MODIFY ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
            ENTITY travel
               UPDATE FIELDS ( overall_status )
                  WITH VALUE #( FOR key IN keys ( travel_id      = key-travel_id
@@ -321,7 +321,7 @@ CLASS lhc_travel IMPLEMENTATION.
            REPORTED reported.
 
     " Read changed data for action result
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
          ENTITY travel
            FIELDS ( agency_id
                     customer_id
@@ -351,7 +351,7 @@ CLASS lhc_travel IMPLEMENTATION.
 ********************************************************************************
   METHOD set_status_rejected.
 
-    MODIFY ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
            ENTITY travel
               UPDATE FROM VALUE #( FOR key IN keys ( travel_id = key-travel_id
                                                      overall_status = 'X'   " Canceled
@@ -360,7 +360,7 @@ CLASS lhc_travel IMPLEMENTATION.
            REPORTED reported.
 
     " read changed data for result
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
      ENTITY travel
        FIELDS ( agency_id
                 customer_id
@@ -391,7 +391,7 @@ CLASS lhc_travel IMPLEMENTATION.
 ********************************************************************************
   METHOD get_features.
 
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY travel
          FIELDS (  travel_id overall_status )
          WITH CORRESPONDING #( keys )
@@ -432,14 +432,14 @@ CLASS lhc_travel IMPLEMENTATION.
 *
   METHOD recalctotalprice.
     TYPES: BEGIN OF ty_amount_per_currencycode,
-             amount        TYPE /TKFK/total_price,
-             currency_code TYPE /TKFK/currency_code,
+             amount        TYPE ZTKFK_total_price,
+             currency_code TYPE ZTKFK_currency_code,
            END OF ty_amount_per_currencycode.
 
     DATA: amount_per_currencycode TYPE STANDARD TABLE OF ty_amount_per_currencycode.
 
     " Read all relevant travel instances.
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
          ENTITY travel
             FIELDS ( booking_fee currency_code )
             WITH CORRESPONDING #( keys )
@@ -454,7 +454,7 @@ CLASS lhc_travel IMPLEMENTATION.
                                            currency_code = <fs_travel>-currency_code ) ).
 
       " Read all associated bookings and add them to the total price.
-      READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+      READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
         ENTITY travel BY \_booking
           FIELDS ( flight_price currency_code )
         WITH VALUE #( ( %key = <fs_travel>-%key ) )
@@ -466,7 +466,7 @@ CLASS lhc_travel IMPLEMENTATION.
       ENDLOOP.
 
       " Read all associated booking supplements and add them to the total price.
-      READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+      READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
         ENTITY booking BY \_booksupplement
           FIELDS (  price currency_code )
         WITH VALUE #( FOR rba_booking IN lt_booking ( %tky = rba_booking-%tky ) )
@@ -483,7 +483,7 @@ CLASS lhc_travel IMPLEMENTATION.
         IF single_amount_per_currencycode-currency_code = <fs_travel>-currency_code.
           <fs_travel>-total_price += single_amount_per_currencycode-amount.
         ELSE.
-          /TKFK/cl_flight_amdp=>convert_currency(
+          ZTKFK_cl_flight_amdp=>convert_currency(
              EXPORTING
                iv_amount                   =  single_amount_per_currencycode-amount
                iv_currency_code_source     =  single_amount_per_currencycode-currency_code
@@ -498,7 +498,7 @@ CLASS lhc_travel IMPLEMENTATION.
     ENDLOOP.
 
     " write back the modified total_price of travels
-    MODIFY ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY travel
         UPDATE FIELDS ( total_price )
         WITH CORRESPONDING #( lt_travel ).
@@ -507,7 +507,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD calculatetotalprice.
 
-    MODIFY ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY travel
         EXECUTE recalctotalprice
         FROM CORRESPONDING #( keys )
@@ -519,8 +519,8 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD earlynumbering_create.
 
     DATA:
-      entity        TYPE STRUCTURE FOR CREATE /TKFK/I_Travel_M,
-      travel_id_max TYPE /TKFK/travel_id.
+      entity        TYPE STRUCTURE FOR CREATE ZTKFK_I_Travel_M,
+      travel_id_max TYPE ZTKFK_travel_id.
 
     " Ensure Travel ID is not set yet (idempotent)- must be checked when BO is draft-enabled
     LOOP AT entities INTO entity WHERE travel_id IS NOT INITIAL.
@@ -535,7 +535,7 @@ CLASS lhc_travel IMPLEMENTATION.
         cl_numberrange_runtime=>number_get(
           EXPORTING
             nr_range_nr       = '01'
-            object            = '/TKFK/TRV_M'
+            object            = 'ZTKFK_TRV_M'
             quantity          = CONV #( lines( entities_wo_travelid ) )
           IMPORTING
             number            = DATA(number_range_key)
@@ -564,8 +564,8 @@ CLASS lhc_travel IMPLEMENTATION.
           APPEND VALUE #(
                 %cid      = entity-%cid
                 %key      = entity-%key
-                %msg      = NEW /TKFK/cm_flight_messages(
-                                textid = /TKFK/cm_flight_messages=>number_range_depleted
+                %msg      = NEW ZTKFK_cm_flight_messages(
+                                textid = ZTKFK_cm_flight_messages=>number_range_depleted
                                 severity = if_abap_behv_message=>severity-warning
                        )
             ) TO reported-travel.
@@ -578,8 +578,8 @@ CLASS lhc_travel IMPLEMENTATION.
           APPEND VALUE #(
                 %cid      = entity-%cid
                 %key      = entity-%key
-                %msg      = NEW /TKFK/cm_flight_messages(
-                                textid = /TKFK/cm_flight_messages=>not_sufficient_numbers
+                %msg      = NEW ZTKFK_cm_flight_messages(
+                                textid = ZTKFK_cm_flight_messages=>not_sufficient_numbers
                                 severity = if_abap_behv_message=>severity-error )
             ) TO reported-travel.
           APPEND VALUE #(
@@ -610,9 +610,9 @@ CLASS lhc_travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD earlynumbering_cba_booking.
-    DATA: max_booking_id TYPE /TKFK/booking_id.
+    DATA: max_booking_id TYPE ZTKFK_booking_id.
 
-    READ ENTITIES OF /TKFK/I_Travel_M IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_M IN LOCAL MODE
       ENTITY travel BY \_booking
         FROM CORRESPONDING #( entities )
         LINK DATA(bookings)
@@ -622,9 +622,9 @@ CLASS lhc_travel IMPLEMENTATION.
     LOOP AT entities ASSIGNING FIELD-SYMBOL(<travel_group>) GROUP BY <travel_group>-travel_id.
 
       " Get highest booking_id from bookings belonging to travel
-      max_booking_id = REDUCE #( INIT max = CONV /TKFK/booking_id( '0' )
+      max_booking_id = REDUCE #( INIT max = CONV ZTKFK_booking_id( '0' )
                                  FOR  booking IN bookings USING KEY entity WHERE ( source-travel_id  = <travel_group>-travel_id )
-                                 NEXT max = COND /TKFK/booking_id( WHEN booking-target-booking_id > max
+                                 NEXT max = COND ZTKFK_booking_id( WHEN booking-target-booking_id > max
                                                                     THEN booking-target-booking_id
                                                                     ELSE max )
                                ).
@@ -632,7 +632,7 @@ CLASS lhc_travel IMPLEMENTATION.
       max_booking_id = REDUCE #( INIT max = max_booking_id
                                  FOR  entity IN entities USING KEY entity WHERE ( travel_id  = <travel_group>-travel_id )
                                  FOR  target IN entity-%target
-                                 NEXT max = COND /TKFK/booking_id( WHEN   target-booking_id > max
+                                 NEXT max = COND ZTKFK_booking_id( WHEN   target-booking_id > max
                                                                     THEN target-booking_id
                                                                     ELSE max )
                                ).
@@ -681,9 +681,9 @@ CLASS lcl_save IMPLEMENTATION.
 *
 ********************************************************************************
 
-    DATA travel_log        TYPE STANDARD TABLE OF /TKFK/log_travel.
-    DATA travel_log_create TYPE STANDARD TABLE OF /TKFK/log_travel.
-    DATA travel_log_update TYPE STANDARD TABLE OF /TKFK/log_travel.
+    DATA travel_log        TYPE STANDARD TABLE OF ZTKFK_log_travel.
+    DATA travel_log_create TYPE STANDARD TABLE OF ZTKFK_log_travel.
+    DATA travel_log_update TYPE STANDARD TABLE OF ZTKFK_log_travel.
 
     " (1) Get instance data of all instances that have been created
     IF create-travel IS NOT INITIAL.
@@ -732,8 +732,8 @@ CLASS lcl_save IMPLEMENTATION.
 
       ENDLOOP.
 
-      " Inserts rows specified in lt_travel_log_c into the DB table /TKFK/log_travel
-      INSERT /TKFK/log_travel FROM TABLE @travel_log_create.
+      " Inserts rows specified in lt_travel_log_c into the DB table ZTKFK_log_travel
+      INSERT ZTKFK_log_travel FROM TABLE @travel_log_create.
 
     ENDIF.
 
@@ -788,8 +788,8 @@ CLASS lcl_save IMPLEMENTATION.
       ENDLOOP.
 
 
-      " Inserts rows specified in lt_travel_log_u into the DB table /TKFK/log_travel
-      INSERT /TKFK/log_travel FROM TABLE @travel_log_update.
+      " Inserts rows specified in lt_travel_log_u into the DB table ZTKFK_log_travel
+      INSERT ZTKFK_log_travel FROM TABLE @travel_log_update.
 
     ENDIF.
 
@@ -809,8 +809,8 @@ CLASS lcl_save IMPLEMENTATION.
 
       ENDLOOP.
 
-      " Inserts rows specified in lt_travel_log into the DB table /TKFK/log_travel
-      INSERT /TKFK/log_travel FROM TABLE @travel_log.
+      " Inserts rows specified in lt_travel_log into the DB table ZTKFK_log_travel
+      INSERT ZTKFK_log_travel FROM TABLE @travel_log.
 
     ENDIF.
 
@@ -820,13 +820,13 @@ CLASS lcl_save IMPLEMENTATION.
 * Implements unmanaged save
 *
 ********************************************************************************
-    DATA booksuppls_db TYPE STANDARD TABLE OF /TKFK/booksuppl_m.
+    DATA booksuppls_db TYPE STANDARD TABLE OF ZTKFK_booksuppl_m.
 
     " (1) Get instance data of all instances that have been created
     IF create-booksuppl IS NOT INITIAL.
       booksuppls_db = CORRESPONDING #( create-booksuppl ).
 
-      CALL FUNCTION '/TKFK/FLIGHT_BOOKSUPPL_C' EXPORTING values = booksuppls_db .
+      CALL FUNCTION 'ZTKFK_FLIGHT_BOOKSUPPL_C' EXPORTING values = booksuppls_db .
 
     ENDIF.
 
@@ -835,7 +835,7 @@ CLASS lcl_save IMPLEMENTATION.
     IF booksuppls_db IS NOT INITIAL.
 
       " Read all field values from database
-      SELECT * FROM /TKFK/booksuppl_m FOR ALL ENTRIES IN @booksuppls_db
+      SELECT * FROM ZTKFK_booksuppl_m FOR ALL ENTRIES IN @booksuppls_db
                WHERE booking_supplement_id = @booksuppls_db-booking_supplement_id
                INTO TABLE @booksuppls_db .
 
@@ -861,7 +861,7 @@ CLASS lcl_save IMPLEMENTATION.
       ENDLOOP.
 
       " Update the complete instance data
-      CALL FUNCTION '/TKFK/FLIGHT_BOOKSUPPL_U' EXPORTING values = booksuppls_db .
+      CALL FUNCTION 'ZTKFK_FLIGHT_BOOKSUPPL_U' EXPORTING values = booksuppls_db .
 
     ENDIF.
 
@@ -869,7 +869,7 @@ CLASS lcl_save IMPLEMENTATION.
     IF delete-booksuppl IS NOT INITIAL.
       booksuppls_db = CORRESPONDING #( delete-booksuppl ).
 
-      CALL FUNCTION '/TKFK/FLIGHT_BOOKSUPPL_D' EXPORTING values = booksuppls_db .
+      CALL FUNCTION 'ZTKFK_FLIGHT_BOOKSUPPL_D' EXPORTING values = booksuppls_db .
 
     ENDIF.
 

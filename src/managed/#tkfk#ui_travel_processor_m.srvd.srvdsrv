@@ -1,18 +1,18 @@
 @EndUserText.label: 'Service definition for managing travels'
-define service /TKFK/UI_TRAVEL_Processor_M {
-  expose /TKFK/C_Travel_Processor_M as Travel;
-  expose /TKFK/C_Booking_Processor_M as Booking;
-  expose /TKFK/C_BookSuppl_Processor_M as BookingSupplement;
-  expose /TKFK/I_Supplement as Supplement;
-  expose /TKFK/I_SupplementText as SupplementText;
-  expose /TKFK/I_Customer as Passenger;
-  expose /TKFK/I_Agency as TravelAgency;
-  expose /TKFK/I_Carrier as Airline;
-  expose /TKFK/I_Connection as FlightConnection;
-  expose /TKFK/I_Flight as Flight;
-  expose /TKFK/I_Airport as Airport;
+define service ZTKFK_UI_TRAVEL_Processor_M {
+  expose ZTKFK_C_Travel_Processor_M as Travel;
+  expose ZTKFK_C_Booking_Processor_M as Booking;
+  expose ZTKFK_C_BookSuppl_Processor_M as BookingSupplement;
+  expose ZTKFK_I_Supplement as Supplement;
+  expose ZTKFK_I_SupplementText as SupplementText;
+  expose ZTKFK_I_Customer as Passenger;
+  expose ZTKFK_I_Agency as TravelAgency;
+  expose ZTKFK_I_Carrier as Airline;
+  expose ZTKFK_I_Connection as FlightConnection;
+  expose ZTKFK_I_Flight as Flight;
+  expose ZTKFK_I_Airport as Airport;
   expose I_Currency as Currency;
   expose I_Country as Country;
-  expose /TKFK/I_Overall_Status_VH as OverallStatusVH;
-  expose /TKFK/I_Booking_Status_VH as BookingStatusVH;
+  expose ZTKFK_I_Overall_Status_VH as OverallStatusVH;
+  expose ZTKFK_I_Booking_Status_VH as BookingStatusVH;
 }

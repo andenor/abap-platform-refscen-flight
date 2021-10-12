@@ -1,4 +1,4 @@
-"! @testing BDEF:/TKFK/I_Travel_M
+"! @testing BDEF:ZTKFK_I_Travel_M
 CLASS ltc_managed DEFINITION FINAL FOR TESTING
   DURATION SHORT
   RISK LEVEL HARMLESS.
@@ -75,8 +75,8 @@ CLASS ltc_managed IMPLEMENTATION.
 
   METHOD class_setup.
     CREATE OBJECT class_under_test FOR TESTING.
-    cds_test_environment = cl_cds_test_environment=>create( i_for_entity = '/TKFK/I_TRAVEL_M' ).
-    sql_test_environment = cl_osql_test_environment=>create( i_dependency_list = VALUE #( ( '/TKFK/CUSTOMER' ) ) ).
+    cds_test_environment = cl_cds_test_environment=>create( i_for_entity = 'ZTKFK_I_TRAVEL_M' ).
+    sql_test_environment = cl_osql_test_environment=>create( i_dependency_list = VALUE #( ( 'ZTKFK_CUSTOMER' ) ) ).
   ENDMETHOD.
 
   METHOD setup.
@@ -96,13 +96,13 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD validate_travel_status_open.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '52' overall_status = 'O' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structures
-    DATA failed TYPE RESPONSE FOR FAILED LATE /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /TKFK/i_travel_m.
+    DATA failed TYPE RESPONSE FOR FAILED LATE ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_i_travel_m.
 
     " Call method to be tested
     class_under_test->validate_travel_status(
@@ -124,13 +124,13 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD validate_travel_status_acpt.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '52' overall_status = 'A' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structures
-    DATA failed TYPE RESPONSE FOR FAILED LATE /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /TKFK/i_travel_m.
+    DATA failed TYPE RESPONSE FOR FAILED LATE ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_i_travel_m.
 
     " Call method to be tested
     class_under_test->validate_travel_status(
@@ -152,13 +152,13 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD validate_travel_status_rej.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '52' overall_status = 'X' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structures
-    DATA failed TYPE RESPONSE FOR FAILED LATE /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /TKFK/i_travel_m.
+    DATA failed TYPE RESPONSE FOR FAILED LATE ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_i_travel_m.
 
     " Call method to be tested
     class_under_test->validate_travel_status(
@@ -180,13 +180,13 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD validate_travel_status_invalid.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '52' overall_status = 'T' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structures
-    DATA failed TYPE RESPONSE FOR FAILED LATE /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /TKFK/i_travel_m.
+    DATA failed TYPE RESPONSE FOR FAILED LATE ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_i_travel_m.
 
     " Call method to be tested
     class_under_test->validate_travel_status(
@@ -225,14 +225,14 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD get_features_open.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '43' overall_status = 'O' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required table and structures
-    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT /TKFK/i_travel_m\\travel.
-    DATA failed TYPE RESPONSE FOR FAILED EARLY /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED EARLY  /TKFK/i_travel_m.
+    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT ZTKFK_i_travel_m\\travel.
+    DATA failed TYPE RESPONSE FOR FAILED EARLY ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED EARLY  ZTKFK_i_travel_m.
 
     " Call the method to be tested
     class_under_test->get_features(
@@ -263,14 +263,14 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD get_features_accepted.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '43' overall_status = 'A' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required table and structures
-    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT /TKFK/i_travel_m\\travel.
-    DATA failed TYPE RESPONSE FOR FAILED EARLY /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED EARLY  /TKFK/i_travel_m.
+    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT ZTKFK_i_travel_m\\travel.
+    DATA failed TYPE RESPONSE FOR FAILED EARLY ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED EARLY  ZTKFK_i_travel_m.
 
     " Call the method to be tested
     class_under_test->get_features(
@@ -301,14 +301,14 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD get_features_rejected.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '43' overall_status = 'X' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required table and structures
-    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT /TKFK/i_travel_m\\travel.
-    DATA failed TYPE RESPONSE FOR FAILED EARLY /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED EARLY  /TKFK/i_travel_m.
+    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT ZTKFK_i_travel_m\\travel.
+    DATA failed TYPE RESPONSE FOR FAILED EARLY ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED EARLY  ZTKFK_i_travel_m.
 
     " Call method to be tested
     class_under_test->get_features(
@@ -340,14 +340,14 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD get_features_invalidstatus.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '43' overall_status = 'T' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required table and structures
-    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT /TKFK/i_travel_m\\travel.
-    DATA failed TYPE RESPONSE FOR FAILED EARLY /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED EARLY  /TKFK/i_travel_m.
+    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT ZTKFK_i_travel_m\\travel.
+    DATA failed TYPE RESPONSE FOR FAILED EARLY ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED EARLY  ZTKFK_i_travel_m.
 
     " Call the method to be tested
     class_under_test->get_features(
@@ -379,9 +379,9 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD get_features_invalidkey.
 
     " Declare required table and structures
-    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT /TKFK/i_travel_m\\travel.
-    DATA failed TYPE RESPONSE FOR FAILED EARLY /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED EARLY  /TKFK/i_travel_m.
+    DATA result  TYPE TABLE FOR INSTANCE FEATURES RESULT ZTKFK_i_travel_m\\travel.
+    DATA failed TYPE RESPONSE FOR FAILED EARLY ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED EARLY  ZTKFK_i_travel_m.
 
     " Call the method to be tested with invalid/not existing key
     class_under_test->get_features(
@@ -411,18 +411,18 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD validate_customer_valid.
 
     " Fill in test data for entity travel
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '43' customer_id = '1' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Fill in test data for customer table
-    DATA customer_mock_data TYPE STANDARD TABLE OF /TKFK/customer.
+    DATA customer_mock_data TYPE STANDARD TABLE OF ZTKFK_customer.
     customer_mock_data = VALUE #(  (  customer_id = '1' ) ).
     sql_test_environment->insert_test_data( customer_mock_data ).
 
     " Declare required structures
-    DATA failed TYPE RESPONSE FOR FAILED LATE /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /TKFK/i_travel_m.
+    DATA failed TYPE RESPONSE FOR FAILED LATE ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_i_travel_m.
 
     " Call the method to be tested
     class_under_test->validate_customer(
@@ -443,13 +443,13 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD validate_customer_invalid.
 
     " Fill in test data for entity travel
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '43' customer_id = '1' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structures
-    DATA failed TYPE RESPONSE FOR FAILED LATE /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /TKFK/i_travel_m.
+    DATA failed TYPE RESPONSE FOR FAILED LATE ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_i_travel_m.
 
     " Call the method to be tested
     class_under_test->validate_customer(
@@ -486,13 +486,13 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD validate_customer_initial.
 
     " Fill in test data for entity travel
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '43' customer_id = '' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structures
-    DATA failed TYPE RESPONSE FOR FAILED LATE /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /TKFK/i_travel_m.
+    DATA failed TYPE RESPONSE FOR FAILED LATE ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_i_travel_m.
 
     " Call the method to be tested
     class_under_test->validate_customer(
@@ -531,7 +531,7 @@ CLASS ltc_managed IMPLEMENTATION.
   METHOD set_status_accepted.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /TKFK/travel_m.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_travel_m.
     travel_mock_data = VALUE #( ( travel_id = '42' overall_status = 'A' )
                                 ( travel_id = '43' overall_status = 'B' )
                                 ( travel_id = '44' overall_status = 'X' )
@@ -539,10 +539,10 @@ CLASS ltc_managed IMPLEMENTATION.
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required table and structures
-    DATA result   TYPE TABLE FOR ACTION RESULT /TKFK/i_travel_m\\travel~accepttravel.
-    DATA mapped   TYPE RESPONSE FOR MAPPED EARLY /TKFK/i_travel_m.
-    DATA failed   TYPE RESPONSE FOR FAILED EARLY /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED EARLY  /TKFK/i_travel_m.
+    DATA result   TYPE TABLE FOR ACTION RESULT ZTKFK_i_travel_m\\travel~accepttravel.
+    DATA mapped   TYPE RESPONSE FOR MAPPED EARLY ZTKFK_i_travel_m.
+    DATA failed   TYPE RESPONSE FOR FAILED EARLY ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED EARLY  ZTKFK_i_travel_m.
 
     " Call the method to be tested
     class_under_test->set_status_accepted(
@@ -582,7 +582,7 @@ CLASS ltc_managed IMPLEMENTATION.
 
     " Additionally check modified instances
 
-    READ ENTITY /TKFK/i_travel_m
+    READ ENTITY ZTKFK_i_travel_m
       FIELDS ( travel_id overall_status ) WITH CORRESPONDING #( travel_mock_data )
       RESULT DATA(read_result).
 
@@ -602,20 +602,20 @@ ENDCLASS.
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-"! This class mocks the entity /TKFK/I_TRAVEL_M.
+"! This class mocks the entity ZTKFK_I_TRAVEL_M.
 "! All EML calls will go to this class instead of the real entity.
 "! We will save the data written during the test method
 "! and also return the same data for a read operation
 CLASS test_double_for_entity DEFINITION FOR TESTING.
   PUBLIC SECTION.
     INTERFACES if_abap_behavior_testdouble.
-    DATA written TYPE TABLE FOR UPDATE /TKFK/i_travel_m.
+    DATA written TYPE TABLE FOR UPDATE ZTKFK_i_travel_m.
 ENDCLASS.
 
 CLASS test_double_for_entity IMPLEMENTATION.
   METHOD if_abap_behavior_testdouble~modify.
     LOOP AT changes ASSIGNING FIELD-SYMBOL(<change>).
-      cl_abap_unit_assert=>assert_equals( msg = 'modify-mock entity' exp = '/TKFK/I_TRAVEL_M' act = <change>-entity_name ).
+      cl_abap_unit_assert=>assert_equals( msg = 'modify-mock entity' exp = 'ZTKFK_I_TRAVEL_M' act = <change>-entity_name ).
       cl_abap_unit_assert=>assert_equals( msg = 'modify-mock operation' exp = if_abap_behv=>op-m-update act = <change>-op ).
       ASSIGN <change>-instances->* TO FIELD-SYMBOL(<instances>).
       me->written = <instances>.
@@ -624,7 +624,7 @@ CLASS test_double_for_entity IMPLEMENTATION.
 
   METHOD if_abap_behavior_testdouble~read.
     LOOP AT retrievals ASSIGNING FIELD-SYMBOL(<retrieval>).
-      cl_abap_unit_assert=>assert_equals( msg = 'read-mock entity' exp = '/TKFK/I_TRAVEL_M' act = <retrieval>-entity_name ).
+      cl_abap_unit_assert=>assert_equals( msg = 'read-mock entity' exp = 'ZTKFK_I_TRAVEL_M' act = <retrieval>-entity_name ).
       cl_abap_unit_assert=>assert_equals( msg = 'read-mock operation' exp = if_abap_behv=>op-r-read act = <retrieval>-op ).
       ASSIGN <retrieval>-results->* TO FIELD-SYMBOL(<instances>).
       <instances> = CORRESPONDING #( written ).
@@ -662,7 +662,7 @@ CLASS test_using_entity_stub IMPLEMENTATION.
 
     " create the test double for our entity. READ and MODIFIY will call entity_mock
     CREATE OBJECT entity_mock.
-    entity_mock->if_abap_behavior_testdouble~root_name = '/TKFK/I_TRAVEL_M'.
+    entity_mock->if_abap_behavior_testdouble~root_name = 'ZTKFK_I_TRAVEL_M'.
   ENDMETHOD.
 
   METHOD setup.
@@ -672,10 +672,10 @@ CLASS test_using_entity_stub IMPLEMENTATION.
 
   METHOD set_status_completed.
     " call the method to be tested
-    DATA result TYPE TABLE FOR ACTION RESULT /TKFK/i_travel_m\\travel~accepttravel.
-    DATA mapped TYPE RESPONSE FOR MAPPED EARLY /TKFK/i_travel_m.
-    DATA failed TYPE RESPONSE FOR FAILED EARLY /TKFK/i_travel_m.
-    DATA reported TYPE RESPONSE FOR REPORTED EARLY  /TKFK/i_travel_m.
+    DATA result TYPE TABLE FOR ACTION RESULT ZTKFK_i_travel_m\\travel~accepttravel.
+    DATA mapped TYPE RESPONSE FOR MAPPED EARLY ZTKFK_i_travel_m.
+    DATA failed TYPE RESPONSE FOR FAILED EARLY ZTKFK_i_travel_m.
+    DATA reported TYPE RESPONSE FOR REPORTED EARLY  ZTKFK_i_travel_m.
 
     class_under_test->set_status_accepted(
       EXPORTING
@@ -717,7 +717,7 @@ CLASS test_using_entity_stub IMPLEMENTATION.
 
   METHOD teardown.
     " deactivate test double
-    cl_abap_behv_test_environment=>unset_test_double( root = '/TKFK/TRAVEL_D' ).
+    cl_abap_behv_test_environment=>unset_test_double( root = 'ZTKFK_TRAVEL_D' ).
 
     " clean up any involved entity (should not be necessary as we mocked the entity, just to be safe).
     ROLLBACK ENTITIES.                                 "#EC CI_ROLLBACK

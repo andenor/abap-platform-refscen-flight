@@ -1,9 +1,9 @@
-managed implementation in class /TKFK/BP_TRAVEL_M unique;
+managed implementation in class ZTKFK_BP_TRAVEL_M unique;
 strict;
 
-define behavior for /TKFK/I_Travel_M alias travel
-implementation in class /TKFK/BP_TRAVEL_M unique
-persistent table /TKFK/TRAVEL_M
+define behavior for ZTKFK_I_Travel_M alias travel
+implementation in class ZTKFK_BP_TRAVEL_M unique
+persistent table ZTKFK_TRAVEL_M
 with additional save
 etag master last_changed_at
 lock master
@@ -21,7 +21,7 @@ authorization master(global)
   field ( readonly ) travel_id;
 
   // mapping entity's field types with table field types
-  mapping for /TKFK/TRAVEL_M corresponding;
+  mapping for ZTKFK_TRAVEL_M corresponding;
 
   // standard operations for travel entity
   create;
@@ -55,9 +55,9 @@ authorization master(global)
 
 }
 
-define behavior for /TKFK/I_Booking_M alias booking
-implementation in class /TKFK/BP_BOOKING_M unique
-persistent table /TKFK/BOOKING_M
+define behavior for ZTKFK_I_Booking_M alias booking
+implementation in class ZTKFK_BP_BOOKING_M unique
+persistent table ZTKFK_BOOKING_M
 etag master last_changed_at
 lock dependent by _Travel
 early numbering
@@ -69,7 +69,7 @@ authorization dependent by _Travel
   field ( readonly ) travel_id;
 
   // mapping entity's field types with table field types
-  mapping for /TKFK/BOOKING_M corresponding;
+  mapping for ZTKFK_BOOKING_M corresponding;
 
   // Fields that are mandatory for create but should be read-only afterwards
   field ( readonly ) booking_id;
@@ -92,9 +92,9 @@ authorization dependent by _Travel
 }
 
 
-define behavior for /TKFK/I_BookSuppl_M alias booksuppl
-implementation in class /TKFK/BP_BOOKINGSUPPLEMENT_M unique
-//persistent table /TKFK/BOOKSUPPL_M
+define behavior for ZTKFK_I_BookSuppl_M alias booksuppl
+implementation in class ZTKFK_BP_BOOKINGSUPPLEMENT_M unique
+//persistent table ZTKFK_BOOKSUPPL_M
 with unmanaged save
 etag master last_changed_at
 lock dependent by _Travel
@@ -107,7 +107,7 @@ authorization dependent by _Travel
   field ( readonly ) travel_id, booking_id, booking_supplement_id;
 
   // mapping entity's field types with table field types
-  mapping for /TKFK/BOOKSUPPL_M corresponding;
+  mapping for ZTKFK_BOOKSUPPL_M corresponding;
 
   // standard operations for booking supplement entity
   update;

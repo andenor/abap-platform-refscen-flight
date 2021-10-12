@@ -26,7 +26,7 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD calculatetotalprice.
 
 
-    MODIFY ENTITIES OF /TKFK/i_travel_m IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_i_travel_m IN LOCAL MODE
       ENTITY travel
         EXECUTE recalctotalprice
         FROM CORRESPONDING #( keys )
@@ -43,7 +43,7 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD validateStatus.
 
 
-    READ ENTITIES OF /TKFK/i_travel_m IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_i_travel_m IN LOCAL MODE
       ENTITY booking
         FIELDS ( booking_status )
         WITH CORRESPONDING #( keys )
@@ -64,8 +64,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
           APPEND VALUE #( %key = booking-%key
                           %state_area         = 'VALIDATE_BOOKINGSTATUS'
-                          %msg = NEW /TKFK/cm_flight_messages(
-                               textid = /TKFK/cm_flight_messages=>status_invalid
+                          %msg = NEW ZTKFK_cm_flight_messages(
+                               textid = ZTKFK_cm_flight_messages=>status_invalid
                                status = booking-booking_status
                                severity = if_abap_behv_message=>severity-error )
                           %element-booking_status = if_abap_behv=>mk-on
@@ -85,7 +85,7 @@ CLASS lhc_travel IMPLEMENTATION.
 ********************************************************************************
   METHOD get_features.
 
-    READ ENTITIES OF /TKFK/i_travel_m IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_i_travel_m IN LOCAL MODE
       ENTITY booking
          FIELDS ( booking_id booking_status )
          WITH CORRESPONDING #( keys )
@@ -121,9 +121,9 @@ CLASS lhc_travel IMPLEMENTATION.
 
 
   METHOD earlynumbering_cba_booksupplem.
-    DATA: max_booking_suppl_id TYPE /TKFK/booking_supplement_id .
+    DATA: max_booking_suppl_id TYPE ZTKFK_booking_supplement_id .
 
-    READ ENTITIES OF /TKFK/i_travel_m IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_i_travel_m IN LOCAL MODE
       ENTITY booking BY \_booksupplement
         FROM CORRESPONDING #( entities )
         LINK DATA(booking_supplements)
@@ -133,11 +133,11 @@ CLASS lhc_travel IMPLEMENTATION.
     LOOP AT entities ASSIGNING FIELD-SYMBOL(<booking_group>) GROUP BY <booking_group>-%tky.
 
       " Get highest bookingsupplement_id from bookings belonging to booking
-      max_booking_suppl_id = REDUCE #( INIT max = CONV /TKFK/booking_supplement_id( '0' )
+      max_booking_suppl_id = REDUCE #( INIT max = CONV ZTKFK_booking_supplement_id( '0' )
                                        FOR  booksuppl IN booking_supplements USING KEY entity
                                                                              WHERE (     source-travel_id  = <booking_group>-travel_id
                                                                                      AND source-booking_id = <booking_group>-booking_id )
-                                       NEXT max = COND /TKFK/booking_supplement_id( WHEN   booksuppl-target-booking_supplement_id > max
+                                       NEXT max = COND ZTKFK_booking_supplement_id( WHEN   booksuppl-target-booking_supplement_id > max
                                                                           THEN booksuppl-target-booking_supplement_id
                                                                           ELSE max )
                                      ).
@@ -147,7 +147,7 @@ CLASS lhc_travel IMPLEMENTATION.
                                                                WHERE (     travel_id  = <booking_group>-travel_id
                                                                        AND booking_id = <booking_group>-booking_id )
                                        FOR  target IN entity-%target
-                                       NEXT max = COND /TKFK/booking_supplement_id( WHEN   target-booking_supplement_id > max
+                                       NEXT max = COND ZTKFK_booking_supplement_id( WHEN   target-booking_supplement_id > max
                                                                                      THEN target-booking_supplement_id
                                                                                      ELSE max )
                                      ).

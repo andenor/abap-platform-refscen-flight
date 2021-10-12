@@ -1,4 +1,4 @@
-CLASS /TKFK/cl_travel_auxiliary_m DEFINITION
+CLASS ZTKFK_cl_travel_auxiliary_m DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -12,7 +12,7 @@ CLASS /TKFK/cl_travel_auxiliary_m DEFINITION
 ENDCLASS.
 
 
-CLASS /TKFK/cl_travel_auxiliary_m IMPLEMENTATION.
+CLASS ZTKFK_cl_travel_auxiliary_m IMPLEMENTATION.
 
 
 ENDCLASS.

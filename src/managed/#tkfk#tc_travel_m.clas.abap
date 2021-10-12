@@ -1,7 +1,7 @@
-"! @testing BDEF:/TKFK/I_TRAVEL_M
-"! test entity /TKFK/I_TRAVEL_M from the outside
+"! @testing BDEF:ZTKFK_I_TRAVEL_M
+"! test entity ZTKFK_I_TRAVEL_M from the outside
 "! by mocking all database artefacts
-CLASS /TKFK/tc_travel_m DEFINITION
+CLASS ZTKFK_tc_travel_m DEFINITION
   FOR TESTING
   RISK LEVEL HARMLESS
   DURATION SHORT
@@ -14,13 +14,13 @@ CLASS /TKFK/tc_travel_m DEFINITION
   PRIVATE SECTION.
     CLASS-DATA: cds_test_environment TYPE REF TO if_cds_test_environment,
                 sql_test_environment TYPE REF TO if_osql_test_environment,
-                begin_date           TYPE /TKFK/begin_date,
-                end_date             TYPE /TKFK/end_date,
-                agency_mock_data     TYPE STANDARD TABLE OF /TKFK/agency,
-                customer_mock_data   TYPE STANDARD TABLE OF /TKFK/customer,
-                carrier_mock_data    TYPE STANDARD TABLE OF /TKFK/carrier,
-                flight_mock_data     TYPE STANDARD TABLE OF /TKFK/flight,
-                supplement_mock_data TYPE STANDARD TABLE OF /TKFK/supplement.
+                begin_date           TYPE ZTKFK_begin_date,
+                end_date             TYPE ZTKFK_end_date,
+                agency_mock_data     TYPE STANDARD TABLE OF ZTKFK_agency,
+                customer_mock_data   TYPE STANDARD TABLE OF ZTKFK_customer,
+                carrier_mock_data    TYPE STANDARD TABLE OF ZTKFK_carrier,
+                flight_mock_data     TYPE STANDARD TABLE OF ZTKFK_flight,
+                supplement_mock_data TYPE STANDARD TABLE OF ZTKFK_supplement.
 
     CLASS-METHODS :
       class_setup,
@@ -34,7 +34,7 @@ ENDCLASS.
 
 
 
-CLASS /TKFK/tc_travel_m IMPLEMENTATION.
+CLASS ZTKFK_tc_travel_m IMPLEMENTATION.
 
 
   METHOD class_setup.
@@ -42,9 +42,9 @@ CLASS /TKFK/tc_travel_m IMPLEMENTATION.
     " Create the stubs/doubles for the underlying CDS entities
     cds_test_environment = cl_cds_test_environment=>create_for_multiple_cds(
                       i_for_entities = VALUE #(
-                        ( i_for_entity = '/TKFK/I_TRAVEL_M' )
-                        ( i_for_entity = '/TKFK/I_BOOKING_M' )
-                        ( i_for_entity = '/TKFK/I_BOOKSUPPL_M' ) ) ).
+                        ( i_for_entity = 'ZTKFK_I_TRAVEL_M' )
+                        ( i_for_entity = 'ZTKFK_I_BOOKING_M' )
+                        ( i_for_entity = 'ZTKFK_I_BOOKSUPPL_M' ) ) ).
 *    cds_test_environment->enable_double_redirection( ).
 
 
@@ -59,13 +59,13 @@ CLASS /TKFK/tc_travel_m IMPLEMENTATION.
 
     " stub referenced and additional used tables.
     sql_test_environment = cl_osql_test_environment=>create( i_dependency_list = VALUE #(
-        ( '/TKFK/AGENCY' )
-        ( '/TKFK/CUSTOMER' )
-        ( '/TKFK/CARRIER' )
-        ( '/TKFK/FLIGHT' )
-        ( '/TKFK/SUPPLEMENT' )
+        ( 'ZTKFK_AGENCY' )
+        ( 'ZTKFK_CUSTOMER' )
+        ( 'ZTKFK_CARRIER' )
+        ( 'ZTKFK_FLIGHT' )
+        ( 'ZTKFK_SUPPLEMENT' )
 
-        ( '/TKFK/LOG_TRAVEL' )
+        ( 'ZTKFK_LOG_TRAVEL' )
     ) ).
 
     sql_test_environment->insert_test_data( agency_mock_data     ).
@@ -91,7 +91,7 @@ CLASS /TKFK/tc_travel_m IMPLEMENTATION.
 
   METHOD big_eml.
     " create a complete composition and call an action on it.
-    MODIFY ENTITIES OF /TKFK/i_travel_m
+    MODIFY ENTITIES OF ZTKFK_i_travel_m
       ENTITY travel
         CREATE SET FIELDS WITH
           VALUE #( (  %cid = 'ROOT1'
@@ -154,7 +154,7 @@ CLASS /TKFK/tc_travel_m IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( msg = 'commit_failed'   act = commit_failed ).
     cl_abap_unit_assert=>assert_initial( msg = 'commit_reported' act = commit_reported ).
 
-    SELECT single FROM /TKFK/i_travel_m FIELDS overall_status, total_price INTO @DATA(ls_travel). "#EC CI_NOWHERE
+    SELECT single FROM ZTKFK_i_travel_m FIELDS overall_status, total_price INTO @DATA(ls_travel). "#EC CI_NOWHERE
     cl_abap_unit_assert=>assert_not_initial( msg = 'travel from db' act = ls_travel ).
 
     " assert that the action has changed the overall status
@@ -163,8 +163,8 @@ CLASS /TKFK/tc_travel_m IMPLEMENTATION.
     " total_price = SUM( flight_price ) + SUM ( supplement price ) + booking_fee
     cl_abap_unit_assert=>assert_equals( msg = 'total price incl. booking_fee' exp = '2210.50' act = ls_travel-total_price ).
 
-    SELECT single @abap_true FROM /TKFK/log_travel INTO @DATA(log_travel). "#EC CI_NOWHERE
-    cl_abap_unit_assert=>assert_true( msg = '/TKFK/LOG_TRAVEL' act = log_travel ).
+    SELECT single @abap_true FROM ZTKFK_log_travel INTO @DATA(log_travel). "#EC CI_NOWHERE
+    cl_abap_unit_assert=>assert_true( msg = 'ZTKFK_LOG_TRAVEL' act = log_travel ).
   ENDMETHOD.
 
 ENDCLASS.
