@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/A_TRAVEL_DISCOUNT</DDLNAME>
+    <DDLNAME>ZTKFK_A_TRAVEL_DISCOUNT</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Abstract Entity for Deducting Discount</DDTEXT>
     <SOURCE_TYPE>A</SOURCE_TYPE>

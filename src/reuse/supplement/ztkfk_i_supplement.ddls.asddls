@@ -3,12 +3,12 @@
 
 @Search.searchable: true
 
-define root view entity /DMO/I_Supplement
-  as select from /dmo/supplement as supplement
+define root view entity ZTKFK_I_Supplement
+  as select from ZTKFK_supplement as supplement
 
-  composition [0..*] of /DMO/I_SupplementText        as _SupplementText
+  composition [0..*] of ZTKFK_I_SupplementText        as _SupplementText
   association [0..1] to I_Currency                   as _Currency           on $projection.CurrencyCode = _Currency.Currency
-  association [0..1] to /DMO/I_SupplementCategory_VH as _SupplementCategory on $projection.SupplementCategory = _SupplementCategory.SupplementCategory
+  association [0..1] to ZTKFK_I_SupplementCategory_VH as _SupplementCategory on $projection.SupplementCategory = _SupplementCategory.SupplementCategory
 
 {
       @Search.defaultSearchElement: true

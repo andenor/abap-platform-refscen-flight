@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>/DMO/SAPLFLIGHT_TRAVEL_API</NAME>
+    <NAME>ZTKFK_SAPLFLIGHT_TRAVEL_API</NAME>
     <DBAPL>S</DBAPL>
     <DBNA>D$</DBNA>
     <SUBC>F</SUBC>

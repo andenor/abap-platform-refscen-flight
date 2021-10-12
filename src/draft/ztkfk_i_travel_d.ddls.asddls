@@ -1,17 +1,17 @@
 @EndUserText.label: 'Travel View Entity for Draft RefScen'
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 
-define root view entity /DMO/I_Travel_D
-  as select from /dmo/a_travel_d
+define root view entity ZTKFK_I_Travel_D
+  as select from ZTKFK_a_travel_d
 
-  composition [0..*] of /DMO/I_Booking_D         as _Booking
+  composition [0..*] of ZTKFK_I_Booking_D         as _Booking
 
-  association [0..1] to /DMO/I_Agency            as _Agency        on $projection.AgencyID = _Agency.AgencyID
-  association [0..1] to /DMO/I_Customer          as _Customer      on $projection.CustomerID = _Customer.CustomerID
-  association [1..1] to /DMO/I_Overall_Status_VH as _OverallStatus on $projection.OverallStatus = _OverallStatus.OverallStatus
+  association [0..1] to ZTKFK_I_Agency            as _Agency        on $projection.AgencyID = _Agency.AgencyID
+  association [0..1] to ZTKFK_I_Customer          as _Customer      on $projection.CustomerID = _Customer.CustomerID
+  association [1..1] to ZTKFK_I_Overall_Status_VH as _OverallStatus on $projection.OverallStatus = _OverallStatus.OverallStatus
   association [0..1] to I_Currency               as _Currency      on $projection.CurrencyCode = _Currency.Currency
 
-{ ///dmo/a_travel_d
+{ //ZTKFK_a_travel_d
   key travel_uuid           as TravelUUID,
 
       travel_id             as TravelID,

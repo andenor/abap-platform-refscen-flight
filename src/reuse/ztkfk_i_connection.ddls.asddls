@@ -3,16 +3,16 @@
 
 @Search.searchable: true
 
-define view entity /DMO/I_Connection
-  as select from /dmo/connection as Connection
+define view entity ZTKFK_I_Connection
+  as select from ZTKFK_connection as Connection
   
-  association [1..1] to /DMO/I_Carrier as _Airline  on $projection.AirlineID = _Airline.AirlineID
+  association [1..1] to ZTKFK_I_Carrier as _Airline  on $projection.AirlineID = _Airline.AirlineID
 
 {
       @Search.defaultSearchElement: true
       @Search.fuzzinessThreshold: 0.8
       @ObjectModel.text.association: '_Airline'
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Carrier', element: 'CarrierID'} }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'ZTKFK_I_Carrier', element: 'CarrierID'} }]
   key Connection.carrier_id      as AirlineID,
 
       @Search.defaultSearchElement: true
@@ -20,12 +20,12 @@ define view entity /DMO/I_Connection
 
       @Search.defaultSearchElement: true
       @Search.fuzzinessThreshold: 0.8
-      @Consumption.valueHelpDefinition: [{entity: {name: '/DMO/I_Airport', element: 'Airport_ID' } }]
+      @Consumption.valueHelpDefinition: [{entity: {name: 'ZTKFK_I_Airport', element: 'Airport_ID' } }]
       Connection.airport_from_id as DepartureAirport,
 
       @Search.defaultSearchElement: true
       @Search.fuzzinessThreshold: 0.8
-      @Consumption.valueHelpDefinition: [{entity: {name: '/DMO/I_Airport', element: 'Airport_ID' } }]
+      @Consumption.valueHelpDefinition: [{entity: {name: 'ZTKFK_I_Airport', element: 'Airport_ID' } }]
       Connection.airport_to_id   as DestinationAirport,
 
       Connection.departure_time  as DepartureTime,

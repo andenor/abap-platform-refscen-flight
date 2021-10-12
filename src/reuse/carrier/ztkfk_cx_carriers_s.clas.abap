@@ -1,4 +1,4 @@
-CLASS /dmo/cx_carriers_s DEFINITION
+CLASS ZTKFK_cx_carriers_s DEFINITION
   PUBLIC
   INHERITING FROM cx_static_check
   FINAL
@@ -12,7 +12,7 @@ CLASS /dmo/cx_carriers_s DEFINITION
 
     CONSTANTS:
       BEGIN OF name_required,
-        msgid TYPE symsgid VALUE '/DMO/CM_CARRIER_S',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_CARRIER_S',
         msgno TYPE symsgno VALUE '001',
         attr1 TYPE scx_attrname VALUE 'MV_AIRLINE_ID',
         attr2 TYPE scx_attrname VALUE '',
@@ -20,7 +20,7 @@ CLASS /dmo/cx_carriers_s DEFINITION
         attr4 TYPE scx_attrname VALUE '',
       END OF name_required,
       BEGIN OF invalid_currency_code,
-        msgid TYPE symsgid VALUE '/DMO/CM_CARRIER_S',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_CARRIER_S',
         msgno TYPE symsgno VALUE '002',
         attr1 TYPE scx_attrname VALUE 'MV_CURRENCY_CODE',
         attr2 TYPE scx_attrname VALUE '',
@@ -28,7 +28,7 @@ CLASS /dmo/cx_carriers_s DEFINITION
         attr4 TYPE scx_attrname VALUE '',
       END OF invalid_currency_code,
       BEGIN OF currency_code_required,
-        msgid TYPE symsgid VALUE '/DMO/CM_CARRIER_S',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_CARRIER_S',
         msgno TYPE symsgno VALUE '003',
         attr1 TYPE scx_attrname VALUE 'MV_AIRLINE_ID',
         attr2 TYPE scx_attrname VALUE '',
@@ -36,7 +36,7 @@ CLASS /dmo/cx_carriers_s DEFINITION
         attr4 TYPE scx_attrname VALUE '',
       END OF currency_code_required,
       BEGIN OF airline_still_used,
-        msgid TYPE symsgid VALUE '/DMO/CM_CARRIER_S',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_CARRIER_S',
         msgno TYPE symsgno VALUE '004',
         attr1 TYPE scx_attrname VALUE 'MV_AIRLINE_ID',
         attr2 TYPE scx_attrname VALUE '',
@@ -46,8 +46,8 @@ CLASS /dmo/cx_carriers_s DEFINITION
 
 
     DATA:
-      mv_airline_id    TYPE /dmo/carrier_id,
-      mv_currency_code TYPE /dmo/currency_code.
+      mv_airline_id    TYPE ZTKFK_carrier_id,
+      mv_currency_code TYPE ZTKFK_currency_code.
 
     METHODS:
       constructor
@@ -55,8 +55,8 @@ CLASS /dmo/cx_carriers_s DEFINITION
           textid        LIKE if_t100_message=>t100key         OPTIONAL
           previous      LIKE previous                         OPTIONAL
           severity      TYPE if_abap_behv_message=>t_severity DEFAULT  if_abap_behv_message=>severity-error
-          airline_id    TYPE /dmo/carrier_id         OPTIONAL
-          currency_code TYPE /dmo/currency_code OPTIONAL
+          airline_id    TYPE ZTKFK_carrier_id         OPTIONAL
+          currency_code TYPE ZTKFK_currency_code OPTIONAL
         .
 
   PROTECTED SECTION.
@@ -65,7 +65,7 @@ ENDCLASS.
 
 
 
-CLASS /dmo/cx_carriers_s IMPLEMENTATION.
+CLASS ZTKFK_cx_carriers_s IMPLEMENTATION.
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.
 

@@ -1,4 +1,4 @@
-CLASS /dmo/cl_travel_auxiliary DEFINITION
+CLASS ZTKFK_cl_travel_auxiliary DEFINITION
   INHERITING FROM cl_abap_behv
   PUBLIC
   FINAL
@@ -26,12 +26,12 @@ ENDCLASS.
 
 
 
-CLASS /dmo/cl_travel_auxiliary IMPLEMENTATION.
+CLASS ZTKFK_cl_travel_auxiliary IMPLEMENTATION.
 
   METHOD get_cause_from_message.
     fail_cause = if_abap_behv=>cause-unspecific.
 
-    IF msgid = '/DMO/CM_FLIGHT_LEGAC'.
+    IF msgid = 'ZTKFK_CM_FLIGHT_LEGAC'.
       CASE msgno.
         WHEN '009'  "Travel Key initial
           OR '016'  "Travel does not exist

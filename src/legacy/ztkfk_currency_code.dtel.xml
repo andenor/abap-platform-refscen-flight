@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD04V>
-    <ROLLNAME>/DMO/CURRENCY_CODE</ROLLNAME>
+    <ROLLNAME>ZTKFK_CURRENCY_CODE</ROLLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <HEADLEN>55</HEADLEN>
     <SCRLEN1>10</SCRLEN1>

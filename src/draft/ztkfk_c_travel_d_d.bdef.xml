@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <BDEF>
-    <NAME>/DMO/C_TRAVEL_D_D</NAME>
+    <NAME>ZTKFK_C_TRAVEL_D_D</NAME>
     <TYPE>BDEF/BDO</TYPE>
-    <DESCRIPTION>Behavior for /DMO/C_TRAVEL_D_D</DESCRIPTION>
+    <DESCRIPTION>Behavior for ZTKFK_C_TRAVEL_D_D</DESCRIPTION>
     <DESCRIPTION_TEXT_LIMIT>60</DESCRIPTION_TEXT_LIMIT>
     <LANGUAGE>EN</LANGUAGE>
     <LINKS>

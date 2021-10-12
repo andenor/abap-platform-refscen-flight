@@ -2,15 +2,15 @@
 @EndUserText.label: 'Booking view'
 
 
-define view entity /DMO/I_Booking_U
-  as select from /dmo/booking as Booking 
+define view entity ZTKFK_I_Booking_U
+  as select from ZTKFK_booking as Booking 
 
-  association        to parent /DMO/I_Travel_U     as _Travel     on  $projection.TravelID = _Travel.TravelID
-  composition [0..*] of /DMO/I_BookingSupplement_U as _BookSupplement
+  association        to parent ZTKFK_I_Travel_U     as _Travel     on  $projection.TravelID = _Travel.TravelID
+  composition [0..*] of ZTKFK_I_BookingSupplement_U as _BookSupplement
 
-  association [1..1] to /DMO/I_Customer            as _Customer   on  $projection.CustomerID = _Customer.CustomerID
-  association [1..1] to /DMO/I_Carrier             as _Carrier    on  $projection.AirlineID = _Carrier.AirlineID
-  association [1..1] to /DMO/I_Connection          as _Connection on  $projection.AirlineID    = _Connection.AirlineID
+  association [1..1] to ZTKFK_I_Customer            as _Customer   on  $projection.CustomerID = _Customer.CustomerID
+  association [1..1] to ZTKFK_I_Carrier             as _Carrier    on  $projection.AirlineID = _Carrier.AirlineID
+  association [1..1] to ZTKFK_I_Connection          as _Connection on  $projection.AirlineID    = _Connection.AirlineID
                                                                   and $projection.ConnectionID = _Connection.ConnectionID
 {
 

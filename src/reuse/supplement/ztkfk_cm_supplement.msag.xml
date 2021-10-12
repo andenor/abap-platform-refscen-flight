@@ -3,38 +3,38 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <T100A>
-    <ARBGB>/DMO/CM_SUPPLEMENT</ARBGB>
+    <ARBGB>ZTKFK_CM_SUPPLEMENT</ARBGB>
     <MASTERLANG>E</MASTERLANG>
     <STEXT>Supplement Messages</STEXT>
    </T100A>
    <T100>
     <T100>
      <SPRSL>E</SPRSL>
-     <ARBGB>/DMO/CM_SUPPLEMENT</ARBGB>
+     <ARBGB>ZTKFK_CM_SUPPLEMENT</ARBGB>
      <MSGNR>001</MSGNR>
      <TEXT>A Price is required!</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
-     <ARBGB>/DMO/CM_SUPPLEMENT</ARBGB>
+     <ARBGB>ZTKFK_CM_SUPPLEMENT</ARBGB>
      <MSGNR>002</MSGNR>
      <TEXT>A Currency Code is required!</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
-     <ARBGB>/DMO/CM_SUPPLEMENT</ARBGB>
+     <ARBGB>ZTKFK_CM_SUPPLEMENT</ARBGB>
      <MSGNR>003</MSGNR>
      <TEXT>A Description is required!</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
-     <ARBGB>/DMO/CM_SUPPLEMENT</ARBGB>
+     <ARBGB>ZTKFK_CM_SUPPLEMENT</ARBGB>
      <MSGNR>004</MSGNR>
      <TEXT>Only &amp;1 IDs left for Supplement Category &amp;2!</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
-     <ARBGB>/DMO/CM_SUPPLEMENT</ARBGB>
+     <ARBGB>ZTKFK_CM_SUPPLEMENT</ARBGB>
      <MSGNR>005</MSGNR>
      <TEXT>Not enough IDs left for Supplement Category &amp;1!</TEXT>
     </T100>

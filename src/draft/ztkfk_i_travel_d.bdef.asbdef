@@ -2,10 +2,10 @@ managed;
 strict;
 with draft;
 
-define behavior for /DMO/I_Travel_D alias Travel
-implementation in class /dmo/bp_travel_d unique
-persistent table /dmo/a_travel_d
-draft table /dmo/d_travel_d
+define behavior for ZTKFK_I_Travel_D alias Travel
+implementation in class ZTKFK_bp_travel_d unique
+persistent table ZTKFK_a_travel_d
+draft table ZTKFK_d_travel_d
 lock master
 total etag LastChangedAt
 authorization master ( global, instance )
@@ -23,7 +23,7 @@ etag master LocalLastChangedAt
 
   action ( features : instance, authorization: update ) acceptTravel result [1] $self;
   action ( features : instance, authorization: update ) rejectTravel result [1] $self;
-  action ( features : instance, authorization: update ) deductDiscount parameter /dmo/a_travel_discount result [1] $self;
+  action ( features : instance, authorization: update ) deductDiscount parameter ZTKFK_a_travel_discount result [1] $self;
   internal action reCalcTotalPrice;
 
   determination setTravelNumber on save { create; }
@@ -49,7 +49,7 @@ etag master LocalLastChangedAt
     validation Booking ~ validateConnection;
     validation Bookingsupplement ~ validateSupplement; }
 
-  mapping for /dmo/a_travel_d
+  mapping for ZTKFK_a_travel_d
   { AgencyID = agency_id;
     BeginDate = begin_date;
     BookingFee = booking_fee;
@@ -68,10 +68,10 @@ etag master LocalLastChangedAt
     TravelUUID = travel_uuid; }
 }
 
-define behavior for /DMO/I_Booking_D alias Booking
-implementation in class /dmo/bp_booking_d unique
-persistent table /dmo/a_booking_d
-draft table /dmo/d_booking_d
+define behavior for ZTKFK_I_Booking_D alias Booking
+implementation in class ZTKFK_bp_booking_d unique
+persistent table ZTKFK_a_booking_d
+draft table ZTKFK_d_booking_d
 lock dependent by _Travel
 authorization dependent by _Travel
 etag master LocalLastChangedAt
@@ -94,7 +94,7 @@ etag master LocalLastChangedAt
   validation validateCustomer on save { create; field CustomerID; }
   validation validateConnection on save { create; field AirlineID, ConnectionID, FlightDate; }
 
-  mapping for /dmo/a_booking_d
+  mapping for ZTKFK_a_booking_d
   { AirlineID = carrier_id;
     BookingDate = booking_date;
     BookingID = booking_id;
@@ -110,10 +110,10 @@ etag master LocalLastChangedAt
 
 }
 
-define behavior for /DMO/I_BookingSupplement_D alias BookingSupplement
-implementation in class /dmo/bp_bookingsupplement_d unique
-persistent table /dmo/a_bksuppl_d
-draft table /dmo/d_bksuppl_d
+define behavior for ZTKFK_I_BookingSupplement_D alias BookingSupplement
+implementation in class ZTKFK_bp_bookingsupplement_d unique
+persistent table ZTKFK_a_bksuppl_d
+draft table ZTKFK_d_bksuppl_d
 lock dependent by _Travel
 authorization dependent by _Travel
 etag master LocalLastChangedAt
@@ -133,7 +133,7 @@ etag master LocalLastChangedAt
 
   validation validateSupplement on save { create; field SupplementID; }
 
-  mapping for /dmo/a_bksuppl_d
+  mapping for ZTKFK_a_bksuppl_d
   { BookSupplPrice = price;
     BookSupplUUID = booksuppl_uuid;
     BookingSupplementID = booking_supplement_id;

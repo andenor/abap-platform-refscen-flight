@@ -4,10 +4,10 @@
 @Metadata.allowExtensions: true
 
 @Search.searchable: true
-define view entity /DMO/C_Booking_U
-  as projection on /DMO/I_Booking_U
+define view entity ZTKFK_C_Booking_U
+  as projection on ZTKFK_I_Booking_U
 
-{      ///DMO/I_Booking_U
+{      //ZTKFK_I_Booking_U
       @Search.defaultSearchElement: true
   key TravelID,
  
@@ -16,20 +16,20 @@ define view entity /DMO/C_Booking_U
 
       BookingDate,
 
-      @Consumption.valueHelpDefinition: [ { entity: { name:    '/DMO/I_Customer', 
+      @Consumption.valueHelpDefinition: [ { entity: { name:    'ZTKFK_I_Customer', 
                                                      element: 'CustomerID' } } ]
       @Search.defaultSearchElement: true
       @ObjectModel.text.element: ['CustomerName']
       CustomerID,
       _Customer.LastName    as CustomerName,
 
-      @Consumption.valueHelpDefinition: [ { entity: { name:    '/DMO/I_Carrier', 
+      @Consumption.valueHelpDefinition: [ { entity: { name:    'ZTKFK_I_Carrier', 
                                                       element: 'AirlineID' } } ]
       @ObjectModel.text.element: ['AirlineName']
       AirlineID,
       _Carrier.Name     as AirlineName,
 
-      @Consumption.valueHelpDefinition: [ { entity: { name:    '/DMO/I_Flight', 
+      @Consumption.valueHelpDefinition: [ { entity: { name:    'ZTKFK_I_Flight', 
                                                       element: 'ConnectionID' },
                                             additionalBinding: [ { localElement: 'FlightDate',   element: 'FlightDate' },
                                                                  { localElement: 'AirlineID',    element: 'AirlineID' },
@@ -37,7 +37,7 @@ define view entity /DMO/C_Booking_U
                                                                  { localElement: 'CurrencyCode', element: 'CurrencyCode' } ] } ]
       ConnectionID,
       
-      @Consumption.valueHelpDefinition: [ { entity: { name:    '/DMO/I_Flight', 
+      @Consumption.valueHelpDefinition: [ { entity: { name:    'ZTKFK_I_Flight', 
                                                       element: 'FlightDate' },
                                             additionalBinding: [ { localElement: 'ConnectionID', element: 'ConnectionID' },
                                                                  { localElement: 'AirlineID',    element: 'AirlineID' },
@@ -53,9 +53,9 @@ define view entity /DMO/C_Booking_U
       
 //      LastChangedAt,
       /* Associations */
-      ///DMO/I_Booking_U
-      _Travel: redirected to parent /DMO/C_Travel_U,
-      _BookSupplement: redirected to composition child /DMO/C_BookingSupplement_U,
+      //ZTKFK_I_Booking_U
+      _Travel: redirected to parent ZTKFK_C_Travel_U,
+      _BookSupplement: redirected to composition child ZTKFK_C_BookingSupplement_U,
       _Carrier,
       _Connection,
       _Customer

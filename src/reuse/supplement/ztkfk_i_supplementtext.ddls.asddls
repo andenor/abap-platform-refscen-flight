@@ -3,10 +3,10 @@
 
 @Search.searchable: true
 
-define view entity /DMO/I_SupplementText
-  as select from /dmo/suppl_text as SupplementText
+define view entity ZTKFK_I_SupplementText
+  as select from ZTKFK_suppl_text as SupplementText
 
-  association        to parent /DMO/I_Supplement as _Supplement on $projection.SupplementID = _Supplement.SupplementID
+  association        to parent ZTKFK_I_Supplement as _Supplement on $projection.SupplementID = _Supplement.SupplementID
   association [0..1] to I_Language               as _Language   on $projection.LanguageCode = _Language.Language
 
 {

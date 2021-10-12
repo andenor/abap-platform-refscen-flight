@@ -1,5 +1,5 @@
-CLASS /dmo/bp_bookingsupplement_d DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF /dmo/i_travel_d.
+CLASS ZTKFK_bp_bookingsupplement_d DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF ZTKFK_i_travel_d.
 ENDCLASS.
 
-CLASS /dmo/bp_bookingsupplement_d IMPLEMENTATION.
+CLASS ZTKFK_bp_bookingsupplement_d IMPLEMENTATION.
 ENDCLASS.

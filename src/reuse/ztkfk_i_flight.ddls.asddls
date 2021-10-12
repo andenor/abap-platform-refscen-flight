@@ -3,23 +3,23 @@
 
 @Search.searchable: true
 
-define view entity /DMO/I_Flight
-  as select from /dmo/flight as Flight
+define view entity ZTKFK_I_Flight
+  as select from ZTKFK_flight as Flight
 
-  association [1] to /DMO/I_Carrier as _Airline         on $projection.AirlineID = _Airline.AirlineID
-  association [1] to /DMO/I_Connection as _Connection   on $projection.ConnectionID = _Connection.ConnectionID 
+  association [1] to ZTKFK_I_Carrier as _Airline         on $projection.AirlineID = _Airline.AirlineID
+  association [1] to ZTKFK_I_Connection as _Connection   on $projection.ConnectionID = _Connection.ConnectionID 
                                                        and $projection.AirlineID = _Connection.AirlineID
   association [0..1] to I_Currency     as _Currency     on $projection.CurrencyCode = _Currency.Currency
 
 {
       @Search.defaultSearchElement: true
       @ObjectModel.text.association: '_Airline'
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Carrier' , element: 'AirlineID'} }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'ZTKFK_I_Carrier' , element: 'AirlineID'} }]
   key Flight.carrier_id     as AirlineID,
 
       @Search.defaultSearchElement: true
       @Search.fuzzinessThreshold: 0.8
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Connection', element: 'ConnectionID'}, 
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'ZTKFK_I_Connection', element: 'ConnectionID'}, 
                      additionalBinding: [{ element: 'AirlineID', localElement: 'AirlineID' }] }]
   key Flight.connection_id  as ConnectionID,
 

@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>/DMO/BP_BOOKINGSUPPLEMENT_U</CLSNAME>
+    <CLSNAME>ZTKFK_BP_BOOKINGSUPPLEMENT_U</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>Behavior Pool for Handling Booking Supplements</DESCRIPT>
     <CATEGORY>06</CATEGORY>
@@ -11,7 +11,7 @@
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
-    <CLSDEFINT>/DMO/I_TRAVEL_U</CLSDEFINT>
+    <CLSDEFINT>ZTKFK_I_TRAVEL_U</CLSDEFINT>
    </VSEOCLASS>
   </asx:values>
  </asx:abap>

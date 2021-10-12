@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <AUTHX>
-    <FIELDNAME>/DMO/CNTRY</FIELDNAME>
+    <FIELDNAME>ZTKFK_CNTRY</FIELDNAME>
     <ROLLNAME>LAND1</ROLLNAME>
    </AUTHX>
   </asx:values>

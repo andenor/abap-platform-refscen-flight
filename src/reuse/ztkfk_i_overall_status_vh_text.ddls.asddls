@@ -8,10 +8,10 @@
  dataClass: #MASTER
  }
 @ObjectModel.resultSet.sizeCategory: #XS
-define view entity /DMO/I_Overall_Status_VH_Text
-  as select from /dmo/oall_stat_t
+define view entity ZTKFK_I_Overall_Status_VH_Text
+  as select from ZTKFK_oall_stat_t
 
-  association [1..1] to /DMO/I_Overall_Status_VH as _OverallStatus on $projection.OverallStatus = _OverallStatus.OverallStatus
+  association [1..1] to ZTKFK_I_Overall_Status_VH as _OverallStatus on $projection.OverallStatus = _OverallStatus.OverallStatus
 
 {
       @ObjectModel.text.element: ['Text']

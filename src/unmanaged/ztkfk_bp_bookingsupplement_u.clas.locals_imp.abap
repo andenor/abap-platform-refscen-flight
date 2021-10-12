@@ -2,8 +2,8 @@ CLASS lhc_bookingsupplement DEFINITION
   INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
 
-    TYPES tt_bookingsupplement_failed   TYPE TABLE FOR FAILED    /dmo/i_bookingsupplement_u.
-    TYPES tt_bookingsupplement_reported TYPE TABLE FOR REPORTED  /dmo/i_bookingsupplement_u.
+    TYPES tt_bookingsupplement_failed   TYPE TABLE FOR FAILED    ZTKFK_i_bookingsupplement_u.
+    TYPES tt_bookingsupplement_reported TYPE TABLE FOR REPORTED  ZTKFK_i_bookingsupplement_u.
 
     METHODS update FOR MODIFY
       IMPORTING entities FOR UPDATE bookingsupplement.
@@ -23,10 +23,10 @@ CLASS lhc_bookingsupplement DEFINITION
     METHODS map_messages
       IMPORTING
         cid                   TYPE string OPTIONAL
-        travel_id             TYPE /dmo/travel_id OPTIONAL
-        booking_id            TYPE /dmo/booking_id OPTIONAL
-        booking_supplement_id TYPE /dmo/booking_supplement_id OPTIONAL
-        messages              TYPE /dmo/t_message
+        travel_id             TYPE ZTKFK_travel_id OPTIONAL
+        booking_id            TYPE ZTKFK_booking_id OPTIONAL
+        booking_supplement_id TYPE ZTKFK_booking_supplement_id OPTIONAL
+        messages              TYPE ZTKFK_t_message
       EXPORTING
         failed_added          TYPE abap_bool
       CHANGING
@@ -43,20 +43,20 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 *
 **********************************************************************
   METHOD update.
-    DATA: messages         TYPE /dmo/t_message,
-          book_supplements TYPE /dmo/book_suppl.
+    DATA: messages         TYPE ZTKFK_t_message,
+          book_supplements TYPE ZTKFK_book_suppl.
 
     LOOP AT entities ASSIGNING FIELD-SYMBOL(<bookingsupplement>).
       book_supplements = CORRESPONDING   #( <bookingsupplement> MAPPING FROM ENTITY ).
 
-      CALL FUNCTION '/DMO/FLIGHT_TRAVEL_UPDATE'
+      CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_UPDATE'
         EXPORTING
-          is_travel              = VALUE /dmo/s_travel_in( travel_id = <bookingsupplement>-travelid )
-          is_travelx             = VALUE /dmo/s_travel_inx( travel_id = <bookingsupplement>-travelid )
-          it_booking_supplement  = VALUE /dmo/t_booking_supplement_in( ( CORRESPONDING #( book_supplements ) ) )
-          it_booking_supplementx = VALUE /dmo/t_booking_supplement_inx( (
+          is_travel              = VALUE ZTKFK_s_travel_in( travel_id = <bookingsupplement>-travelid )
+          is_travelx             = VALUE ZTKFK_s_travel_inx( travel_id = <bookingsupplement>-travelid )
+          it_booking_supplement  = VALUE ZTKFK_t_booking_supplement_in( ( CORRESPONDING #( book_supplements ) ) )
+          it_booking_supplementx = VALUE ZTKFK_t_booking_supplement_inx( (
                                             booking_supplement_id = <bookingsupplement>-bookingsupplementid
-                                            action_code           = /dmo/if_flight_legacy=>action_code-update
+                                            action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                             booking_id            = <bookingsupplement>-bookingid
                                             _intx                 = CORRESPONDING #( <bookingsupplement> MAPPING FROM ENTITY )
                                           ) )
@@ -84,21 +84,21 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 *
 **********************************************************************
   METHOD delete.
-    DATA: messages TYPE /dmo/t_message.
+    DATA: messages TYPE ZTKFK_t_message.
 
     LOOP AT keys ASSIGNING FIELD-SYMBOL(<bookingsupplement>).
 
-      CALL FUNCTION '/DMO/FLIGHT_TRAVEL_UPDATE'
+      CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_UPDATE'
         EXPORTING
-          is_travel              = VALUE /dmo/s_travel_in( travel_id = <bookingsupplement>-travelid )
-          is_travelx             = VALUE /dmo/s_travel_inx( travel_id = <bookingsupplement>-travelid )
-          it_booking             = VALUE /dmo/t_booking_in( ( booking_id = <bookingsupplement>-bookingid ) )
-          it_bookingx            = VALUE /dmo/t_booking_inx( ( booking_id = <bookingsupplement>-bookingid ) )
-          it_booking_supplement  = VALUE /dmo/t_booking_supplement_in( (  booking_supplement_id = <bookingsupplement>-bookingSupplementid
+          is_travel              = VALUE ZTKFK_s_travel_in( travel_id = <bookingsupplement>-travelid )
+          is_travelx             = VALUE ZTKFK_s_travel_inx( travel_id = <bookingsupplement>-travelid )
+          it_booking             = VALUE ZTKFK_t_booking_in( ( booking_id = <bookingsupplement>-bookingid ) )
+          it_bookingx            = VALUE ZTKFK_t_booking_inx( ( booking_id = <bookingsupplement>-bookingid ) )
+          it_booking_supplement  = VALUE ZTKFK_t_booking_supplement_in( (  booking_supplement_id = <bookingsupplement>-bookingSupplementid
                                                                           booking_id            = <bookingsupplement>-BookingID ) )
-          it_booking_supplementx = VALUE /dmo/t_booking_supplement_inx( ( booking_supplement_id = <bookingsupplement>-bookingsupplementid
+          it_booking_supplementx = VALUE ZTKFK_t_booking_supplement_inx( ( booking_supplement_id = <bookingsupplement>-bookingsupplementid
                                                                           booking_id            = <bookingsupplement>-bookingid
-                                                                          action_code           = /dmo/if_flight_legacy=>action_code-delete ) )
+                                                                          action_code           = ZTKFK_if_flight_legacy=>action_code-delete ) )
         IMPORTING
           et_messages            = messages.
 
@@ -124,13 +124,13 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 **********************************************************************
   METHOD read.
 
-    DATA: booksuppls_out TYPE /dmo/t_booking_supplement,
-          messages       TYPE /dmo/t_message.
+    DATA: booksuppls_out TYPE ZTKFK_t_booking_supplement,
+          messages       TYPE ZTKFK_t_message.
 
     LOOP AT keys ASSIGNING FIELD-SYMBOL(<booksuppl_by_travel>)
                                GROUP BY <booksuppl_by_travel>-TravelID.
 
-      CALL FUNCTION '/DMO/FLIGHT_TRAVEL_READ'
+      CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_READ'
         EXPORTING
           iv_travel_id          = <booksuppl_by_travel>-travelid
         IMPORTING
@@ -185,14 +185,14 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 *
 **********************************************************************
   METHOD rba_Booking.
-    DATA: booking_out TYPE /dmo/t_booking,
+    DATA: booking_out TYPE ZTKFK_t_booking,
           travel      LIKE LINE OF result,
-          messages    TYPE /dmo/t_message.
+          messages    TYPE ZTKFK_t_message.
 
     LOOP AT keys_rba ASSIGNING FIELD-SYMBOL(<booksuppl_by_travel>)
                                    GROUP BY <booksuppl_by_travel>-TravelID.
 
-      CALL FUNCTION '/DMO/FLIGHT_TRAVEL_READ'
+      CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_READ'
         EXPORTING
           iv_travel_id = <booksuppl_by_travel>-%key-TravelID
         IMPORTING
@@ -244,14 +244,14 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 *
 **********************************************************************
   METHOD rba_travel.
-    DATA: travel_out TYPE /dmo/travel,
+    DATA: travel_out TYPE ZTKFK_travel,
           travel     LIKE LINE OF result,
-          messages   TYPE /dmo/t_message.
+          messages   TYPE ZTKFK_t_message.
 
     LOOP AT keys_rba ASSIGNING FIELD-SYMBOL(<booksuppl_by_travel>)
                                    GROUP BY <booksuppl_by_travel>-TravelID.
 
-      CALL FUNCTION '/DMO/FLIGHT_TRAVEL_READ'
+      CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_READ'
         EXPORTING
           iv_travel_id = <booksuppl_by_travel>-%key-TravelID
         IMPORTING
@@ -304,7 +304,7 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
                         travelid              = travel_id
                         bookingid             = booking_id
                         bookingsupplementid   = booking_supplement_id
-                        %fail-cause           = /dmo/cl_travel_auxiliary=>get_cause_from_message(
+                        %fail-cause           = ZTKFK_cl_travel_auxiliary=>get_cause_from_message(
                                                   msgid = message-msgid
                                                   msgno = message-msgno
                                                 ) )

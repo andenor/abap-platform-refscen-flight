@@ -1,14 +1,14 @@
 CLASS lcl_common_checks DEFINITION FINAL CREATE PRIVATE.
   PUBLIC SECTION.
-    CLASS-METHODS is_currency_code_valid IMPORTING iv_currency_code   TYPE /dmo/currency_code
-                                         CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    CLASS-METHODS is_currency_code_valid IMPORTING iv_currency_code   TYPE ZTKFK_currency_code
+                                         CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                                          RETURNING VALUE(rv_is_valid) TYPE abap_boolean.
-    CLASS-METHODS is_customer_id_valid IMPORTING iv_customer_id     TYPE /dmo/customer_id
-                                       CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    CLASS-METHODS is_customer_id_valid IMPORTING iv_customer_id     TYPE ZTKFK_customer_id
+                                       CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                                        RETURNING VALUE(rv_is_valid) TYPE abap_boolean.
   PRIVATE SECTION.
-    CLASS-DATA mt_currency_code TYPE SORTED TABLE OF /dmo/currency_code WITH UNIQUE KEY table_line.
-    CLASS-DATA mt_customer_id TYPE SORTED TABLE OF /dmo/customer_id WITH UNIQUE KEY table_line.
+    CLASS-DATA mt_currency_code TYPE SORTED TABLE OF ZTKFK_currency_code WITH UNIQUE KEY table_line.
+    CLASS-DATA mt_customer_id TYPE SORTED TABLE OF ZTKFK_customer_id WITH UNIQUE KEY table_line.
 ENDCLASS.
 
 
@@ -23,7 +23,7 @@ CLASS lcl_common_checks IMPLEMENTATION.
     IF sy-subrc = 0.
       rv_is_valid = abap_true.
     ELSE.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>currency_unknown  currency_code = iv_currency_code ) TO ct_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>currency_unknown  currency_code = iv_currency_code ) TO ct_messages.
     ENDIF.
   ENDMETHOD.
 
@@ -32,13 +32,13 @@ CLASS lcl_common_checks IMPLEMENTATION.
     CLEAR rv_is_valid.
     IF mt_customer_id IS INITIAL.
       " There may be very many customers, but we only store the ID in the internal table
-      SELECT DISTINCT customer_id FROM /dmo/customer INTO TABLE @mt_customer_id. "#EC CI_NOWHERE
+      SELECT DISTINCT customer_id FROM ZTKFK_customer INTO TABLE @mt_customer_id. "#EC CI_NOWHERE
     ENDIF.
     READ TABLE mt_customer_id TRANSPORTING NO FIELDS WITH TABLE KEY table_line = iv_customer_id.
     IF sy-subrc = 0.
       rv_is_valid = abap_true.
     ELSE.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>customer_unkown  customer_id = iv_customer_id ) TO ct_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>customer_unkown  customer_id = iv_customer_id ) TO ct_messages.
     ENDIF.
   ENDMETHOD.
 ENDCLASS.
@@ -52,62 +52,62 @@ CLASS lcl_booking_supplement_buffer DEFINITION FINAL CREATE PRIVATE.
     "! Prepare changes in a temporary buffer
     "! @parameter iv_no_delete_check | In some cases we do not need to check the existence of a record to be deleted, as this check has been done before.
     "!                               | E.g. delete all subnodes of a node to be deleted.  In this case we have read the subnodes to get their keys.
-    METHODS cud_prep IMPORTING it_booking_supplement  TYPE /dmo/t_booking_supplement
-                               it_booking_supplementx TYPE /dmo/t_booking_supplementx
+    METHODS cud_prep IMPORTING it_booking_supplement  TYPE ZTKFK_t_booking_supplement
+                               it_booking_supplementx TYPE ZTKFK_t_booking_supplementx
                                iv_no_delete_check     TYPE abap_bool OPTIONAL
-                     EXPORTING et_booking_supplement  TYPE /dmo/t_booking_supplement
-                               et_messages            TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
+                     EXPORTING et_booking_supplement  TYPE ZTKFK_t_booking_supplement
+                               et_messages            TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
     "! Add content of the temporary buffer to the real buffer and clear the temporary buffer
     METHODS cud_copy.
     "! Discard content of the temporary buffer
     METHODS cud_disc.
     "! Get all Booking Supplements for given Bookings
-    METHODS get IMPORTING it_booking_supplement  TYPE /dmo/t_booking_supplement
+    METHODS get IMPORTING it_booking_supplement  TYPE ZTKFK_t_booking_supplement
                           iv_include_buffer      TYPE abap_boolean
                           iv_include_temp_buffer TYPE abap_boolean
-                EXPORTING et_booking_supplement  TYPE /dmo/t_booking_supplement.
+                EXPORTING et_booking_supplement  TYPE ZTKFK_t_booking_supplement.
 
   PRIVATE SECTION.
     CLASS-DATA go_instance TYPE REF TO lcl_booking_supplement_buffer.
     " Main buffer
-    DATA: mt_create_buffer TYPE /dmo/t_booking_supplement,
-          mt_update_buffer TYPE /dmo/t_booking_supplement,
-          mt_delete_buffer TYPE /dmo/t_booking_supplement_key.
+    DATA: mt_create_buffer TYPE ZTKFK_t_booking_supplement,
+          mt_update_buffer TYPE ZTKFK_t_booking_supplement,
+          mt_delete_buffer TYPE ZTKFK_t_booking_supplement_key.
     " Temporary buffer valid during create / update / delete Travel
-    DATA: mt_create_buffer_2 TYPE /dmo/t_booking_supplement,
-          mt_update_buffer_2 TYPE /dmo/t_booking_supplement,
-          mt_delete_buffer_2 TYPE /dmo/t_booking_supplement_key.
+    DATA: mt_create_buffer_2 TYPE ZTKFK_t_booking_supplement,
+          mt_update_buffer_2 TYPE ZTKFK_t_booking_supplement,
+          mt_delete_buffer_2 TYPE ZTKFK_t_booking_supplement_key.
 
-    DATA mt_supplement TYPE SORTED TABLE OF /dmo/supplement WITH UNIQUE KEY supplement_id.
+    DATA mt_supplement TYPE SORTED TABLE OF ZTKFK_supplement WITH UNIQUE KEY supplement_id.
 
-    METHODS _create IMPORTING it_booking_supplement TYPE /dmo/t_booking_supplement
-                    EXPORTING et_booking_supplement TYPE /dmo/t_booking_supplement
-                              et_messages           TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
-    METHODS _update IMPORTING it_booking_supplement  TYPE /dmo/t_booking_supplement
-                              it_booking_supplementx TYPE /dmo/t_booking_supplementx
-                    EXPORTING et_booking_supplement  TYPE /dmo/t_booking_supplement
-                              et_messages            TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
-    METHODS _delete IMPORTING it_booking_supplement TYPE /dmo/t_booking_supplement
+    METHODS _create IMPORTING it_booking_supplement TYPE ZTKFK_t_booking_supplement
+                    EXPORTING et_booking_supplement TYPE ZTKFK_t_booking_supplement
+                              et_messages           TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
+    METHODS _update IMPORTING it_booking_supplement  TYPE ZTKFK_t_booking_supplement
+                              it_booking_supplementx TYPE ZTKFK_t_booking_supplementx
+                    EXPORTING et_booking_supplement  TYPE ZTKFK_t_booking_supplement
+                              et_messages            TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
+    METHODS _delete IMPORTING it_booking_supplement TYPE ZTKFK_t_booking_supplement
                               iv_no_delete_check    TYPE abap_bool
-                    EXPORTING et_messages           TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
+                    EXPORTING et_messages           TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
 
-    METHODS _check IMPORTING is_booking_supplement  TYPE /dmo/book_suppl
-                             is_booking_supplementx TYPE /dmo/s_booking_supplementx OPTIONAL
-                             iv_change_mode         TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                   CHANGING  ct_messages            TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check IMPORTING is_booking_supplement  TYPE ZTKFK_book_suppl
+                             is_booking_supplementx TYPE ZTKFK_s_booking_supplementx OPTIONAL
+                             iv_change_mode         TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                   CHANGING  ct_messages            TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                    RETURNING VALUE(rv_is_valid)     TYPE abap_bool.
-    METHODS _check_supplement IMPORTING is_booking_supplement  TYPE /dmo/book_suppl
-                                        is_booking_supplementx TYPE /dmo/s_booking_supplementx OPTIONAL
-                                        iv_change_mode         TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                              CHANGING  ct_messages            TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_supplement IMPORTING is_booking_supplement  TYPE ZTKFK_book_suppl
+                                        is_booking_supplementx TYPE ZTKFK_s_booking_supplementx OPTIONAL
+                                        iv_change_mode         TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                              CHANGING  ct_messages            TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                               RETURNING VALUE(rv_is_valid)     TYPE abap_bool.
-    METHODS _check_currency_code IMPORTING is_booking_supplement  TYPE /dmo/book_suppl
-                                           is_booking_supplementx TYPE /dmo/s_booking_supplementx OPTIONAL
-                                           iv_change_mode         TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                                 CHANGING  ct_messages            TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_currency_code IMPORTING is_booking_supplement  TYPE ZTKFK_book_suppl
+                                           is_booking_supplementx TYPE ZTKFK_s_booking_supplementx OPTIONAL
+                                           iv_change_mode         TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                                 CHANGING  ct_messages            TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                                  RETURNING VALUE(rv_is_valid)     TYPE abap_bool.
-    METHODS _determine IMPORTING iv_change_mode        TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                       CHANGING  cs_booking_supplement TYPE /dmo/book_suppl.
+    METHODS _determine IMPORTING iv_change_mode        TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                       CHANGING  cs_booking_supplement TYPE ZTKFK_book_suppl.
 ENDCLASS.
 
 
@@ -123,23 +123,23 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
     CLEAR et_messages.
 
     TYPES: BEGIN OF ts_travel_booking_suppl_id,
-             travel_id             TYPE /dmo/travel_id,
-             booking_id            TYPE /dmo/booking_id,
-             booking_supplement_id TYPE /dmo/booking_supplement_id,
+             travel_id             TYPE ZTKFK_travel_id,
+             booking_id            TYPE ZTKFK_booking_id,
+             booking_supplement_id TYPE ZTKFK_booking_supplement_id,
            END OF ts_travel_booking_suppl_id,
            tt_travel_booking_suppl_id TYPE SORTED TABLE OF ts_travel_booking_suppl_id WITH UNIQUE KEY travel_id  booking_id  booking_supplement_id.
     DATA lt_travel_booking_suppl_id TYPE tt_travel_booking_suppl_id.
 
     CHECK it_booking_supplement IS NOT INITIAL.
 
-    SELECT FROM /dmo/book_suppl FIELDS travel_id, booking_id, booking_supplement_id
+    SELECT FROM ZTKFK_book_suppl FIELDS travel_id, booking_id, booking_supplement_id
       FOR ALL ENTRIES IN @it_booking_supplement WHERE travel_id = @it_booking_supplement-travel_id AND booking_id = @it_booking_supplement-booking_id AND booking_supplement_id = @it_booking_supplement-booking_supplement_id
       INTO CORRESPONDING FIELDS OF TABLE @lt_travel_booking_suppl_id.
 
     LOOP AT it_booking_supplement INTO DATA(ls_booking_supplement_create) ##INTO_OK.
       " Booking_Supplement_ID key must not be initial
       IF ls_booking_supplement_create-booking_supplement_id IS INITIAL.
-        APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>booking_supplement_no_key
+        APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>booking_supplement_no_key
                                           travel_id  = ls_booking_supplement_create-travel_id
                                           booking_id = ls_booking_supplement_create-booking_id ) TO et_messages.
         RETURN.
@@ -150,7 +150,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
                                                                                   booking_id            = ls_booking_supplement_create-booking_id
                                                                                   booking_supplement_id = ls_booking_supplement_create-booking_supplement_id.
       IF sy-subrc = 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>booking_supplement_exists
+        APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>booking_supplement_exists
                                           travel_id  = ls_booking_supplement_create-travel_id
                                           booking_id = ls_booking_supplement_create-booking_id
                                           booking_supplement_id = ls_booking_supplement_create-booking_supplement_id ) TO et_messages.
@@ -162,7 +162,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
                                                                         booking_id            = ls_booking_supplement_create-booking_id
                                                                         booking_supplement_id = ls_booking_supplement_create-booking_supplement_id.
       IF sy-subrc = 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>booking_supplement_exists
+        APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>booking_supplement_exists
                                           travel_id  = ls_booking_supplement_create-travel_id
                                           booking_id = ls_booking_supplement_create-booking_id
                                           booking_supplement_id = ls_booking_supplement_create-booking_supplement_id ) TO et_messages.
@@ -171,13 +171,13 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
       " Checks
       IF _check( EXPORTING is_booking_supplement = ls_booking_supplement_create
-                           iv_change_mode        = /dmo/cl_flight_legacy=>change_mode-create
+                           iv_change_mode        = ZTKFK_cl_flight_legacy=>change_mode-create
                  CHANGING  ct_messages           = et_messages ) = abap_false.
         RETURN.
       ENDIF.
 
       " standard determinations
-      _determine( EXPORTING iv_change_mode        = /dmo/cl_flight_legacy=>change_mode-create
+      _determine( EXPORTING iv_change_mode        = ZTKFK_cl_flight_legacy=>change_mode-create
                   CHANGING  cs_booking_supplement = ls_booking_supplement_create ).
 
       INSERT ls_booking_supplement_create INTO TABLE mt_create_buffer_2.
@@ -195,18 +195,18 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
     " Check for empty keys
     LOOP AT it_booking_supplement ASSIGNING FIELD-SYMBOL(<s_booking_supplement_update>) WHERE booking_supplement_id = 0. "#EC CI_SORTSEQ
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_supplement_no_key  travel_id = <s_booking_supplement_update>-travel_id  booking_id = <s_booking_supplement_update>-booking_id ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_supplement_no_key  travel_id = <s_booking_supplement_update>-travel_id  booking_id = <s_booking_supplement_update>-booking_id ) TO et_messages.
       RETURN.
     ENDLOOP.
 
-    DATA lt_book_suppl TYPE SORTED TABLE OF /dmo/book_suppl WITH UNIQUE KEY travel_id  booking_id  booking_supplement_id.
-    SELECT * FROM /dmo/book_suppl FOR ALL ENTRIES IN @it_booking_supplement WHERE travel_id             = @it_booking_supplement-travel_id
+    DATA lt_book_suppl TYPE SORTED TABLE OF ZTKFK_book_suppl WITH UNIQUE KEY travel_id  booking_id  booking_supplement_id.
+    SELECT * FROM ZTKFK_book_suppl FOR ALL ENTRIES IN @it_booking_supplement WHERE travel_id             = @it_booking_supplement-travel_id
                                                                               AND booking_id            = @it_booking_supplement-booking_id
                                                                               AND booking_supplement_id = @it_booking_supplement-booking_supplement_id
                                                                             INTO TABLE @lt_book_suppl.
 
-    FIELD-SYMBOLS <s_buffer_booking_supplement> TYPE /dmo/book_suppl.
-    DATA ls_buffer_booking_supplement TYPE /dmo/book_suppl.
+    FIELD-SYMBOLS <s_buffer_booking_supplement> TYPE ZTKFK_book_suppl.
+    DATA ls_buffer_booking_supplement TYPE ZTKFK_book_suppl.
     LOOP AT it_booking_supplement ASSIGNING <s_booking_supplement_update>.
       UNASSIGN <s_buffer_booking_supplement>.
 
@@ -214,7 +214,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
                                                                         booking_id            = <s_booking_supplement_update>-booking_id
                                                                         booking_supplement_id = <s_booking_supplement_update>-booking_supplement_id.
       IF sy-subrc = 0." Error: Record to be updated marked for deletion
-        APPEND NEW /dmo/cx_flight_legacy( textid                = /dmo/cx_flight_legacy=>booking_supplement_unknown
+        APPEND NEW ZTKFK_cx_flight_legacy( textid                = ZTKFK_cx_flight_legacy=>booking_supplement_unknown
                                           travel_id             = <s_booking_supplement_update>-travel_id
                                           booking_id            = <s_booking_supplement_update>-booking_id
                                           booking_supplement_id = <s_booking_supplement_update>-booking_supplement_id ) TO et_messages.
@@ -263,7 +263,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
       " Error
       IF <s_buffer_booking_supplement> IS NOT ASSIGNED.
-        APPEND NEW /dmo/cx_flight_legacy( textid                = /dmo/cx_flight_legacy=>booking_supplement_unknown
+        APPEND NEW ZTKFK_cx_flight_legacy( textid                = ZTKFK_cx_flight_legacy=>booking_supplement_unknown
                                           travel_id             = <s_booking_supplement_update>-travel_id
                                           booking_id            = <s_booking_supplement_update>-booking_id
                                           booking_supplement_id = <s_booking_supplement_update>-booking_supplement_id ) TO et_messages.
@@ -274,9 +274,9 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
       READ TABLE it_booking_supplementx ASSIGNING FIELD-SYMBOL(<s_booking_supplementx>) WITH KEY travel_id             = <s_booking_supplement_update>-travel_id
                                                                                                  booking_id            = <s_booking_supplement_update>-booking_id
                                                                                                  booking_supplement_id = <s_booking_supplement_update>-booking_supplement_id
-                                                                                                 action_code           = /dmo/if_flight_legacy=>action_code-update.
+                                                                                                 action_code           = ZTKFK_if_flight_legacy=>action_code-update.
       IF sy-subrc <> 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid                = /dmo/cx_flight_legacy=>booking_supplement_no_control
+        APPEND NEW ZTKFK_cx_flight_legacy( textid                = ZTKFK_cx_flight_legacy=>booking_supplement_no_control
                                           travel_id             = <s_booking_supplement_update>-travel_id
                                           booking_id            = <s_booking_supplement_update>-booking_id
                                           booking_supplement_id = <s_booking_supplement_update>-booking_supplement_id ) TO et_messages.
@@ -285,7 +285,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
       IF <s_booking_supplementx>-supplement_id = abap_true AND <s_booking_supplement_update>-supplement_id <> <s_buffer_booking_supplement>-supplement_id.
         " The supplement ID must not be changed (delete the record and create a new one)
-        APPEND NEW /dmo/cx_flight_legacy( textid                = /dmo/cx_flight_legacy=>booking_supplement_suppl_id_u
+        APPEND NEW ZTKFK_cx_flight_legacy( textid                = ZTKFK_cx_flight_legacy=>booking_supplement_suppl_id_u
                                           travel_id             = <s_booking_supplement_update>-travel_id
                                           booking_id            = <s_booking_supplement_update>-booking_id
                                           booking_supplement_id = <s_booking_supplement_update>-booking_supplement_id ) TO et_messages.
@@ -295,7 +295,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
       IF   ( <s_booking_supplementx>-price = abap_true  AND <s_booking_supplementx>-currency_code = abap_false )
         OR ( <s_booking_supplementx>-price = abap_false AND <s_booking_supplementx>-currency_code = abap_true  ).
         " Price and currency code must be changed together
-        APPEND NEW /dmo/cx_flight_legacy( textid                = /dmo/cx_flight_legacy=>booking_supplement_pri_curr_u
+        APPEND NEW ZTKFK_cx_flight_legacy( textid                = ZTKFK_cx_flight_legacy=>booking_supplement_pri_curr_u
                                           travel_id             = <s_booking_supplement_update>-travel_id
                                           booking_id            = <s_booking_supplement_update>-booking_id
                                           booking_supplement_id = <s_booking_supplement_update>-booking_supplement_id ) TO et_messages.
@@ -322,14 +322,14 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
       " Checks
       IF _check( EXPORTING is_booking_supplement  = <s_buffer_booking_supplement>
                            is_booking_supplementx = <s_booking_supplementx>
-                           iv_change_mode         = /dmo/cl_flight_legacy=>change_mode-update
+                           iv_change_mode         = ZTKFK_cl_flight_legacy=>change_mode-update
                  CHANGING  ct_messages            = et_messages ) = abap_false.
         RETURN.
       ENDIF.
 
       " standard determinations
       DATA(ls_booking_supplement) = <s_buffer_booking_supplement>." Needed, as key fields must not be changed
-      _determine( EXPORTING iv_change_mode        = /dmo/cl_flight_legacy=>change_mode-update
+      _determine( EXPORTING iv_change_mode        = ZTKFK_cl_flight_legacy=>change_mode-update
                   CHANGING  cs_booking_supplement = ls_booking_supplement ).
       <s_buffer_booking_supplement>-gr_data = ls_booking_supplement-gr_data.
 
@@ -345,7 +345,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
     " Check for empty keys
     LOOP AT it_booking_supplement ASSIGNING FIELD-SYMBOL(<s_booking_supplement_delete>) WHERE booking_supplement_id = 0. "#EC CI_SORTSEQ
-      APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>booking_supplement_no_key
+      APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>booking_supplement_no_key
                                         travel_id  = <s_booking_supplement_delete>-travel_id
                                         booking_id = <s_booking_supplement_delete>-booking_id ) TO et_messages.
       RETURN.
@@ -367,8 +367,8 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
     ENDLOOP.
 
     IF iv_no_delete_check = abap_false.
-      DATA lt_book_suppl_db TYPE /dmo/t_booking_supplement_key.
-      SELECT travel_id, booking_id, booking_supplement_id FROM /dmo/book_suppl FOR ALL ENTRIES IN @lt_booking_supplement
+      DATA lt_book_suppl_db TYPE ZTKFK_t_booking_supplement_key.
+      SELECT travel_id, booking_id, booking_supplement_id FROM ZTKFK_book_suppl FOR ALL ENTRIES IN @lt_booking_supplement
         WHERE travel_id = @lt_booking_supplement-travel_id AND booking_id = @lt_booking_supplement-booking_id AND booking_supplement_id = @lt_booking_supplement-booking_supplement_id INTO CORRESPONDING FIELDS OF TABLE @lt_book_suppl_db.
     ENDIF.
 
@@ -379,7 +379,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
                                                                           booking_id            = <s_booking_supplement_delete>-booking_id
                                                                           booking_supplement_id = <s_booking_supplement_delete>-booking_supplement_id.
         IF sy-subrc <> 0.
-          APPEND NEW /dmo/cx_flight_legacy( textid                = /dmo/cx_flight_legacy=>booking_supplement_unknown
+          APPEND NEW ZTKFK_cx_flight_legacy( textid                = ZTKFK_cx_flight_legacy=>booking_supplement_unknown
                                             travel_id             = <s_booking_supplement_delete>-travel_id
                                             booking_id            = <s_booking_supplement_delete>-booking_id
                                             booking_supplement_id = <s_booking_supplement_delete>-booking_supplement_id ) TO et_messages.
@@ -397,9 +397,9 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
     ASSERT mt_create_buffer_2 IS INITIAL.
     ASSERT mt_update_buffer_2 IS INITIAL.
     ASSERT mt_delete_buffer_2 IS INITIAL.
-    INSERT /dmo/book_suppl FROM TABLE @mt_create_buffer.
-    UPDATE /dmo/book_suppl FROM TABLE @mt_update_buffer.
-    DELETE /dmo/book_suppl FROM TABLE @( CORRESPONDING #( mt_delete_buffer ) ).
+    INSERT ZTKFK_book_suppl FROM TABLE @mt_create_buffer.
+    UPDATE ZTKFK_book_suppl FROM TABLE @mt_update_buffer.
+    DELETE ZTKFK_book_suppl FROM TABLE @( CORRESPONDING #( mt_delete_buffer ) ).
   ENDMETHOD.
 
 
@@ -433,28 +433,28 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
     CHECK it_booking_supplement IS NOT INITIAL.
 
-    DATA lt_booking_supplement_c  TYPE /dmo/t_booking_supplement.
-    DATA lt_booking_supplement_u  TYPE /dmo/t_booking_supplement.
-    DATA lt_booking_supplement_d  TYPE /dmo/t_booking_supplement.
-    DATA lt_booking_supplementx_u TYPE /dmo/t_booking_supplementx.
+    DATA lt_booking_supplement_c  TYPE ZTKFK_t_booking_supplement.
+    DATA lt_booking_supplement_u  TYPE ZTKFK_t_booking_supplement.
+    DATA lt_booking_supplement_d  TYPE ZTKFK_t_booking_supplement.
+    DATA lt_booking_supplementx_u TYPE ZTKFK_t_booking_supplementx.
     LOOP AT it_booking_supplement ASSIGNING FIELD-SYMBOL(<s_booking_supplement>).
       READ TABLE it_booking_supplementx ASSIGNING FIELD-SYMBOL(<s_booking_supplementx>) WITH TABLE KEY travel_id             = <s_booking_supplement>-travel_id
                                                                                                        booking_id            = <s_booking_supplement>-booking_id
                                                                                                        booking_supplement_id = <s_booking_supplement>-booking_supplement_id.
       IF sy-subrc <> 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid                = /dmo/cx_flight_legacy=>booking_supplement_no_control
+        APPEND NEW ZTKFK_cx_flight_legacy( textid                = ZTKFK_cx_flight_legacy=>booking_supplement_no_control
                                           travel_id             = <s_booking_supplement>-travel_id
                                           booking_id            = <s_booking_supplement>-booking_id
                                           booking_supplement_id = <s_booking_supplement>-booking_supplement_id ) TO et_messages.
         RETURN.
       ENDIF.
-      CASE CONV /dmo/if_flight_legacy=>action_code_enum( <s_booking_supplementx>-action_code ).
-        WHEN /dmo/if_flight_legacy=>action_code-create.
+      CASE CONV ZTKFK_if_flight_legacy=>action_code_enum( <s_booking_supplementx>-action_code ).
+        WHEN ZTKFK_if_flight_legacy=>action_code-create.
           INSERT <s_booking_supplement>  INTO TABLE lt_booking_supplement_c.
-        WHEN /dmo/if_flight_legacy=>action_code-update.
+        WHEN ZTKFK_if_flight_legacy=>action_code-update.
           INSERT <s_booking_supplement>  INTO TABLE lt_booking_supplement_u.
           INSERT <s_booking_supplementx> INTO TABLE lt_booking_supplementx_u.
-        WHEN /dmo/if_flight_legacy=>action_code-delete.
+        WHEN ZTKFK_if_flight_legacy=>action_code-delete.
           INSERT <s_booking_supplement>  INTO TABLE lt_booking_supplement_d.
       ENDCASE.
     ENDLOOP.
@@ -526,7 +526,7 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
     CHECK it_booking_supplement IS NOT INITIAL.
 
-    SELECT * FROM /dmo/book_suppl FOR ALL ENTRIES IN @it_booking_supplement WHERE travel_id  = @it_booking_supplement-travel_id
+    SELECT * FROM ZTKFK_book_suppl FOR ALL ENTRIES IN @it_booking_supplement WHERE travel_id  = @it_booking_supplement-travel_id
                                                                               AND booking_id = @it_booking_supplement-booking_id
       INTO TABLE @et_booking_supplement ##SELECT_FAE_WITH_LOB[DESCRIPTION]. "#EC CI_SEL_DEL
 
@@ -573,14 +573,14 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
   METHOD _check_supplement.
     rv_is_valid = abap_true.
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_booking_supplementx-supplement_id = abap_true ).
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_booking_supplementx-supplement_id = abap_true ).
       IF mt_supplement IS INITIAL.
-        SELECT * FROM /dmo/supplement INTO TABLE @mt_supplement. "#EC CI_NOWHERE
+        SELECT * FROM ZTKFK_supplement INTO TABLE @mt_supplement. "#EC CI_NOWHERE
       ENDIF.
       READ TABLE mt_supplement TRANSPORTING NO FIELDS WITH TABLE KEY supplement_id = is_booking_supplement-supplement_id.
       IF sy-subrc <> 0.
         rv_is_valid = abap_false.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>supplement_unknown  supplement_id = is_booking_supplement-supplement_id ) TO ct_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>supplement_unknown  supplement_id = is_booking_supplement-supplement_id ) TO ct_messages.
       ENDIF.
     ENDIF.
   ENDMETHOD.
@@ -588,19 +588,19 @@ CLASS lcl_booking_supplement_buffer IMPLEMENTATION.
 
   METHOD _check_currency_code.
     rv_is_valid = abap_true.
-    IF   ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create AND is_booking_supplement-currency_code IS NOT INITIAL ) " Will be derived if initial
-      OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_booking_supplementx-currency_code = abap_true ).
+    IF   ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create AND is_booking_supplement-currency_code IS NOT INITIAL ) " Will be derived if initial
+      OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_booking_supplementx-currency_code = abap_true ).
       rv_is_valid = lcl_common_checks=>is_currency_code_valid( EXPORTING iv_currency_code = is_booking_supplement-currency_code CHANGING ct_messages = ct_messages ).
     ENDIF.
   ENDMETHOD.
 
 
   METHOD _determine.
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create.
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create.
       " Derive price and currency code if one of the fields is initial
       IF cs_booking_supplement-price IS INITIAL OR cs_booking_supplement-currency_code IS INITIAL.
         IF mt_supplement IS INITIAL.
-          SELECT * FROM /dmo/supplement INTO TABLE @mt_supplement. "#EC CI_NOWHERE
+          SELECT * FROM ZTKFK_supplement INTO TABLE @mt_supplement. "#EC CI_NOWHERE
         ENDIF.
         READ TABLE mt_supplement ASSIGNING FIELD-SYMBOL(<s_supplement>) WITH TABLE KEY supplement_id = cs_booking_supplement-supplement_id.
         ASSERT sy-subrc = 0. " Check has been done before
@@ -617,85 +617,85 @@ CLASS lcl_booking_buffer DEFINITION FINAL CREATE PRIVATE.
     CLASS-METHODS: get_instance RETURNING VALUE(ro_instance) TYPE REF TO lcl_booking_buffer.
     METHODS save.
     METHODS initialize.
-    METHODS check_booking_id IMPORTING iv_travel_id       TYPE /dmo/travel_id
-                                       iv_booking_id      TYPE /dmo/booking_id
-                             CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS check_booking_id IMPORTING iv_travel_id       TYPE ZTKFK_travel_id
+                                       iv_booking_id      TYPE ZTKFK_booking_id
+                             CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                              RETURNING VALUE(rv_is_valid) TYPE abap_bool.
     "! Prepare changes in a temporary buffer
     "! @parameter iv_no_delete_check | In some cases we do not need to check the existence of a record to be deleted, as this check has been done before.
     "!                               | E.g. delete all subnodes of a node to be deleted.  In this case we have read the subnodes to get their keys.
-    METHODS cud_prep IMPORTING it_booking         TYPE /dmo/t_booking
-                               it_bookingx        TYPE /dmo/t_bookingx
+    METHODS cud_prep IMPORTING it_booking         TYPE ZTKFK_t_booking
+                               it_bookingx        TYPE ZTKFK_t_bookingx
                                iv_no_delete_check TYPE abap_bool OPTIONAL
-                     EXPORTING et_booking         TYPE /dmo/t_booking
-                               et_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
+                     EXPORTING et_booking         TYPE ZTKFK_t_booking
+                               et_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
     "! Add content of the temporary buffer to the real buffer and clear the temporary buffer
     METHODS cud_copy.
     "! Discard content of the temporary buffer
     METHODS cud_disc.
     "! Get all Bookings for given Travels
-    METHODS get IMPORTING it_booking             TYPE /dmo/t_booking
+    METHODS get IMPORTING it_booking             TYPE ZTKFK_t_booking
                           iv_include_buffer      TYPE abap_boolean
                           iv_include_temp_buffer TYPE abap_boolean
-                EXPORTING et_booking             TYPE /dmo/t_booking.
+                EXPORTING et_booking             TYPE ZTKFK_t_booking.
 
   PRIVATE SECTION.
     CLASS-DATA go_instance TYPE REF TO lcl_booking_buffer.
     " Main buffer
-    DATA: mt_create_buffer TYPE /dmo/t_booking,
-          mt_update_buffer TYPE /dmo/t_booking,
-          mt_delete_buffer TYPE /dmo/t_booking_key.
+    DATA: mt_create_buffer TYPE ZTKFK_t_booking,
+          mt_update_buffer TYPE ZTKFK_t_booking,
+          mt_delete_buffer TYPE ZTKFK_t_booking_key.
     " Temporary buffer valid during create / update / delete Travel
-    DATA: mt_create_buffer_2 TYPE /dmo/t_booking,
-          mt_update_buffer_2 TYPE /dmo/t_booking,
-          mt_delete_buffer_2 TYPE /dmo/t_booking_key.
+    DATA: mt_create_buffer_2 TYPE ZTKFK_t_booking,
+          mt_update_buffer_2 TYPE ZTKFK_t_booking,
+          mt_delete_buffer_2 TYPE ZTKFK_t_booking_key.
 
     TYPES: BEGIN OF ts_flight_key,
-             carrier_id    TYPE /dmo/carrier_id,
-             connection_id TYPE /dmo/connection_id,
-             flight_date   TYPE /dmo/flight_date,
+             carrier_id    TYPE ZTKFK_carrier_id,
+             connection_id TYPE ZTKFK_connection_id,
+             flight_date   TYPE ZTKFK_flight_date,
            END OF ts_flight_key.
     TYPES tt_flight_key TYPE SORTED TABLE OF ts_flight_key WITH UNIQUE KEY carrier_id  connection_id  flight_date.
     DATA mt_flight_key TYPE tt_flight_key.
 
-    METHODS _create IMPORTING it_booking  TYPE /dmo/t_booking
-                    EXPORTING et_booking  TYPE /dmo/t_booking
-                              et_messages TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
-    METHODS _update IMPORTING it_booking  TYPE /dmo/t_booking
-                              it_bookingx TYPE /dmo/t_bookingx
-                    EXPORTING et_booking  TYPE /dmo/t_booking
-                              et_messages TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
-    METHODS _delete IMPORTING it_booking         TYPE /dmo/t_booking
+    METHODS _create IMPORTING it_booking  TYPE ZTKFK_t_booking
+                    EXPORTING et_booking  TYPE ZTKFK_t_booking
+                              et_messages TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
+    METHODS _update IMPORTING it_booking  TYPE ZTKFK_t_booking
+                              it_bookingx TYPE ZTKFK_t_bookingx
+                    EXPORTING et_booking  TYPE ZTKFK_t_booking
+                              et_messages TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
+    METHODS _delete IMPORTING it_booking         TYPE ZTKFK_t_booking
                               iv_no_delete_check TYPE abap_bool
-                    EXPORTING et_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
+                    EXPORTING et_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
 
-    METHODS _check IMPORTING is_booking         TYPE /dmo/booking
-                             is_bookingx        TYPE /dmo/s_bookingx OPTIONAL
-                             iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                   CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check IMPORTING is_booking         TYPE ZTKFK_booking
+                             is_bookingx        TYPE ZTKFK_s_bookingx OPTIONAL
+                             iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                   CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                    RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_booking_date IMPORTING is_booking         TYPE /dmo/booking
-                                          is_bookingx        TYPE /dmo/s_bookingx OPTIONAL
-                                          iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                                CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_booking_date IMPORTING is_booking         TYPE ZTKFK_booking
+                                          is_bookingx        TYPE ZTKFK_s_bookingx OPTIONAL
+                                          iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                                CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                                 RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_customer IMPORTING is_booking         TYPE /dmo/booking
-                                      is_bookingx        TYPE /dmo/s_bookingx OPTIONAL
-                                      iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                            CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_customer IMPORTING is_booking         TYPE ZTKFK_booking
+                                      is_bookingx        TYPE ZTKFK_s_bookingx OPTIONAL
+                                      iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                            CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                             RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_flight IMPORTING is_booking         TYPE /dmo/booking
-                                    is_bookingx        TYPE /dmo/s_bookingx OPTIONAL
-                                    iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                          CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_flight IMPORTING is_booking         TYPE ZTKFK_booking
+                                    is_bookingx        TYPE ZTKFK_s_bookingx OPTIONAL
+                                    iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                          CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                           RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_currency_code IMPORTING is_booking         TYPE /dmo/booking
-                                           is_bookingx        TYPE /dmo/s_bookingx OPTIONAL
-                                           iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                                 CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_currency_code IMPORTING is_booking         TYPE ZTKFK_booking
+                                           is_bookingx        TYPE ZTKFK_s_bookingx OPTIONAL
+                                           iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                                 CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                                  RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _determine IMPORTING iv_change_mode TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                       CHANGING  cs_booking     TYPE /dmo/booking.
+    METHODS _determine IMPORTING iv_change_mode TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                       CHANGING  cs_booking     TYPE ZTKFK_booking.
 ENDCLASS.
 
 CLASS lcl_booking_buffer IMPLEMENTATION.
@@ -710,46 +710,46 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
     CLEAR et_messages.
 
     TYPES: BEGIN OF ts_travel_booking_id,
-             travel_id  TYPE /dmo/travel_id,
-             booking_id TYPE /dmo/booking_id,
+             travel_id  TYPE ZTKFK_travel_id,
+             booking_id TYPE ZTKFK_booking_id,
            END OF ts_travel_booking_id,
            tt_travel_booking_id TYPE SORTED TABLE OF ts_travel_booking_id WITH UNIQUE KEY travel_id booking_id.
     DATA lt_travel_booking_id TYPE tt_travel_booking_id.
 
     CHECK it_booking IS NOT INITIAL.
 
-    SELECT FROM /dmo/booking FIELDS travel_id, booking_id FOR ALL ENTRIES IN @it_booking WHERE travel_id = @it_booking-travel_id AND booking_id = @it_booking-booking_id INTO CORRESPONDING FIELDS OF TABLE @lt_travel_booking_id.
+    SELECT FROM ZTKFK_booking FIELDS travel_id, booking_id FOR ALL ENTRIES IN @it_booking WHERE travel_id = @it_booking-travel_id AND booking_id = @it_booking-booking_id INTO CORRESPONDING FIELDS OF TABLE @lt_travel_booking_id.
 
     LOOP AT it_booking INTO DATA(ls_booking_create) ##INTO_OK.
       " Booking_ID key must not be initial
       IF ls_booking_create-booking_id IS INITIAL.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_no_key  travel_id = ls_booking_create-travel_id ) TO et_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_no_key  travel_id = ls_booking_create-travel_id ) TO et_messages.
         RETURN.
       ENDIF.
 
       " Booking_ID key check DB
       READ TABLE lt_travel_booking_id TRANSPORTING NO FIELDS WITH TABLE KEY travel_id = ls_booking_create-travel_id  booking_id = ls_booking_create-booking_id.
       IF sy-subrc = 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_exists  travel_id = ls_booking_create-travel_id  booking_id = ls_booking_create-booking_id ) TO et_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_exists  travel_id = ls_booking_create-travel_id  booking_id = ls_booking_create-booking_id ) TO et_messages.
         RETURN.
       ENDIF.
 
       " Booking_ID key check Buffer
       READ TABLE mt_create_buffer TRANSPORTING NO FIELDS WITH TABLE KEY travel_id = ls_booking_create-travel_id  booking_id = ls_booking_create-booking_id.
       IF sy-subrc = 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_exists  travel_id = ls_booking_create-travel_id  booking_id = ls_booking_create-booking_id ) TO et_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_exists  travel_id = ls_booking_create-travel_id  booking_id = ls_booking_create-booking_id ) TO et_messages.
         RETURN.
       ENDIF.
 
       " Checks
       IF _check( EXPORTING is_booking     = ls_booking_create
-                           iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create
+                           iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create
                  CHANGING  ct_messages    = et_messages ) = abap_false.
         RETURN.
       ENDIF.
 
       " standard determinations
-      _determine( EXPORTING iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create
+      _determine( EXPORTING iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create
                   CHANGING cs_booking      = ls_booking_create ).
 
       INSERT ls_booking_create INTO TABLE mt_create_buffer_2.
@@ -767,21 +767,21 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
     " Check for empty keys
     LOOP AT it_booking ASSIGNING FIELD-SYMBOL(<s_booking_update>) WHERE booking_id = 0. "#EC CI_SORTSEQ
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_no_key  travel_id = <s_booking_update>-travel_id ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_no_key  travel_id = <s_booking_update>-travel_id ) TO et_messages.
       RETURN.
     ENDLOOP.
 
-    DATA lt_booking TYPE SORTED TABLE OF /dmo/booking WITH UNIQUE KEY travel_id  booking_id.
-    SELECT * FROM /dmo/booking FOR ALL ENTRIES IN @it_booking WHERE travel_id = @it_booking-travel_id AND booking_id = @it_booking-booking_id INTO TABLE @lt_booking.
+    DATA lt_booking TYPE SORTED TABLE OF ZTKFK_booking WITH UNIQUE KEY travel_id  booking_id.
+    SELECT * FROM ZTKFK_booking FOR ALL ENTRIES IN @it_booking WHERE travel_id = @it_booking-travel_id AND booking_id = @it_booking-booking_id INTO TABLE @lt_booking.
 
-    FIELD-SYMBOLS <s_buffer_booking> TYPE /dmo/booking.
-    DATA ls_buffer_booking TYPE /dmo/booking.
+    FIELD-SYMBOLS <s_buffer_booking> TYPE ZTKFK_booking.
+    DATA ls_buffer_booking TYPE ZTKFK_booking.
     LOOP AT it_booking ASSIGNING <s_booking_update>.
       UNASSIGN <s_buffer_booking>.
 
       READ TABLE mt_delete_buffer TRANSPORTING NO FIELDS WITH TABLE KEY travel_id = <s_booking_update>-travel_id  booking_id = <s_booking_update>-booking_id.
       IF sy-subrc = 0." Error: Record to be updated marked for deletion
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_unknown  travel_id = <s_booking_update>-travel_id  booking_id = <s_booking_update>-booking_id ) TO et_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_unknown  travel_id = <s_booking_update>-travel_id  booking_id = <s_booking_update>-booking_id ) TO et_messages.
         RETURN.
       ENDIF.
 
@@ -817,16 +817,16 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
       " Error
       IF <s_buffer_booking> IS NOT ASSIGNED.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_unknown  travel_id = <s_booking_update>-travel_id  booking_id = <s_booking_update>-booking_id ) TO et_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_unknown  travel_id = <s_booking_update>-travel_id  booking_id = <s_booking_update>-booking_id ) TO et_messages.
         RETURN.
       ENDIF.
 
       " Merge fields to be updated
       READ TABLE it_bookingx ASSIGNING FIELD-SYMBOL(<s_bookingx>) WITH KEY travel_id   = <s_booking_update>-travel_id
                                                                            booking_id  = <s_booking_update>-booking_id
-                                                                           action_code = /dmo/if_flight_legacy=>action_code-update.
+                                                                           action_code = ZTKFK_if_flight_legacy=>action_code-update.
       IF sy-subrc <> 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>booking_no_control
+        APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>booking_no_control
                                           travel_id  = <s_booking_update>-travel_id
                                           booking_id = <s_booking_update>-booking_id ) TO et_messages.
         RETURN.
@@ -836,7 +836,7 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
         OR ( <s_bookingx>-connection_id = abap_true AND ( <s_booking_update>-connection_id <> <s_buffer_booking>-connection_id ) )
         OR ( <s_bookingx>-flight_date   = abap_true AND ( <s_booking_update>-flight_date   <> <s_buffer_booking>-flight_date   ) ).
         " The flight must not be changed (delete the record and create a new one)
-        APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>booking_flight_u
+        APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>booking_flight_u
                                           travel_id  = <s_booking_update>-travel_id
                                           booking_id = <s_booking_update>-booking_id ) TO et_messages.
         RETURN.
@@ -845,7 +845,7 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
       IF   ( <s_bookingx>-flight_price = abap_true  AND <s_bookingx>-currency_code = abap_false )
         OR ( <s_bookingx>-flight_price = abap_false AND <s_bookingx>-currency_code = abap_true  ).
         " Price and currency code must be changed together
-        APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>booking_price_currency_u
+        APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>booking_price_currency_u
                                           travel_id  = <s_booking_update>-travel_id
                                           booking_id = <s_booking_update>-booking_id ) TO et_messages.
         RETURN.
@@ -871,14 +871,14 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
       " Checks
       IF _check( EXPORTING is_booking     = <s_buffer_booking>
                            is_bookingx    = <s_bookingx>
-                           iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update
+                           iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update
                  CHANGING  ct_messages    = et_messages ) = abap_false.
         RETURN.
       ENDIF.
 
       " standard determinations
       DATA(ls_booking) = <s_buffer_booking>." Needed, as key fields must not be changed
-      _determine( EXPORTING iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update
+      _determine( EXPORTING iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update
                   CHANGING  cs_booking     = ls_booking ).
       <s_buffer_booking>-gr_data = ls_booking-gr_data.
 
@@ -894,7 +894,7 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
     " Check for empty keys
     LOOP AT it_booking ASSIGNING FIELD-SYMBOL(<s_booking_delete>) WHERE booking_id = 0. "#EC CI_SORTSEQ
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_no_key  travel_id = <s_booking_delete>-travel_id ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_no_key  travel_id = <s_booking_delete>-travel_id ) TO et_messages.
       RETURN.
     ENDLOOP.
 
@@ -910,8 +910,8 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
     ENDLOOP.
 
     IF iv_no_delete_check = abap_false.
-      DATA lt_booking_db TYPE /dmo/t_booking_key.
-      SELECT travel_id, booking_id FROM /dmo/booking FOR ALL ENTRIES IN @lt_booking WHERE travel_id = @lt_booking-travel_id AND booking_id = @lt_booking-booking_id INTO CORRESPONDING FIELDS OF TABLE @lt_booking_db.
+      DATA lt_booking_db TYPE ZTKFK_t_booking_key.
+      SELECT travel_id, booking_id FROM ZTKFK_booking FOR ALL ENTRIES IN @lt_booking WHERE travel_id = @lt_booking-travel_id AND booking_id = @lt_booking-booking_id INTO CORRESPONDING FIELDS OF TABLE @lt_booking_db.
     ENDIF.
 
     " Check existence and append to delete buffer
@@ -919,7 +919,7 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
       IF iv_no_delete_check = abap_false.
         READ TABLE lt_booking_db TRANSPORTING NO FIELDS WITH TABLE KEY travel_id = <s_booking_delete>-travel_id  booking_id = <s_booking_delete>-booking_id.
         IF sy-subrc <> 0.
-          APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_unknown  travel_id = <s_booking_delete>-travel_id  booking_id = <s_booking_delete>-booking_id ) TO et_messages.
+          APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_unknown  travel_id = <s_booking_delete>-travel_id  booking_id = <s_booking_delete>-booking_id ) TO et_messages.
           RETURN.
         ENDIF.
       ENDIF.
@@ -932,9 +932,9 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
     ASSERT mt_create_buffer_2 IS INITIAL.
     ASSERT mt_update_buffer_2 IS INITIAL.
     ASSERT mt_delete_buffer_2 IS INITIAL.
-    INSERT /dmo/booking FROM TABLE @mt_create_buffer.
-    UPDATE /dmo/booking FROM TABLE @mt_update_buffer.
-    DELETE /dmo/booking FROM TABLE @( CORRESPONDING #( mt_delete_buffer ) ).
+    INSERT ZTKFK_booking FROM TABLE @mt_create_buffer.
+    UPDATE ZTKFK_booking FROM TABLE @mt_update_buffer.
+    DELETE ZTKFK_booking FROM TABLE @( CORRESPONDING #( mt_delete_buffer ) ).
   ENDMETHOD.
 
 
@@ -947,17 +947,17 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
     rv_is_valid = abap_false.
 
     IF iv_booking_id IS INITIAL.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_no_key  travel_id = iv_travel_id ) TO ct_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_no_key  travel_id = iv_travel_id ) TO ct_messages.
       RETURN.
     ENDIF.
 
     IF line_exists( mt_delete_buffer[ travel_id = iv_travel_id  booking_id = iv_booking_id ] ).
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_unknown  travel_id = iv_travel_id  booking_id = iv_booking_id ) TO ct_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_unknown  travel_id = iv_travel_id  booking_id = iv_booking_id ) TO ct_messages.
       RETURN.
     ENDIF.
 
     IF line_exists( mt_delete_buffer_2[ travel_id = iv_travel_id  booking_id = iv_booking_id ] ).
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_unknown  travel_id = iv_travel_id  booking_id = iv_booking_id ) TO ct_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_unknown  travel_id = iv_travel_id  booking_id = iv_booking_id ) TO ct_messages.
       RETURN.
     ENDIF.
 
@@ -971,13 +971,13 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @iv_travel_id AND booking_id = @iv_booking_id INTO @DATA(lv_db_exists).
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @iv_travel_id AND booking_id = @iv_booking_id INTO @DATA(lv_db_exists).
     IF lv_db_exists = abap_true.
       rv_is_valid = abap_true.
       RETURN.
     ENDIF.
 
-    APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_unknown  travel_id = iv_travel_id  booking_id = iv_booking_id ) TO ct_messages.
+    APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_unknown  travel_id = iv_travel_id  booking_id = iv_booking_id ) TO ct_messages.
   ENDMETHOD.
 
 
@@ -987,25 +987,25 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
     CHECK it_booking IS NOT INITIAL.
 
-    DATA lt_booking_c  TYPE /dmo/t_booking.
-    DATA lt_booking_u  TYPE /dmo/t_booking.
-    DATA lt_booking_d  TYPE /dmo/t_booking.
-    DATA lt_bookingx_u TYPE /dmo/t_bookingx.
+    DATA lt_booking_c  TYPE ZTKFK_t_booking.
+    DATA lt_booking_u  TYPE ZTKFK_t_booking.
+    DATA lt_booking_d  TYPE ZTKFK_t_booking.
+    DATA lt_bookingx_u TYPE ZTKFK_t_bookingx.
     LOOP AT it_booking ASSIGNING FIELD-SYMBOL(<s_booking>).
       READ TABLE it_bookingx ASSIGNING FIELD-SYMBOL(<s_bookingx>) WITH TABLE KEY travel_id = <s_booking>-travel_id  booking_id = <s_booking>-booking_id.
       IF sy-subrc <> 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>booking_no_control
+        APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>booking_no_control
                                           travel_id  = <s_booking>-travel_id
                                           booking_id = <s_booking>-booking_id ) TO et_messages.
         RETURN.
       ENDIF.
-      CASE CONV /dmo/if_flight_legacy=>action_code_enum( <s_bookingx>-action_code ).
-        WHEN /dmo/if_flight_legacy=>action_code-create.
+      CASE CONV ZTKFK_if_flight_legacy=>action_code_enum( <s_bookingx>-action_code ).
+        WHEN ZTKFK_if_flight_legacy=>action_code-create.
           INSERT <s_booking>  INTO TABLE lt_booking_c.
-        WHEN /dmo/if_flight_legacy=>action_code-update.
+        WHEN ZTKFK_if_flight_legacy=>action_code-update.
           INSERT <s_booking>  INTO TABLE lt_booking_u.
           INSERT <s_bookingx> INTO TABLE lt_bookingx_u.
-        WHEN /dmo/if_flight_legacy=>action_code-delete.
+        WHEN ZTKFK_if_flight_legacy=>action_code-delete.
           INSERT <s_booking>  INTO TABLE lt_booking_d.
       ENDCASE.
     ENDLOOP.
@@ -1065,7 +1065,7 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
     CHECK it_booking IS NOT INITIAL.
 
-    SELECT * FROM /dmo/booking FOR ALL ENTRIES IN @it_booking WHERE travel_id  = @it_booking-travel_id
+    SELECT * FROM ZTKFK_booking FOR ALL ENTRIES IN @it_booking WHERE travel_id  = @it_booking-travel_id
       INTO TABLE @et_booking ##SELECT_FAE_WITH_LOB[DESCRIPTION]. "#EC CI_ALL_FIELDS_NEEDED "#EC CI_SEL_DEL
 
     IF iv_include_buffer = abap_true.
@@ -1138,13 +1138,13 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
   METHOD _check_booking_date.
     rv_is_valid = abap_true.
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_bookingx-booking_date = abap_true ).
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_bookingx-booking_date = abap_true ).
 
       " A. Booking Date must not be initial
       " B. When the record is created it must not be in the past
-      IF is_booking-booking_date IS INITIAL OR is_booking-booking_date = '' OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create AND is_booking-booking_date < cl_abap_context_info=>get_system_date( ) ).
+      IF is_booking-booking_date IS INITIAL OR is_booking-booking_date = '' OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create AND is_booking-booking_date < cl_abap_context_info=>get_system_date( ) ).
         rv_is_valid = abap_false.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>booking_booking_date_invalid  travel_id = is_booking-travel_id  booking_id = is_booking-booking_id  booking_date = is_booking-booking_date ) TO ct_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>booking_booking_date_invalid  travel_id = is_booking-travel_id  booking_id = is_booking-booking_id  booking_date = is_booking-booking_date ) TO ct_messages.
       ENDIF.
     ENDIF.
   ENDMETHOD.
@@ -1152,7 +1152,7 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
   METHOD _check_customer.
     rv_is_valid = abap_true.
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_bookingx-customer_id = abap_true ).
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_bookingx-customer_id = abap_true ).
       rv_is_valid = lcl_common_checks=>is_customer_id_valid( EXPORTING iv_customer_id = is_booking-customer_id CHANGING ct_messages = ct_messages ).
     ENDIF.
   ENDMETHOD.
@@ -1160,16 +1160,16 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
   METHOD _check_flight.
     rv_is_valid = abap_true.
-    IF     iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create
-      OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update
+    IF     iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create
+      OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update
         AND ( is_bookingx-carrier_id = abap_true OR is_bookingx-connection_id = abap_true OR is_bookingx-flight_date = abap_true ) ).
       IF mt_flight_key IS INITIAL.
-        SELECT carrier_id, connection_id, flight_date FROM /dmo/flight INTO CORRESPONDING FIELDS OF TABLE @mt_flight_key. "#EC CI_NOWHERE
+        SELECT carrier_id, connection_id, flight_date FROM ZTKFK_flight INTO CORRESPONDING FIELDS OF TABLE @mt_flight_key. "#EC CI_NOWHERE
       ENDIF.
       READ TABLE mt_flight_key TRANSPORTING NO FIELDS WITH TABLE KEY carrier_id = is_booking-carrier_id  connection_id = is_booking-connection_id  flight_date = is_booking-flight_date.
       IF sy-subrc <> 0.
         rv_is_valid = abap_false.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>flight_unknown  carrier_id = is_booking-carrier_id  connection_id = is_booking-connection_id  flight_date = is_booking-flight_date ) TO ct_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>flight_unknown  carrier_id = is_booking-carrier_id  connection_id = is_booking-connection_id  flight_date = is_booking-flight_date ) TO ct_messages.
       ENDIF.
     ENDIF.
   ENDMETHOD.
@@ -1177,19 +1177,19 @@ CLASS lcl_booking_buffer IMPLEMENTATION.
 
   METHOD _check_currency_code.
     rv_is_valid = abap_true.
-    IF   ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create AND is_booking-currency_code IS NOT INITIAL ) " Will be derived if initial
-      OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_bookingx-currency_code = abap_true ).
+    IF   ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create AND is_booking-currency_code IS NOT INITIAL ) " Will be derived if initial
+      OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_bookingx-currency_code = abap_true ).
       rv_is_valid = lcl_common_checks=>is_currency_code_valid( EXPORTING iv_currency_code = is_booking-currency_code CHANGING ct_messages = ct_messages ).
     ENDIF.
   ENDMETHOD.
 
 
   METHOD _determine.
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create.
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create.
       " Derive price and currency code if one of the fields is initial
       IF cs_booking-flight_price IS INITIAL OR cs_booking-currency_code IS INITIAL.
         " Flight price might have changed, we need to use current flight price
-        SELECT SINGLE price, currency_code FROM /dmo/flight WHERE carrier_id    = @cs_booking-carrier_id
+        SELECT SINGLE price, currency_code FROM ZTKFK_flight WHERE carrier_id    = @cs_booking-carrier_id
                                                               AND connection_id = @cs_booking-connection_id
                                                               AND flight_date   = @cs_booking-flight_date INTO ( @cs_booking-flight_price, @cs_booking-currency_code ).
         ASSERT sy-subrc = 0. " Check has been done before
@@ -1202,85 +1202,85 @@ ENDCLASS.
 CLASS lcl_travel_buffer DEFINITION FINAL CREATE PRIVATE.
   PUBLIC SECTION.
     CLASS-METHODS: get_instance RETURNING VALUE(ro_instance) TYPE REF TO lcl_travel_buffer.
-    METHODS set_status_to_booked IMPORTING iv_travel_id TYPE /dmo/travel_id
-                                 EXPORTING et_messages  TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
+    METHODS set_status_to_booked IMPORTING iv_travel_id TYPE ZTKFK_travel_id
+                                 EXPORTING et_messages  TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
     METHODS save.
     METHODS initialize.
-    METHODS check_travel_id IMPORTING iv_travel_id       TYPE /dmo/travel_id
-                            CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS check_travel_id IMPORTING iv_travel_id       TYPE ZTKFK_travel_id
+                            CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                             RETURNING VALUE(rv_is_valid) TYPE abap_bool.
     "! Prepare changes in a temporary buffer
     "! @parameter iv_no_delete_check | In some cases we do not need to check the existence of a record to be deleted, as this check has been done before.
     "!                               | E.g. delete all subnodes of a node to be deleted.  In this case we have read the subnodes to get their keys.
-    METHODS cud_prep IMPORTING it_travel          TYPE /dmo/t_travel
-                               it_travelx         TYPE /dmo/t_travelx
+    METHODS cud_prep IMPORTING it_travel          TYPE ZTKFK_t_travel
+                               it_travelx         TYPE ZTKFK_t_travelx
                                iv_no_delete_check TYPE abap_bool OPTIONAL
-                     EXPORTING et_travel          TYPE /dmo/t_travel
-                               et_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
+                     EXPORTING et_travel          TYPE ZTKFK_t_travel
+                               et_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
     "! Add content of the temporary buffer to the real buffer and clear the temporary buffer
     METHODS cud_copy.
     "! Discard content of the temporary buffer
     METHODS cud_disc.
-    METHODS get IMPORTING it_travel              TYPE /dmo/t_travel
+    METHODS get IMPORTING it_travel              TYPE ZTKFK_t_travel
                           iv_include_buffer      TYPE abap_boolean
                           iv_include_temp_buffer TYPE abap_boolean
-                EXPORTING et_travel              TYPE /dmo/t_travel.
+                EXPORTING et_travel              TYPE ZTKFK_t_travel.
 
   PRIVATE SECTION.
     CLASS-DATA go_instance TYPE REF TO lcl_travel_buffer.
     " Main buffer
-    DATA: mt_create_buffer TYPE /dmo/t_travel,
-          mt_update_buffer TYPE /dmo/t_travel,
-          mt_delete_buffer TYPE /dmo/t_travel_key.
+    DATA: mt_create_buffer TYPE ZTKFK_t_travel,
+          mt_update_buffer TYPE ZTKFK_t_travel,
+          mt_delete_buffer TYPE ZTKFK_t_travel_key.
     " Temporary buffer valid during create / update / delete Travel
-    DATA: mt_create_buffer_2 TYPE /dmo/t_travel,
-          mt_update_buffer_2 TYPE /dmo/t_travel,
-          mt_delete_buffer_2 TYPE /dmo/t_travel_key.
+    DATA: mt_create_buffer_2 TYPE ZTKFK_t_travel,
+          mt_update_buffer_2 TYPE ZTKFK_t_travel,
+          mt_delete_buffer_2 TYPE ZTKFK_t_travel_key.
 
-    DATA mt_agency_id   TYPE SORTED TABLE OF /dmo/agency_id   WITH UNIQUE KEY table_line.
+    DATA mt_agency_id   TYPE SORTED TABLE OF ZTKFK_agency_id   WITH UNIQUE KEY table_line.
 
-    METHODS _create IMPORTING it_travel   TYPE /dmo/t_travel
-                    EXPORTING et_travel   TYPE /dmo/t_travel
-                              et_messages TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
-    METHODS _update IMPORTING it_travel   TYPE /dmo/t_travel
-                              it_travelx  TYPE /dmo/t_travelx
-                    EXPORTING et_travel   TYPE /dmo/t_travel
-                              et_messages TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
-    METHODS _delete IMPORTING it_travel          TYPE /dmo/t_travel
+    METHODS _create IMPORTING it_travel   TYPE ZTKFK_t_travel
+                    EXPORTING et_travel   TYPE ZTKFK_t_travel
+                              et_messages TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
+    METHODS _update IMPORTING it_travel   TYPE ZTKFK_t_travel
+                              it_travelx  TYPE ZTKFK_t_travelx
+                    EXPORTING et_travel   TYPE ZTKFK_t_travel
+                              et_messages TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
+    METHODS _delete IMPORTING it_travel          TYPE ZTKFK_t_travel
                               iv_no_delete_check TYPE abap_bool
-                    EXPORTING et_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message.
+                    EXPORTING et_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message.
 
-    METHODS _check IMPORTING is_travel          TYPE /dmo/travel
-                             is_travelx         TYPE /dmo/s_travelx OPTIONAL
-                             iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                   CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check IMPORTING is_travel          TYPE ZTKFK_travel
+                             is_travelx         TYPE ZTKFK_s_travelx OPTIONAL
+                             iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                   CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                    RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_agency IMPORTING is_travel          TYPE /dmo/travel
-                                    is_travelx         TYPE /dmo/s_travelx OPTIONAL
-                                    iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                          CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_agency IMPORTING is_travel          TYPE ZTKFK_travel
+                                    is_travelx         TYPE ZTKFK_s_travelx OPTIONAL
+                                    iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                          CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                           RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_customer IMPORTING is_travel          TYPE /dmo/travel
-                                      is_travelx         TYPE /dmo/s_travelx OPTIONAL
-                                      iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                            CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_customer IMPORTING is_travel          TYPE ZTKFK_travel
+                                      is_travelx         TYPE ZTKFK_s_travelx OPTIONAL
+                                      iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                            CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                             RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_dates IMPORTING is_travel          TYPE /dmo/travel
-                                   is_travelx         TYPE /dmo/s_travelx OPTIONAL
-                                   iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                         CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_dates IMPORTING is_travel          TYPE ZTKFK_travel
+                                   is_travelx         TYPE ZTKFK_s_travelx OPTIONAL
+                                   iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                         CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                          RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_status IMPORTING is_travel          TYPE /dmo/travel
-                                    is_travelx         TYPE /dmo/s_travelx OPTIONAL
-                                    iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                          CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_status IMPORTING is_travel          TYPE ZTKFK_travel
+                                    is_travelx         TYPE ZTKFK_s_travelx OPTIONAL
+                                    iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                          CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                           RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _check_currency_code IMPORTING is_travel          TYPE /dmo/travel
-                                           is_travelx         TYPE /dmo/s_travelx OPTIONAL
-                                           iv_change_mode     TYPE /dmo/cl_flight_legacy=>ty_change_mode
-                                 CHANGING  ct_messages        TYPE /dmo/if_flight_legacy=>tt_if_t100_message
+    METHODS _check_currency_code IMPORTING is_travel          TYPE ZTKFK_travel
+                                           is_travelx         TYPE ZTKFK_s_travelx OPTIONAL
+                                           iv_change_mode     TYPE ZTKFK_cl_flight_legacy=>ty_change_mode
+                                 CHANGING  ct_messages        TYPE ZTKFK_if_flight_legacy=>tt_if_t100_message
                                  RETURNING VALUE(rv_is_valid) TYPE abap_bool.
-    METHODS _update_admin IMPORTING iv_new TYPE abap_bool CHANGING cs_travel_admin TYPE /dmo/travel_admin.
+    METHODS _update_admin IMPORTING iv_new TYPE abap_bool CHANGING cs_travel_admin TYPE ZTKFK_travel_admin.
 ENDCLASS.
 
 
@@ -1298,14 +1298,14 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
     CHECK it_travel IS NOT INITIAL.
 
     DATA lt_travel_to_process LIKE it_travel.
-    DATA lv_travel_id_max     TYPE /dmo/travel_id.
+    DATA lv_travel_id_max     TYPE ZTKFK_travel_id.
 
     lt_travel_to_process = it_travel.
 
     " Checks
     LOOP AT it_travel INTO DATA(ls_travel_create) ##INTO_OK.
       IF _check( EXPORTING is_travel     = ls_travel_create
-                           iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create
+                           iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create
                  CHANGING  ct_messages   = et_messages ) = abap_false.
         DELETE lt_travel_to_process WHERE travel_id = ls_travel_create-travel_id.
       ENDIF.
@@ -1318,7 +1318,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
         cl_numberrange_runtime=>number_get(
           EXPORTING
             nr_range_nr       = '01'
-            object            = '/DMO/TRAVL'
+            object            = 'ZTKFK_TRAVL'
             quantity          = CONV #( lines( lt_travel_to_process ) )
           IMPORTING
             number            = DATA(lv_key)
@@ -1332,7 +1332,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
 
     IF lv_return_code = '2' OR lv_return_code = '3'.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_nr_last_number ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_nr_last_number ) TO et_messages.
       EXIT.
     ENDIF.
 
@@ -1347,7 +1347,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
       GET TIME STAMP FIELD ls_travel_create-createdat.
       ls_travel_create-lastchangedby = ls_travel_create-createdby.
       ls_travel_create-lastchangedat = ls_travel_create-createdat.
-      ls_travel_create-status = /dmo/if_flight_legacy=>travel_status-new.
+      ls_travel_create-status = ZTKFK_if_flight_legacy=>travel_status-new.
 
 
 
@@ -1374,21 +1374,21 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
     " Check for empty keys
     READ TABLE it_travel TRANSPORTING NO FIELDS WITH TABLE KEY travel_id = '0'.
     IF sy-subrc = 0.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_no_key ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_no_key ) TO et_messages.
       RETURN.
     ENDIF.
 
-    DATA lt_travel TYPE SORTED TABLE OF /dmo/travel WITH UNIQUE KEY travel_id.
-    SELECT * FROM /dmo/travel FOR ALL ENTRIES IN @it_travel WHERE travel_id = @it_travel-travel_id INTO TABLE @lt_travel ##SELECT_FAE_WITH_LOB[DESCRIPTION].
+    DATA lt_travel TYPE SORTED TABLE OF ZTKFK_travel WITH UNIQUE KEY travel_id.
+    SELECT * FROM ZTKFK_travel FOR ALL ENTRIES IN @it_travel WHERE travel_id = @it_travel-travel_id INTO TABLE @lt_travel ##SELECT_FAE_WITH_LOB[DESCRIPTION].
 
-    FIELD-SYMBOLS <s_buffer_travel> TYPE /dmo/travel.
-    DATA ls_buffer_travel TYPE /dmo/travel.
+    FIELD-SYMBOLS <s_buffer_travel> TYPE ZTKFK_travel.
+    DATA ls_buffer_travel TYPE ZTKFK_travel.
     LOOP AT it_travel ASSIGNING FIELD-SYMBOL(<s_travel_update>).
       UNASSIGN <s_buffer_travel>.
 
       READ TABLE mt_delete_buffer TRANSPORTING NO FIELDS WITH TABLE KEY travel_id = <s_travel_update>-travel_id.
       IF sy-subrc = 0." Error: Record to be updated marked for deletion
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_unknown  travel_id = <s_travel_update>-travel_id ) TO et_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_unknown  travel_id = <s_travel_update>-travel_id ) TO et_messages.
         RETURN.
       ENDIF.
 
@@ -1429,14 +1429,14 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
       " Error
       IF <s_buffer_travel> IS NOT ASSIGNED.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_unknown  travel_id = <s_travel_update>-travel_id ) TO et_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_unknown  travel_id = <s_travel_update>-travel_id ) TO et_messages.
         RETURN.
       ENDIF.
 
       " Merge fields to be updated
-      READ TABLE it_travelx ASSIGNING FIELD-SYMBOL(<s_travelx>) WITH KEY travel_id = <s_travel_update>-travel_id  action_code = /dmo/if_flight_legacy=>action_code-update.
+      READ TABLE it_travelx ASSIGNING FIELD-SYMBOL(<s_travelx>) WITH KEY travel_id = <s_travel_update>-travel_id  action_code = ZTKFK_if_flight_legacy=>action_code-update.
       IF sy-subrc <> 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_no_control  travel_id = <s_travel_update>-travel_id ) TO et_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_no_control  travel_id = <s_travel_update>-travel_id ) TO et_messages.
         RETURN.
       ENDIF.
       DATA lv_field TYPE i.
@@ -1459,7 +1459,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
       " Checks
       IF _check( EXPORTING is_travel      = <s_buffer_travel>
                            is_travelx     = <s_travelx>
-                           iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update
+                           iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update
                  CHANGING  ct_messages    = et_messages ) = abap_false.
         RETURN.
       ENDIF.
@@ -1482,7 +1482,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
     " Check for empty keys
     READ TABLE it_travel TRANSPORTING NO FIELDS WITH TABLE KEY travel_id = '0'.
     IF sy-subrc = 0.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_no_key ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_no_key ) TO et_messages.
       RETURN.
     ENDIF.
 
@@ -1498,8 +1498,8 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
     ENDLOOP.
 
     IF iv_no_delete_check = abap_false.
-      DATA lt_travel_db TYPE SORTED TABLE OF /dmo/travel_id WITH UNIQUE KEY table_line.
-      SELECT travel_id FROM /dmo/travel FOR ALL ENTRIES IN @lt_travel WHERE travel_id = @lt_travel-travel_id INTO TABLE @lt_travel_db.
+      DATA lt_travel_db TYPE SORTED TABLE OF ZTKFK_travel_id WITH UNIQUE KEY table_line.
+      SELECT travel_id FROM ZTKFK_travel FOR ALL ENTRIES IN @lt_travel WHERE travel_id = @lt_travel-travel_id INTO TABLE @lt_travel_db.
     ENDIF.
 
     " Check existence and append to delete buffer
@@ -1507,7 +1507,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
       IF iv_no_delete_check = abap_false.
         READ TABLE lt_travel_db ASSIGNING FIELD-SYMBOL(<s_travel_old>) WITH TABLE KEY table_line = <s_travel_delete>-travel_id.
         IF sy-subrc <> 0.
-          APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_unknown  travel_id = <s_travel_delete>-travel_id ) TO et_messages.
+          APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_unknown  travel_id = <s_travel_delete>-travel_id ) TO et_messages.
           RETURN.
         ENDIF.
       ENDIF.
@@ -1523,13 +1523,13 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
     " Check for empty travel ID
     IF iv_travel_id IS INITIAL.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_no_key ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_no_key ) TO et_messages.
       RETURN.
     ENDIF.
 
     READ TABLE mt_delete_buffer TRANSPORTING NO FIELDS WITH TABLE KEY travel_id = iv_travel_id.
     IF sy-subrc = 0." Error: Record of action marked for deletion
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_unknown  travel_id = iv_travel_id ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_unknown  travel_id = iv_travel_id ) TO et_messages.
       RETURN.
     ENDIF.
 
@@ -1547,7 +1547,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
     " Usual case: Read record from DB and put it into the UPDATE buffer
     IF <s_travel> IS NOT ASSIGNED.
-      SELECT SINGLE * FROM /dmo/travel WHERE travel_id = @iv_travel_id INTO @DATA(ls_travel) .
+      SELECT SINGLE * FROM ZTKFK_travel WHERE travel_id = @iv_travel_id INTO @DATA(ls_travel) .
       IF sy-subrc = 0.
         INSERT ls_travel INTO TABLE mt_update_buffer ASSIGNING <s_travel>.
       ENDIF.
@@ -1555,11 +1555,11 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
     " Error
     IF <s_travel> IS NOT ASSIGNED.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_unknown  travel_id = iv_travel_id ) TO et_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_unknown  travel_id = iv_travel_id ) TO et_messages.
       RETURN.
     ENDIF.
 
-    <s_travel>-status = /dmo/if_flight_legacy=>travel_status-booked.
+    <s_travel>-status = ZTKFK_if_flight_legacy=>travel_status-booked.
     _update_admin( EXPORTING iv_new = lv_new CHANGING cs_travel_admin = <s_travel>-gr_admin ).
   ENDMETHOD.
 
@@ -1568,9 +1568,9 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
     ASSERT mt_create_buffer_2 IS INITIAL.
     ASSERT mt_update_buffer_2 IS INITIAL.
     ASSERT mt_delete_buffer_2 IS INITIAL.
-    INSERT /dmo/travel FROM TABLE @mt_create_buffer.
-    UPDATE /dmo/travel FROM TABLE @mt_update_buffer.
-    DELETE /dmo/travel FROM TABLE @( CORRESPONDING #( mt_delete_buffer ) ).
+    INSERT ZTKFK_travel FROM TABLE @mt_create_buffer.
+    UPDATE ZTKFK_travel FROM TABLE @mt_update_buffer.
+    DELETE ZTKFK_travel FROM TABLE @( CORRESPONDING #( mt_delete_buffer ) ).
   ENDMETHOD.
 
 
@@ -1583,12 +1583,12 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
     rv_is_valid = abap_false.
 
     IF iv_travel_id IS INITIAL.
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_no_key ) TO ct_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_no_key ) TO ct_messages.
       RETURN.
     ENDIF.
 
     IF line_exists( mt_delete_buffer[ travel_id = iv_travel_id ] ).
-      APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_unknown  travel_id = iv_travel_id ) TO ct_messages.
+      APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_unknown  travel_id = iv_travel_id ) TO ct_messages.
       RETURN.
     ENDIF.
 
@@ -1597,13 +1597,13 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @iv_travel_id INTO @DATA(lv_db_exists).
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @iv_travel_id INTO @DATA(lv_db_exists).
     IF lv_db_exists = abap_true.
       rv_is_valid = abap_true.
       RETURN.
     ENDIF.
 
-    APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_unknown  travel_id = iv_travel_id ) TO ct_messages.
+    APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_unknown  travel_id = iv_travel_id ) TO ct_messages.
   ENDMETHOD.
 
 
@@ -1613,24 +1613,24 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
     CHECK it_travel IS NOT INITIAL.
 
-    DATA lt_travel_c  TYPE /dmo/t_travel.
-    DATA lt_travel_u  TYPE /dmo/t_travel.
-    DATA lt_travel_d  TYPE /dmo/t_travel.
-    DATA lt_travelx_u TYPE /dmo/t_travelx.
+    DATA lt_travel_c  TYPE ZTKFK_t_travel.
+    DATA lt_travel_u  TYPE ZTKFK_t_travel.
+    DATA lt_travel_d  TYPE ZTKFK_t_travel.
+    DATA lt_travelx_u TYPE ZTKFK_t_travelx.
     LOOP AT it_travel ASSIGNING FIELD-SYMBOL(<s_travel>).
       READ TABLE it_travelx ASSIGNING FIELD-SYMBOL(<s_travelx>) WITH TABLE KEY travel_id = <s_travel>-travel_id.
       IF sy-subrc <> 0.
-        APPEND NEW /dmo/cx_flight_legacy( textid     = /dmo/cx_flight_legacy=>travel_no_control
+        APPEND NEW ZTKFK_cx_flight_legacy( textid     = ZTKFK_cx_flight_legacy=>travel_no_control
                                           travel_id  = <s_travel>-travel_id ) TO et_messages.
         RETURN.
       ENDIF.
-      CASE CONV /dmo/if_flight_legacy=>action_code_enum( <s_travelx>-action_code ).
-        WHEN /dmo/if_flight_legacy=>action_code-create.
+      CASE CONV ZTKFK_if_flight_legacy=>action_code_enum( <s_travelx>-action_code ).
+        WHEN ZTKFK_if_flight_legacy=>action_code-create.
           INSERT <s_travel>  INTO TABLE lt_travel_c.
-        WHEN /dmo/if_flight_legacy=>action_code-update.
+        WHEN ZTKFK_if_flight_legacy=>action_code-update.
           INSERT <s_travel>  INTO TABLE lt_travel_u.
           INSERT <s_travelx> INTO TABLE lt_travelx_u.
-        WHEN /dmo/if_flight_legacy=>action_code-delete.
+        WHEN ZTKFK_if_flight_legacy=>action_code-delete.
           INSERT <s_travel>  INTO TABLE lt_travel_d.
       ENDCASE.
     ENDLOOP.
@@ -1692,7 +1692,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
     CHECK it_travel IS NOT INITIAL.
 
-    SELECT * FROM /dmo/travel FOR ALL ENTRIES IN @it_travel WHERE travel_id = @it_travel-travel_id
+    SELECT * FROM ZTKFK_travel FOR ALL ENTRIES IN @it_travel WHERE travel_id = @it_travel-travel_id
       INTO TABLE @et_travel ##SELECT_FAE_WITH_LOB[DESCRIPTION]. "#EC CI_ALL_FIELDS_NEEDED "#EC CI_SEL_DEL
 
     IF iv_include_buffer = abap_true.
@@ -1778,14 +1778,14 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
   METHOD _check_agency.
     rv_is_valid = abap_true.
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_travelx-agency_id = abap_true ).
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_travelx-agency_id = abap_true ).
       IF mt_agency_id IS INITIAL.
-        SELECT DISTINCT agency_id FROM /dmo/agency INTO TABLE @mt_agency_id. "#EC CI_NOWHERE
+        SELECT DISTINCT agency_id FROM ZTKFK_agency INTO TABLE @mt_agency_id. "#EC CI_NOWHERE
       ENDIF.
       READ TABLE mt_agency_id TRANSPORTING NO FIELDS WITH TABLE KEY table_line = is_travel-agency_id.
       IF sy-subrc <> 0.
         rv_is_valid = abap_false.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>agency_unkown  agency_id = is_travel-agency_id ) TO ct_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>agency_unkown  agency_id = is_travel-agency_id ) TO ct_messages.
       ENDIF.
     ENDIF.
   ENDMETHOD.
@@ -1793,7 +1793,7 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
   METHOD _check_customer.
     rv_is_valid = abap_true.
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_travelx-customer_id = abap_true ).
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_travelx-customer_id = abap_true ).
       rv_is_valid = lcl_common_checks=>is_customer_id_valid( EXPORTING iv_customer_id = is_travel-customer_id CHANGING ct_messages = ct_messages ).
     ENDIF.
   ENDMETHOD.
@@ -1803,28 +1803,28 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
     rv_is_valid = abap_true.
 
     " begin date
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_travelx-begin_date = abap_true ).
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_travelx-begin_date = abap_true ).
       IF is_travel-begin_date IS INITIAL OR is_travel-begin_date = ''.
         rv_is_valid = abap_false.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>no_begin_date  travel_id = is_travel-travel_id ) TO ct_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>no_begin_date  travel_id = is_travel-travel_id ) TO ct_messages.
       ENDIF.
     ENDIF.
 
     " end date
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_travelx-end_date = abap_true ).
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_travelx-end_date = abap_true ).
       IF is_travel-end_date IS INITIAL OR is_travel-end_date = ''.
         rv_is_valid = abap_false.
-        APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>no_end_date  travel_id = is_travel-travel_id ) TO ct_messages.
+        APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>no_end_date  travel_id = is_travel-travel_id ) TO ct_messages.
       ENDIF.
     ENDIF.
 
     " begin date < = end date
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_travelx-begin_date = abap_true )
-                                                                  OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_travelx-end_date   = abap_true ).
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_travelx-begin_date = abap_true )
+                                                                  OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_travelx-end_date   = abap_true ).
       IF is_travel-begin_date IS NOT INITIAL AND is_travel-end_date IS NOT INITIAL.
         IF is_travel-begin_date > is_travel-end_date.
           rv_is_valid = abap_false.
-          APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>end_date_before_begin_date  begin_date = is_travel-begin_date  end_date = is_travel-end_date  travel_id = is_travel-travel_id ) TO ct_messages.
+          APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>end_date_before_begin_date  begin_date = is_travel-begin_date  end_date = is_travel-end_date  travel_id = is_travel-travel_id ) TO ct_messages.
         ENDIF.
       ENDIF.
     ENDIF.
@@ -1833,15 +1833,15 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
 
   METHOD _check_status.
     rv_is_valid = abap_true.
-    IF iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_travelx-status = abap_true.
+    IF iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_travelx-status = abap_true.
       CASE is_travel-status.
-        WHEN CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-booked ).   " OK
-        WHEN CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-cancelled )." OK
-        WHEN CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-new ).      " OK
-        WHEN CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-planned ).  " OK
+        WHEN CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-booked ).   " OK
+        WHEN CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-cancelled )." OK
+        WHEN CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-new ).      " OK
+        WHEN CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-planned ).  " OK
         WHEN OTHERS.
           rv_is_valid = abap_false.
-          APPEND NEW /dmo/cx_flight_legacy( textid = /dmo/cx_flight_legacy=>travel_status_invalid  status = is_travel-status ) TO ct_messages.
+          APPEND NEW ZTKFK_cx_flight_legacy( textid = ZTKFK_cx_flight_legacy=>travel_status_invalid  status = is_travel-status ) TO ct_messages.
       ENDCASE.
     ENDIF.
   ENDMETHOD.
@@ -1853,8 +1853,8 @@ CLASS lcl_travel_buffer IMPLEMENTATION.
       " When no prices have been entered yet, the currency code may be initial
       RETURN.
     ENDIF.
-    IF   iv_change_mode = /dmo/cl_flight_legacy=>change_mode-create
-      OR ( iv_change_mode = /dmo/cl_flight_legacy=>change_mode-update AND is_travelx-currency_code = abap_true ).
+    IF   iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-create
+      OR ( iv_change_mode = ZTKFK_cl_flight_legacy=>change_mode-update AND is_travelx-currency_code = abap_true ).
       rv_is_valid = lcl_common_checks=>is_currency_code_valid( EXPORTING iv_currency_code = is_travel-currency_code CHANGING ct_messages = ct_messages ).
     ENDIF.
   ENDMETHOD.

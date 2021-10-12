@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/C_CARRIERSLOCKSINGLETON_S</DDLNAME>
+    <DDLNAME>ZTKFK_C_CARRIERSLOCKSINGLETON_S</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Carrier Singleton Projection View</DDTEXT>
     <SOURCE_TYPE>P</SOURCE_TYPE>

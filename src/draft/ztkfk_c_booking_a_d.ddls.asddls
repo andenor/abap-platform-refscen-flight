@@ -3,8 +3,8 @@
 
 @Metadata.allowExtensions: true
 @Search.searchable: true
-define view entity /DMO/C_Booking_A_D
-  as projection on /DMO/I_Booking_D
+define view entity ZTKFK_C_Booking_A_D
+  as projection on ZTKFK_I_Booking_D
 {
   key BookingUUID,
 
@@ -17,16 +17,16 @@ define view entity /DMO/C_Booking_A_D
 
       @ObjectModel.text.element: ['CustomerName']
       @Search.defaultSearchElement: true
-      @Consumption.valueHelpDefinition: [{entity: {name: '/DMO/I_Customer', element: 'CustomerID' }}]
+      @Consumption.valueHelpDefinition: [{entity: {name: 'ZTKFK_I_Customer', element: 'CustomerID' }}]
       CustomerID,
       _Customer.LastName as CustomerName,
 
       @ObjectModel.text.element: ['CarrierName']
-      @Consumption.valueHelpDefinition: [{entity: {name: '/DMO/I_Carrier', element: 'AirlineID' }}]
+      @Consumption.valueHelpDefinition: [{entity: {name: 'ZTKFK_I_Carrier', element: 'AirlineID' }}]
       AirlineID,
       _Carrier.Name      as CarrierName,
 
-      @Consumption.valueHelpDefinition: [ {entity: {name: '/DMO/I_Flight', element: 'ConnectionID'},
+      @Consumption.valueHelpDefinition: [ {entity: {name: 'ZTKFK_I_Flight', element: 'ConnectionID'},
                      additionalBinding: [ { localElement: 'FlightDate',   element: 'FlightDate'},
                                           { localElement: 'AirlineID',    element: 'AirlineID'},
                                           { localElement: 'FlightPrice',  element: 'Price', usage: #RESULT},
@@ -36,7 +36,7 @@ define view entity /DMO/C_Booking_A_D
       FlightDate,
 
       
-      @Consumption.valueHelpDefinition: [ {entity: {name: '/DMO/I_Flight', element: 'ConnectionID'},
+      @Consumption.valueHelpDefinition: [ {entity: {name: 'ZTKFK_I_Flight', element: 'ConnectionID'},
                      additionalBinding: [ { localElement: 'FlightDate',   element: 'FlightDate'},
                                           { localElement: 'AirlineID',    element: 'AirlineID'},
                                           { localElement: 'FlightPrice',  element: 'Price', usage: #RESULT },
@@ -47,17 +47,17 @@ define view entity /DMO/C_Booking_A_D
       CurrencyCode,
 
       @ObjectModel.text.element: ['BookingStatusText']
-      @Consumption.valueHelpDefinition: [{entity: {name: '/DMO/I_Booking_Status_VH', element: 'BookingStatus' }}]
+      @Consumption.valueHelpDefinition: [{entity: {name: 'ZTKFK_I_Booking_Status_VH', element: 'BookingStatus' }}]
       BookingStatus,
       _BookingStatus._Text.Text as BookingStatusText: localized, 
 
       LocalLastChangedAt,
 
       /* Associations */
-      _BookingSupplement: redirected to composition child /DMO/C_BookingSupplement_A_D,
+      _BookingSupplement: redirected to composition child ZTKFK_C_BookingSupplement_A_D,
       _BookingStatus, 
       _Carrier,
       _Connection,
       _Customer,
-      _Travel: redirected to parent /DMO/C_Travel_A_D
+      _Travel: redirected to parent ZTKFK_C_Travel_A_D
 }

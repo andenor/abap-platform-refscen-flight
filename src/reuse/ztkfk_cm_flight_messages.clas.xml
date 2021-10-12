@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>/DMO/CM_FLIGHT_MESSAGES</CLSNAME>
+    <CLSNAME>ZTKFK_CM_FLIGHT_MESSAGES</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>Flight Reference Scenario: Message Exception Class</DESCRIPT>
     <CATEGORY>40</CATEGORY>
@@ -14,7 +14,7 @@
    </VSEOCLASS>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
-     <CLSNAME>/DMO/CM_FLIGHT_MESSAGES</CLSNAME>
+     <CLSNAME>ZTKFK_CM_FLIGHT_MESSAGES</CLSNAME>
      <CMPNAME>CONSTRUCTOR</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>CONSTRUCTOR</DESCRIPT>

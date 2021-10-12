@@ -1,8 +1,8 @@
-projection implementation in class /dmo/bp_c_supplement unique;
+projection implementation in class ZTKFK_bp_c_supplement unique;
 strict;
 use draft;
 
-define behavior for /DMO/C_Supplement alias Supplement
+define behavior for ZTKFK_C_Supplement alias Supplement
 {
   use create ( augment );
   use update ( augment );

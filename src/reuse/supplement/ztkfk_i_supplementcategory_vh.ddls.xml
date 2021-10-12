@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/I_SUPPLEMENTCATEGORY_VH</DDLNAME>
+    <DDLNAME>ZTKFK_I_SUPPLEMENTCATEGORY_VH</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Supplement Type Value Help</DDTEXT>
     <SOURCE_TYPE>W</SOURCE_TYPE>

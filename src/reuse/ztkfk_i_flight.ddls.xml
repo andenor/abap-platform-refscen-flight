@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/I_FLIGHT</DDLNAME>
+    <DDLNAME>ZTKFK_I_FLIGHT</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Flight View - CDS Data Model</DDTEXT>
     <SOURCE_TYPE>W</SOURCE_TYPE>

@@ -4,22 +4,22 @@
 @Metadata.allowExtensions: true
 
 @Search.searchable: true
-define root view entity /DMO/C_Travel_U
+define root view entity ZTKFK_C_Travel_U
   provider contract transactional_query
-  as projection on /DMO/I_Travel_U
+  as projection on ZTKFK_I_Travel_U
 
-{     ///DMO/I_Travel_U
+{     //ZTKFK_I_Travel_U
 
   key TravelID,
 
-      @Consumption.valueHelpDefinition: [{ entity: { name:    '/DMO/I_Agency',
+      @Consumption.valueHelpDefinition: [{ entity: { name:    'ZTKFK_I_Agency',
                                                      element: 'AgencyID' } }]
       @ObjectModel.text.element: ['AgencyName']
       @Search.defaultSearchElement: true
       AgencyID,
       _Agency.Name       as AgencyName,
 
-      @Consumption.valueHelpDefinition: [{ entity: { name:    '/DMO/I_Customer',
+      @Consumption.valueHelpDefinition: [{ entity: { name:    'ZTKFK_I_Customer',
                                                      element: 'CustomerID'  } }]
       @ObjectModel.text.element: ['CustomerName']
       @Search.defaultSearchElement: true
@@ -40,7 +40,7 @@ define root view entity /DMO/C_Travel_U
 
       Memo,
 
-      @Consumption.valueHelpDefinition: [{ entity: { name: '/DMO/I_Travel_Status_VH', element: 'TravelStatus' }}]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'ZTKFK_I_Travel_Status_VH', element: 'TravelStatus' }}]
       @ObjectModel.text.element: ['StatusText']  
       Status,
       
@@ -48,8 +48,8 @@ define root view entity /DMO/C_Travel_U
 
       LastChangedAt,
       /* Associations */
-      ///DMO/I_Travel_U
-      _Booking : redirected to composition child /DMO/C_Booking_U,
+      //ZTKFK_I_Travel_U
+      _Booking : redirected to composition child ZTKFK_C_Booking_U,
       _Agency,
       _Currency,
       _Customer,

@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOINTERF>
-    <CLSNAME>/DMO/IF_DATA_GENERATION_BADI</CLSNAME>
+    <CLSNAME>ZTKFK_IF_DATA_GENERATION_BADI</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>Interface for the data generation BAdI call</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>

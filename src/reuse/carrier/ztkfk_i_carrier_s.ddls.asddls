@@ -3,9 +3,9 @@
 @Metadata.ignorePropagatedAnnotations: true
 
 
-define view entity /DMO/I_Carrier_S
-  as select from /DMO/I_Carrier as Airline
-  association        to parent /DMO/I_CarriersLockSingleton_S as _CarrierSingleton on $projection.CarrierSingletonID = _CarrierSingleton.CarrierSingletonID
+define view entity ZTKFK_I_Carrier_S
+  as select from ZTKFK_I_Carrier as Airline
+  association        to parent ZTKFK_I_CarriersLockSingleton_S as _CarrierSingleton on $projection.CarrierSingletonID = _CarrierSingleton.CarrierSingletonID
 
 {
   key AirlineID,

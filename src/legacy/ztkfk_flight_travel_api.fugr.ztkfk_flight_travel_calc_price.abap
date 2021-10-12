@@ -3,29 +3,29 @@
 "! If no parameters are applied, the price of every flight will be recalculated.
 "!
 "! @parameter it_flight | Set of Flights which should be recalculate prices
-FUNCTION /dmo/flight_travel_calc_price.
+FUNCTION ZTKFK_flight_travel_calc_price.
 *"----------------------------------------------------------------------
 *"*"Local Interface:
 *"  IMPORTING
-*"     REFERENCE(IT_FLIGHT) TYPE  /DMO/T_FLIGHT OPTIONAL
+*"     REFERENCE(IT_FLIGHT) TYPE  ZTKFK_T_FLIGHT OPTIONAL
 *"----------------------------------------------------------------------
 
   TYPES BEGIN OF ty_seats_occupied.
-  INCLUDE TYPE /dmo/flight.
-  TYPES   distance       TYPE /dmo/connection-distance.
-  TYPES   distance_unit  TYPE /dmo/connection-distance_unit.
+  INCLUDE TYPE ZTKFK_flight.
+  TYPES   distance       TYPE ZTKFK_connection-distance.
+  TYPES   distance_unit  TYPE ZTKFK_connection-distance_unit.
   TYPES END OF ty_seats_occupied.
 
-  TYPES: tt_flight TYPE STANDARD TABLE OF /dmo/flight WITH KEY client carrier_id connection_id flight_date.
+  TYPES: tt_flight TYPE STANDARD TABLE OF ZTKFK_flight WITH KEY client carrier_id connection_id flight_date.
 
   DATA: lt_seats_occupied          TYPE TABLE OF ty_seats_occupied.
 
   IF it_flight IS SUPPLIED.
-    SELECT FROM /dmo/booking AS booking
-      JOIN     /dmo/connection AS connection
+    SELECT FROM ZTKFK_booking AS booking
+      JOIN     ZTKFK_connection AS connection
                  ON  booking~carrier_id    = connection~carrier_id
                  AND booking~connection_id = connection~connection_id
-      JOIN     /dmo/flight AS flight
+      JOIN     ZTKFK_flight AS flight
                  ON  booking~carrier_id    = flight~carrier_id
                  AND booking~connection_id = flight~connection_id
                  AND booking~flight_date   = flight~flight_date
@@ -40,11 +40,11 @@ FUNCTION /dmo/flight_travel_calc_price.
                flight~currency_code, flight~plane_type_id, flight~seats_max, flight~seats_occupied
       INTO CORRESPONDING FIELDS OF TABLE @lt_seats_occupied.
   ELSE.
-    SELECT FROM /dmo/booking AS booking
-      JOIN     /dmo/connection AS connection
+    SELECT FROM ZTKFK_booking AS booking
+      JOIN     ZTKFK_connection AS connection
                  ON  booking~carrier_id    = connection~carrier_id
                  AND booking~connection_id = connection~connection_id
-      JOIN     /dmo/flight AS flight
+      JOIN     ZTKFK_flight AS flight
                  ON  booking~carrier_id    = flight~carrier_id
                  AND booking~connection_id = flight~connection_id
                  AND booking~flight_date   = flight~flight_date
@@ -61,7 +61,7 @@ FUNCTION /dmo/flight_travel_calc_price.
     <seats_occupied>-price = ( ( 3 * ( <seats_occupied>-seats_occupied * 100 DIV <seats_occupied>-seats_max ) ** 2 DIV 400 ) + 25 ) * <seats_occupied>-distance DIV 100.
   ENDLOOP.
 
-  UPDATE /dmo/flight
+  UPDATE ZTKFK_flight
     FROM TABLE @(
         CORRESPONDING tt_flight(
           lt_seats_occupied MAPPING

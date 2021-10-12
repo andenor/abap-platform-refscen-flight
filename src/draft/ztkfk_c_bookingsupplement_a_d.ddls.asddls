@@ -4,8 +4,8 @@
 @Metadata.allowExtensions: true
 @Search.searchable: true
 
-define view entity /DMO/C_BookingSupplement_A_D
-  as projection on /DMO/I_BookingSupplement_D
+define view entity ZTKFK_C_BookingSupplement_A_D
+  as projection on ZTKFK_I_BookingSupplement_D
 {
   key BookSupplUUID,
 
@@ -17,7 +17,7 @@ define view entity /DMO/C_BookingSupplement_A_D
       BookingSupplementID,
 
       @ObjectModel.text.element: ['SupplementDescription']
-      @Consumption.valueHelpDefinition: [ {entity: {name: '/DMO/I_SUPPLEMENT', element: 'SupplementID' } ,
+      @Consumption.valueHelpDefinition: [ {entity: {name: 'ZTKFK_I_SUPPLEMENT', element: 'SupplementID' } ,
                      additionalBinding: [ { localElement: 'BookSupplPrice',  element: 'Price', usage: #RESULT },
                                           { localElement: 'CurrencyCode', element: 'CurrencyCode', usage: #RESULT }] }]
       SupplementID,
@@ -31,8 +31,8 @@ define view entity /DMO/C_BookingSupplement_A_D
       LocalLastChangedAt,
 
       /* Associations */
-      _Booking : redirected to parent /DMO/C_Booking_A_D,
+      _Booking : redirected to parent ZTKFK_C_Booking_A_D,
       _Product,
       _SupplementText,
-      _Travel  : redirected to /DMO/C_Travel_A_D
+      _Travel  : redirected to ZTKFK_C_Travel_A_D
 }

@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/I_BOOKING_U</DDLNAME>
+    <DDLNAME>ZTKFK_I_BOOKING_U</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Booking view - CDS data model</DDTEXT>
     <SOURCE_TYPE>W</SOURCE_TYPE>

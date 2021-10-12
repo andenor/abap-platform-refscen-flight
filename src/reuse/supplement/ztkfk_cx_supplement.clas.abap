@@ -1,4 +1,4 @@
-CLASS /dmo/cx_supplement DEFINITION
+CLASS ZTKFK_cx_supplement DEFINITION
   PUBLIC
   INHERITING FROM cx_static_check
   FINAL
@@ -12,7 +12,7 @@ CLASS /dmo/cx_supplement DEFINITION
 
     CONSTANTS:
       BEGIN OF price_required,
-        msgid TYPE symsgid VALUE '/DMO/CM_SUPPLEMENT',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_SUPPLEMENT',
         msgno TYPE symsgno VALUE '001',
         attr1 TYPE scx_attrname VALUE '',
         attr2 TYPE scx_attrname VALUE '',
@@ -21,7 +21,7 @@ CLASS /dmo/cx_supplement DEFINITION
       END OF price_required,
 
       BEGIN OF currency_required,
-        msgid TYPE symsgid VALUE '/DMO/CM_SUPPLEMENT',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_SUPPLEMENT',
         msgno TYPE symsgno VALUE '002',
         attr1 TYPE scx_attrname VALUE '',
         attr2 TYPE scx_attrname VALUE '',
@@ -30,7 +30,7 @@ CLASS /dmo/cx_supplement DEFINITION
       END OF currency_required,
 
       BEGIN OF description_required,
-        msgid TYPE symsgid VALUE '/DMO/CM_SUPPLEMENT',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_SUPPLEMENT',
         msgno TYPE symsgno VALUE '003',
         attr1 TYPE scx_attrname VALUE '',
         attr2 TYPE scx_attrname VALUE '',
@@ -39,7 +39,7 @@ CLASS /dmo/cx_supplement DEFINITION
       END OF description_required,
 
       BEGIN OF numbers_left,
-        msgid TYPE symsgid VALUE '/DMO/CM_SUPPLEMENT',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_SUPPLEMENT',
         msgno TYPE symsgno VALUE '004',
         attr1 TYPE scx_attrname VALUE 'MV_NUMBERS_LEFT',
         attr2 TYPE scx_attrname VALUE 'MV_SUPPLEMENT_CATEGORY',
@@ -48,7 +48,7 @@ CLASS /dmo/cx_supplement DEFINITION
       END OF numbers_left,
 
       BEGIN OF numbers_last,
-        msgid TYPE symsgid VALUE '/DMO/CM_SUPPLEMENT',
+        msgid TYPE symsgid VALUE 'ZTKFK_CM_SUPPLEMENT',
         msgno TYPE symsgno VALUE '005',
         attr1 TYPE scx_attrname VALUE 'MV_SUPPLEMENT_CATEGORY',
         attr2 TYPE scx_attrname VALUE '',
@@ -58,7 +58,7 @@ CLASS /dmo/cx_supplement DEFINITION
 
 
     DATA:
-      mv_supplement_category TYPE /dmo/supplement_category,
+      mv_supplement_category TYPE ZTKFK_supplement_category,
       mv_numbers_left        TYPE i.
 
 
@@ -68,7 +68,7 @@ CLASS /dmo/cx_supplement DEFINITION
           textid              LIKE if_t100_message=>t100key         OPTIONAL
           previous            LIKE previous                         OPTIONAL
           severity            TYPE if_abap_behv_message=>t_severity DEFAULT  if_abap_behv_message=>severity-error
-          supplement_category TYPE /dmo/supplement_category         OPTIONAL
+          supplement_category TYPE ZTKFK_supplement_category         OPTIONAL
           numbers_left        TYPE i                                OPTIONAL
         .
 
@@ -78,7 +78,7 @@ ENDCLASS.
 
 
 
-CLASS /dmo/cx_supplement IMPLEMENTATION.
+CLASS ZTKFK_cx_supplement IMPLEMENTATION.
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.
 

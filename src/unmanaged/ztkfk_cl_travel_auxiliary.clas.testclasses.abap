@@ -4,7 +4,7 @@ CLASS ltcl_mapping DEFINITION FINAL FOR TESTING
 
   PRIVATE SECTION.
     METHODS:
-    "! Checks via check table if the current implementation of {@link /DMO/CL_TRAVEL_AUXILIARY.meth:GET_CAUSE_FROM_MESSAGE }.
+    "! Checks via check table if the current implementation of {@link ZTKFK_CL_TRAVEL_AUXILIARY.meth:GET_CAUSE_FROM_MESSAGE }.
     "! Therefore, a table with all permutation is build up and run against the implementation.
       all_in_one FOR TESTING RAISING cx_static_check.
 ENDCLASS.
@@ -26,7 +26,7 @@ CLASS ltcl_mapping IMPLEMENTATION.
           exp TYPE check_table.
 
     exp = VALUE check_table(
-        msgid        = '/DMO/CM_FLIGHT_LEGAC'
+        msgid        = 'ZTKFK_CM_FLIGHT_LEGAC'
 
         is_dependend = abap_true
           "fail_cause = if_abap_behv=>cause-dependency
@@ -62,7 +62,7 @@ CLASS ltcl_mapping IMPLEMENTATION.
           msgid        = test_case-msgid
           msgno        = test_case-msgno
           is_dependend = test_case-is_dependend
-          fail_cause   = /dmo/cl_travel_auxiliary=>get_cause_from_message(
+          fail_cause   = ZTKFK_cl_travel_auxiliary=>get_cause_from_message(
                            msgid        = test_case-msgid
                            msgno        = test_case-msgno
                            is_dependend = test_case-is_dependend

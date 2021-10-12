@@ -1,7 +1,7 @@
 projection;
 strict;
 
-define behavior for /DMO/C_Travel_A_D alias Travel
+define behavior for ZTKFK_C_Travel_A_D alias Travel
 use etag
 {
   use create;
@@ -15,7 +15,7 @@ use etag
   use association _Booking { create; }
 }
 
-define behavior for /DMO/C_Booking_A_D alias Booking
+define behavior for ZTKFK_C_Booking_A_D alias Booking
 use etag
 {
   use update;
@@ -25,7 +25,7 @@ use etag
   use association _Travel;
 }
 
-define behavior for /DMO/C_BookingSupplement_A_D alias BookingSupplement
+define behavior for ZTKFK_C_BookingSupplement_A_D alias BookingSupplement
 use etag
 {
   use update;

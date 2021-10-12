@@ -5,10 +5,10 @@
 @Search.searchable: true
 
 
-define view entity /DMO/I_Flight_R
-  as select from /dmo/flight as Flight
+define view entity ZTKFK_I_Flight_R
+  as select from ZTKFK_flight as Flight
 
-  association [1] to /DMO/I_Carrier as _Airline on $projection.AirlineID = _Airline.AirlineID
+  association [1] to ZTKFK_I_Carrier as _Airline on $projection.AirlineID = _Airline.AirlineID
 
 
 {

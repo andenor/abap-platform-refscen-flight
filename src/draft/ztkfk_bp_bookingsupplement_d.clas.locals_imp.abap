@@ -15,12 +15,12 @@ ENDCLASS.
 CLASS lhc_bookingsupplement IMPLEMENTATION.
 
   METHOD setBookSupplNumber.
-    DATA max_bookingsupplementid TYPE /dmo/booking_supplement_id.
-    DATA bookingsupplements_update TYPE TABLE FOR UPDATE /DMO/I_Travel_D\\BookingSupplement.
+    DATA max_bookingsupplementid TYPE ZTKFK_booking_supplement_id.
+    DATA bookingsupplements_update TYPE TABLE FOR UPDATE ZTKFK_I_Travel_D\\BookingSupplement.
 
     "Read all bookings for the requested booking supplements
     " If multiple booking supplements of the same booking are requested, the booking is returned only once.
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY BookingSupplement BY \_Booking
         FIELDS (  BookingUUID  )
         WITH CORRESPONDING #( keys )
@@ -28,7 +28,7 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 
     " Process all affected bookings. Read respective booking supplements for one booking
     LOOP AT bookings INTO DATA(ls_booking).
-      READ ENTITIES OF /dmo/i_travel_d IN LOCAL MODE
+      READ ENTITIES OF ZTKFK_i_travel_d IN LOCAL MODE
         ENTITY Booking BY \_BookingSupplement
           FIELDS ( BookingSupplementID )
           WITH VALUE #( ( %tky = ls_booking-%tky ) )
@@ -53,7 +53,7 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
     ENDLOOP.
 
     " Provide a booking ID for all bookings that have none.
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY BookingSupplement
         UPDATE FIELDS ( BookingSupplementID ) WITH bookingsupplements_update
       REPORTED DATA(update_reported).
@@ -64,14 +64,14 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 
   METHOD calculateTotalPrice.
     " Read all parent UUIDs
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY BookingSupplement BY \_Travel
         FIELDS ( TravelUUID  )
         WITH CORRESPONDING #(  keys  )
       RESULT DATA(travels).
 
     " Trigger Re-Calculation on Root Node
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         EXECUTE reCalcTotalPrice
           FROM CORRESPONDING  #( travels )
@@ -83,7 +83,7 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 
   METHOD validateSupplement.
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY BookingSupplement
         FIELDS ( SupplementID )
         WITH CORRESPONDING #(  keys )
@@ -92,18 +92,18 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 
     failed = CORRESPONDING #( DEEP read_failed ).
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY BookingSupplement BY \_Booking
         FROM CORRESPONDING #( bookingsupplements )
       LINK DATA(booksuppl_booking_links).
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY BookingSupplement BY \_Travel
         FROM CORRESPONDING #( bookingsupplements )
       LINK DATA(booksuppl_travel_links).
 
 
-    DATA supplements TYPE SORTED TABLE OF /dmo/supplement WITH UNIQUE KEY supplement_id.
+    DATA supplements TYPE SORTED TABLE OF ZTKFK_supplement WITH UNIQUE KEY supplement_id.
 
     " Optimization of DB select: extract distinct non-initial customer IDs
     supplements = CORRESPONDING #( bookingsupplements DISCARDING DUPLICATES MAPPING supplement_id = SupplementID EXCEPT * ).
@@ -111,7 +111,7 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 
     IF  supplements IS NOT INITIAL.
       " Check if customer ID exists
-      SELECT FROM /dmo/supplement FIELDS supplement_id
+      SELECT FROM ZTKFK_supplement FIELDS supplement_id
                                   FOR ALL ENTRIES IN @supplements
                                   WHERE supplement_id = @supplements-supplement_id
       INTO TABLE @DATA(valid_supplements).
@@ -128,8 +128,8 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 
         APPEND VALUE #( %tky                  = <bookingsupplement>-%tky
                         %state_area           = 'VALIDATE_SUPPLEMENT'
-                        %msg                  = NEW /dmo/cm_flight_messages(
-                                                                textid = /dmo/cm_flight_messages=>ENTER_SUPPLEMENT_ID
+                        %msg                  = NEW ZTKFK_cm_flight_messages(
+                                                                textid = ZTKFK_cm_flight_messages=>ENTER_SUPPLEMENT_ID
                                                                 severity = if_abap_behv_message=>severity-error )
                         %path                 = VALUE #( booking-%tky = booksuppl_booking_links[ source-%tky = <bookingsupplement>-%tky ]-target-%tky
                                                          travel-%tky  = booksuppl_travel_links[ source-%tky  = <bookingsupplement>-%tky ]-target-%tky )
@@ -142,8 +142,8 @@ CLASS lhc_bookingsupplement IMPLEMENTATION.
 
         APPEND VALUE #( %tky                  = <bookingsupplement>-%tky
                         %state_area           = 'VALIDATE_SUPPLEMENT'
-                        %msg                  = NEW /dmo/cm_flight_messages(
-                                                                textid = /dmo/cm_flight_messages=>SUPPLEMENT_UNKNOWN
+                        %msg                  = NEW ZTKFK_cm_flight_messages(
+                                                                textid = ZTKFK_cm_flight_messages=>SUPPLEMENT_UNKNOWN
                                                                 severity = if_abap_behv_message=>severity-error )
                         %path                 = VALUE #( booking-%tky = booksuppl_booking_links[ source-%tky = <bookingsupplement>-%tky ]-target-%tky
                                                         travel-%tky  = booksuppl_travel_links[ source-%tky  = <bookingsupplement>-%tky ]-target-%tky )

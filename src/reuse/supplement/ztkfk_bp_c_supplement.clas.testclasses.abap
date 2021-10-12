@@ -4,17 +4,17 @@ CLASS lcl_test_double DEFINITION FOR TESTING.
     INTERFACES if_abap_behavior_testdouble.
 
     CONSTANTS:
-      supplement_entity_name TYPE abp_root_entity_name VALUE '/DMO/I_SUPPLEMENT' ##NO_TEXT,
-      text_entity_name       TYPE abp_root_entity_name VALUE '/DMO/I_SUPPLEMENTTEXT' ##NO_TEXT,
+      supplement_entity_name TYPE abp_root_entity_name VALUE 'ZTKFK_I_SUPPLEMENT' ##NO_TEXT,
+      text_entity_name       TYPE abp_root_entity_name VALUE 'ZTKFK_I_SUPPLEMENTTEXT' ##NO_TEXT,
       text_sub_name          TYPE abp_behv_changes-sub_name VALUE '_SUPPLEMENTTEXT' ##NO_TEXT.
 
     DATA:
-      supplement_create TYPE TABLE FOR CREATE /DMO/I_Supplement\\Supplement,
-      supplement_update TYPE TABLE FOR UPDATE /DMO/I_Supplement\\Supplement,
-      text_create       TYPE TABLE FOR CREATE /DMO/I_Supplement\\Supplement\_SupplementText,
-      text_update       TYPE TABLE FOR UPDATE /DMO/I_Supplement\\SupplementText,
+      supplement_create TYPE TABLE FOR CREATE ZTKFK_I_Supplement\\Supplement,
+      supplement_update TYPE TABLE FOR UPDATE ZTKFK_I_Supplement\\Supplement,
+      text_create       TYPE TABLE FOR CREATE ZTKFK_I_Supplement\\Supplement\_SupplementText,
+      text_update       TYPE TABLE FOR UPDATE ZTKFK_I_Supplement\\SupplementText,
 
-      text_rba_link     TYPE TABLE FOR READ LINK   /DMO/I_Supplement\\Supplement\_SupplementText.
+      text_rba_link     TYPE TABLE FOR READ LINK   ZTKFK_I_Supplement\\Supplement\_SupplementText.
 ENDCLASS.
 
 CLASS lcl_test_double IMPLEMENTATION.
@@ -55,7 +55,7 @@ CLASS lcl_test_double IMPLEMENTATION.
 
   METHOD if_abap_behavior_testdouble~read.
     TYPES:
-      key         TYPE STRUCTURE FOR READ IMPORT /DMO/I_Supplement\\Supplement\_SupplementText.
+      key         TYPE STRUCTURE FOR READ IMPORT ZTKFK_I_Supplement\\Supplement\_SupplementText.
 
     DATA:
       links_to_be_added  LIKE text_rba_link.
@@ -99,9 +99,9 @@ CLASS ltcl_augmentation DEFINITION FINAL FOR TESTING
       entity_double TYPE REF TO lcl_test_double.
 
     DATA:
-      mapped   TYPE RESPONSE FOR MAPPED EARLY /dmo/c_supplement,
-      failed   TYPE RESPONSE FOR FAILED EARLY /dmo/c_supplement,
-      reported TYPE RESPONSE FOR REPORTED EARLY /dmo/c_supplement.
+      mapped   TYPE RESPONSE FOR MAPPED EARLY ZTKFK_c_supplement,
+      failed   TYPE RESPONSE FOR FAILED EARLY ZTKFK_c_supplement,
+      reported TYPE RESPONSE FOR REPORTED EARLY ZTKFK_c_supplement.
 
     METHODS:
       setup,
@@ -174,8 +174,8 @@ CLASS ltcl_augmentation IMPLEMENTATION.
 
   METHOD supplement_create.
     DATA:
-      c_create TYPE STRUCTURE FOR CREATE /DMO/C_Supplement\\Supplement,
-      i_create TYPE STRUCTURE FOR CREATE /DMO/I_Supplement\\Supplement.
+      c_create TYPE STRUCTURE FOR CREATE ZTKFK_C_Supplement\\Supplement,
+      i_create TYPE STRUCTURE FOR CREATE ZTKFK_I_Supplement\\Supplement.
 
     c_create = VALUE #(
                    %is_draft             = if_abap_behv=>mk-on
@@ -185,7 +185,7 @@ CLASS ltcl_augmentation IMPLEMENTATION.
                    CurrencyCode          = 'EUR'
                  ).
 
-    MODIFY ENTITIES OF /dmo/c_supplement
+    MODIFY ENTITIES OF ZTKFK_c_supplement
       ENTITY Supplement
         CREATE AUTO FILL CID
           FIELDS ( SupplementCategory SupplementDescription Price CurrencyCode )
@@ -220,10 +220,10 @@ CLASS ltcl_augmentation IMPLEMENTATION.
   METHOD supplement_create_text_update.
     "Create -------------------------------
     DATA:
-      c_create TYPE STRUCTURE FOR CREATE /DMO/C_Supplement\\Supplement,
-      i_create TYPE STRUCTURE FOR CREATE /DMO/I_Supplement\\Supplement,
-      c_update TYPE STRUCTURE FOR UPDATE /DMO/C_Supplement\\Supplement,
-      i_update TYPE STRUCTURE FOR UPDATE /DMO/I_Supplement\\Supplement.
+      c_create TYPE STRUCTURE FOR CREATE ZTKFK_C_Supplement\\Supplement,
+      i_create TYPE STRUCTURE FOR CREATE ZTKFK_I_Supplement\\Supplement,
+      c_update TYPE STRUCTURE FOR UPDATE ZTKFK_C_Supplement\\Supplement,
+      i_update TYPE STRUCTURE FOR UPDATE ZTKFK_I_Supplement\\Supplement.
 
     c_create = VALUE #(
                    %cid                  = 'TESTCID'
@@ -242,7 +242,7 @@ CLASS ltcl_augmentation IMPLEMENTATION.
                    CurrencyCode          = 'USD'
                  ).
 
-    MODIFY ENTITIES OF /dmo/c_supplement
+    MODIFY ENTITIES OF ZTKFK_c_supplement
       ENTITY Supplement
         CREATE
           FIELDS ( SupplementCategory SupplementDescription Price CurrencyCode )
@@ -307,8 +307,8 @@ CLASS ltcl_augmentation IMPLEMENTATION.
 
   METHOD supplement_update_text_create.
     DATA:
-      c_update TYPE STRUCTURE FOR UPDATE /DMO/C_Supplement\\Supplement,
-      i_update TYPE STRUCTURE FOR UPDATE /DMO/I_Supplement\\Supplement.
+      c_update TYPE STRUCTURE FOR UPDATE ZTKFK_C_Supplement\\Supplement,
+      i_update TYPE STRUCTURE FOR UPDATE ZTKFK_I_Supplement\\Supplement.
 
     c_update = VALUE #(
                    %is_draft             = if_abap_behv=>mk-on
@@ -318,7 +318,7 @@ CLASS ltcl_augmentation IMPLEMENTATION.
                    CurrencyCode          = 'EUR'
                  ).
 
-    MODIFY ENTITIES OF /dmo/c_supplement
+    MODIFY ENTITIES OF ZTKFK_c_supplement
       ENTITY Supplement
         UPDATE
           FIELDS ( SupplementDescription Price CurrencyCode )
@@ -353,8 +353,8 @@ CLASS ltcl_augmentation IMPLEMENTATION.
 
   METHOD supplement_update_text_update.
     DATA:
-      c_update TYPE STRUCTURE FOR UPDATE /DMO/C_Supplement\\Supplement,
-      i_update TYPE STRUCTURE FOR UPDATE /DMO/I_Supplement\\Supplement.
+      c_update TYPE STRUCTURE FOR UPDATE ZTKFK_C_Supplement\\Supplement,
+      i_update TYPE STRUCTURE FOR UPDATE ZTKFK_I_Supplement\\Supplement.
 
     c_update = VALUE #(
                    %is_draft             = if_abap_behv=>mk-on
@@ -369,7 +369,7 @@ CLASS ltcl_augmentation IMPLEMENTATION.
         target = VALUE #( %is_draft = c_update-%is_draft  SupplementID = c_update-SupplementID  LanguageCode = 'EN' )
       ) ).
 
-    MODIFY ENTITIES OF /dmo/c_supplement
+    MODIFY ENTITIES OF ZTKFK_c_supplement
       ENTITY Supplement
         UPDATE
           FIELDS ( SupplementDescription Price CurrencyCode )
@@ -404,8 +404,8 @@ CLASS ltcl_augmentation IMPLEMENTATION.
 
   METHOD text_create.
     DATA:
-      c_update TYPE STRUCTURE FOR UPDATE /DMO/C_Supplement\\Supplement,
-      i_update TYPE STRUCTURE FOR UPDATE /DMO/I_Supplement\\Supplement.
+      c_update TYPE STRUCTURE FOR UPDATE ZTKFK_C_Supplement\\Supplement,
+      i_update TYPE STRUCTURE FOR UPDATE ZTKFK_I_Supplement\\Supplement.
 
     c_update = VALUE #(
                    %is_draft             = if_abap_behv=>mk-on
@@ -413,7 +413,7 @@ CLASS ltcl_augmentation IMPLEMENTATION.
                    SupplementDescription = 'Test'
                  ).
 
-    MODIFY ENTITIES OF /dmo/c_supplement
+    MODIFY ENTITIES OF ZTKFK_c_supplement
       ENTITY Supplement
         UPDATE
           FIELDS ( SupplementDescription )
@@ -443,8 +443,8 @@ CLASS ltcl_augmentation IMPLEMENTATION.
 
   METHOD text_update.
     DATA:
-      c_update TYPE STRUCTURE FOR UPDATE /DMO/C_Supplement\\Supplement,
-      i_update TYPE STRUCTURE FOR UPDATE /DMO/I_Supplement\\Supplement.
+      c_update TYPE STRUCTURE FOR UPDATE ZTKFK_C_Supplement\\Supplement,
+      i_update TYPE STRUCTURE FOR UPDATE ZTKFK_I_Supplement\\Supplement.
 
     c_update = VALUE #(
                    %is_draft             = if_abap_behv=>mk-on
@@ -457,7 +457,7 @@ CLASS ltcl_augmentation IMPLEMENTATION.
         target = VALUE #( %is_draft = c_update-%is_draft  SupplementID = c_update-SupplementID  LanguageCode = 'EN' )
       ) ).
 
-    MODIFY ENTITIES OF /dmo/c_supplement
+    MODIFY ENTITIES OF ZTKFK_c_supplement
       ENTITY Supplement
         UPDATE
           FIELDS ( SupplementDescription )

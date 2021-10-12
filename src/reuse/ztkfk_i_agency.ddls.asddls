@@ -2,8 +2,8 @@
 @EndUserText.label: 'Agency View - CDS Data Model'
 @Search.searchable: true
 
-define view entity /DMO/I_Agency
-  as select from /dmo/agency as Agency
+define view entity ZTKFK_I_Agency
+  as select from ZTKFK_agency as Agency
 
   association [0..1] to I_Country as _Country on $projection.CountryCode = _Country.Country
 

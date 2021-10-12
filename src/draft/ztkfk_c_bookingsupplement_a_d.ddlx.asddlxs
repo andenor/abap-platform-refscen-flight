@@ -6,7 +6,7 @@
                                        label: 'Booking Supplement',
                                        value: 'BookingSupplementID' } } }
                                        
-annotate entity /DMO/C_BookingSupplement_A_D
+annotate entity ZTKFK_C_BookingSupplement_A_D
   with 
 {
   @UI.facet: [ { id:              'BookingSupplement',

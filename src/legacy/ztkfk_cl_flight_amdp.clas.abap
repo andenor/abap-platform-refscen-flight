@@ -1,4 +1,4 @@
-CLASS /dmo/cl_flight_amdp DEFINITION
+CLASS ZTKFK_cl_flight_amdp DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -6,16 +6,16 @@ CLASS /dmo/cl_flight_amdp DEFINITION
   PUBLIC SECTION.
     INTERFACES if_amdp_marker_hdb.
 
-    CLASS-METHODS convert_currency IMPORTING VALUE(iv_amount)               TYPE /dmo/total_price
-                                                  VALUE(iv_currency_code_source) TYPE /dmo/currency_code
-                                                  VALUE(iv_currency_code_target) TYPE /dmo/currency_code
+    CLASS-METHODS convert_currency IMPORTING VALUE(iv_amount)               TYPE ZTKFK_total_price
+                                                  VALUE(iv_currency_code_source) TYPE ZTKFK_currency_code
+                                                  VALUE(iv_currency_code_target) TYPE ZTKFK_currency_code
                                                   VALUE(iv_exchange_rate_date)   TYPE d
-                                        EXPORTING VALUE(ev_amount)               TYPE /dmo/total_price.
+                                        EXPORTING VALUE(ev_amount)               TYPE ZTKFK_total_price.
 ENDCLASS.
 
 
 
-CLASS /dmo/cl_flight_amdp IMPLEMENTATION.
+CLASS ZTKFK_cl_flight_amdp IMPLEMENTATION.
 
   METHOD convert_currency BY DATABASE PROCEDURE FOR HDB LANGUAGE SQLSCRIPT OPTIONS READ-ONLY .
     tab = SELECT CONVERT_CURRENCY( amount         => :iv_amount,

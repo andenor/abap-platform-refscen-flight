@@ -2,7 +2,7 @@ projection;
 strict;
 use draft;
 
-define behavior for /DMO/C_CarriersLockSingleton_S alias CarriersLockSingleton
+define behavior for ZTKFK_C_CarriersLockSingleton_S alias CarriersLockSingleton
 {
   use action Activate;
   use action Discard;
@@ -13,7 +13,7 @@ define behavior for /DMO/C_CarriersLockSingleton_S alias CarriersLockSingleton
   use association _Airline { create; with draft; }
 }
 
-define behavior for /DMO/C_Carrier_S alias Carrier
+define behavior for ZTKFK_C_Carrier_S alias Carrier
 use etag
 {
   use update;

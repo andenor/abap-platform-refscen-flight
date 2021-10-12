@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/I_CUSTOMER</DDLNAME>
+    <DDLNAME>ZTKFK_I_CUSTOMER</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Customer View - CDS Data Model</DDTEXT>
     <SOURCE_TYPE>W</SOURCE_TYPE>

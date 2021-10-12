@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD02V>
-    <TABNAME>/DMO/S_BOOKING_SUPPLEMENT_INTX</TABNAME>
+    <TABNAME>ZTKFK_S_BOOKING_SUPPLEMENT_INTX</TABNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <TABCLASS>INTTAB</TABCLASS>
     <DDTEXT>Flag structure for Booking Supplement data</DDTEXT>

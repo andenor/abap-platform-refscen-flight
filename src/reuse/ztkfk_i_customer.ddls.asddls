@@ -3,8 +3,8 @@
 
 @Search.searchable: true
 
-define view entity /DMO/I_Customer
-  as select from /dmo/customer as Customer
+define view entity ZTKFK_I_Customer
+  as select from ZTKFK_customer as Customer
 
   association [0..1] to I_Country as _Country on $projection.CountryCode = _Country.Country
 

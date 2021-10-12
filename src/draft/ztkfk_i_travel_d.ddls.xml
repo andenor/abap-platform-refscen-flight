@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/I_TRAVEL_D</DDLNAME>
+    <DDLNAME>ZTKFK_I_TRAVEL_D</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Travel View Entity for Draft RefScen</DDTEXT>
     <SOURCE_TYPE>W</SOURCE_TYPE>

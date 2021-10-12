@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD01V>
-    <DOMNAME>/DMO/BOOKING_ID</DOMNAME>
+    <DOMNAME>ZTKFK_BOOKING_ID</DOMNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DATATYPE>NUMC</DATATYPE>
     <LENG>000004</LENG>

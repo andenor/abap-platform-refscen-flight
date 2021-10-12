@@ -5,7 +5,7 @@
                      title: { type: #STANDARD, value: 'BookingID' } } }
 
 
-annotate entity /DMO/C_Booking_A_D with 
+annotate entity ZTKFK_C_Booking_A_D with 
 {
   @UI.facet: [ { id:            'Booking',
                  purpose:       #STANDARD,

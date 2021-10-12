@@ -1,16 +1,16 @@
-@AbapCatalog.sqlViewName: '/DMO/CURRHLP'
+@AbapCatalog.sqlViewName: 'ZTKFK_CURRHLP'
 @AbapCatalog.compiler.compareFilter: true
 @AbapCatalog.preserveKey: true
 @AccessControl.authorizationCheck: #CHECK
 @EndUserText.label: 'Help View for Currency Conversion'
-define view /DMO/CURRENCY_HELPER
+define view ZTKFK_CURRENCY_HELPER
   with parameters
-    amount             : /dmo/total_price,
-    source_currency    : /dmo/currency_code,
-    target_currency    : /dmo/currency_code,
-    exchange_rate_date : /dmo/booking_date
+    amount             : ZTKFK_total_price,
+    source_currency    : ZTKFK_currency_code,
+    target_currency    : ZTKFK_currency_code,
+    exchange_rate_date : ZTKFK_booking_date
 
-  as select from /dmo/agency
+  as select from ZTKFK_agency
 
 {
   key currency_conversion( amount             => $parameters.amount,

@@ -1,8 +1,8 @@
-CLASS /dmo/bp_booking_u DEFINITION
+CLASS ZTKFK_bp_booking_u DEFINITION
   PUBLIC
   ABSTRACT
   FINAL
-  FOR BEHAVIOR OF /dmo/i_travel_u .
+  FOR BEHAVIOR OF ZTKFK_i_travel_u .
 
   PUBLIC SECTION.
   PROTECTED SECTION.
@@ -11,5 +11,5 @@ ENDCLASS.
 
 
 
-CLASS /dmo/bp_booking_u IMPLEMENTATION.
+CLASS ZTKFK_bp_booking_u IMPLEMENTATION.
 ENDCLASS.

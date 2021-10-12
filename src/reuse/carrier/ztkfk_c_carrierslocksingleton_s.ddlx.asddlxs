@@ -4,7 +4,7 @@
                      typeNamePlural: 'Carrier Singleton', 
                      title: { type: #STANDARD, value: 'CarrierSingletonID' } } }
 
-annotate entity /DMO/C_CarriersLockSingleton_S
+annotate entity ZTKFK_C_CarriersLockSingleton_S
   with 
 {
   @UI.facet: [

@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD04V>
-    <ROLLNAME>/DMO/FLIGHT_PRICE</ROLLNAME>
+    <ROLLNAME>ZTKFK_FLIGHT_PRICE</ROLLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
-    <DOMNAME>/DMO/PRICE</DOMNAME>
+    <DOMNAME>ZTKFK_PRICE</DOMNAME>
     <HEADLEN>55</HEADLEN>
     <SCRLEN1>10</SCRLEN1>
     <SCRLEN2>20</SCRLEN2>

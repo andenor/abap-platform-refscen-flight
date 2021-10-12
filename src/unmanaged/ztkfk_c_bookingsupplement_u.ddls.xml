@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/C_BOOKINGSUPPLEMENT_U</DDLNAME>
+    <DDLNAME>ZTKFK_C_BOOKINGSUPPLEMENT_U</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Booking Supplement Projection View</DDTEXT>
     <SOURCE_TYPE>P</SOURCE_TYPE>

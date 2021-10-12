@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD04V>
-    <ROLLNAME>/DMO/STREET</ROLLNAME>
+    <ROLLNAME>ZTKFK_STREET</ROLLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
-    <DOMNAME>/DMO/STREET</DOMNAME>
+    <DOMNAME>ZTKFK_STREET</DOMNAME>
     <HEADLEN>55</HEADLEN>
     <SCRLEN1>05</SCRLEN1>
     <SCRLEN2>20</SCRLEN2>

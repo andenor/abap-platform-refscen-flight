@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/I_BOOKING_STATUS_VH</DDLNAME>
+    <DDLNAME>ZTKFK_I_BOOKING_STATUS_VH</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Overall Status Value Help</DDTEXT>
     <SOURCE_TYPE>W</SOURCE_TYPE>

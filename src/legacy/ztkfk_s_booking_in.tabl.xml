@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD02V>
-    <TABNAME>/DMO/S_BOOKING_IN</TABNAME>
+    <TABNAME>ZTKFK_S_BOOKING_IN</TABNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <TABCLASS>INTTAB</TABCLASS>
     <LANGDEP>X</LANGDEP>
@@ -15,7 +15,7 @@
     <DD03P>
      <FIELDNAME>.INCLUDE</FIELDNAME>
      <ADMINFIELD>0</ADMINFIELD>
-     <PRECFIELD>/DMO/S_BOOKING_KEY</PRECFIELD>
+     <PRECFIELD>ZTKFK_S_BOOKING_KEY</PRECFIELD>
      <MASK>      S</MASK>
      <DDTEXT>Key structure of Booking</DDTEXT>
      <COMPTYPE>S</COMPTYPE>
@@ -23,7 +23,7 @@
     <DD03P>
      <FIELDNAME>.INCLUDE</FIELDNAME>
      <ADMINFIELD>0</ADMINFIELD>
-     <PRECFIELD>/DMO/BOOKING_DATA</PRECFIELD>
+     <PRECFIELD>ZTKFK_BOOKING_DATA</PRECFIELD>
      <MASK>      S</MASK>
      <DDTEXT>Flight Reference Scenario: Booking - Data Include</DDTEXT>
      <COMPTYPE>S</COMPTYPE>

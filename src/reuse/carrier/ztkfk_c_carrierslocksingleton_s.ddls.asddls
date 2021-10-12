@@ -4,14 +4,14 @@
 @Metadata.allowExtensions: true
 @ObjectModel.semanticKey: ['CarrierSingletonID']
 
-define root view entity /DMO/C_CarriersLockSingleton_S
+define root view entity ZTKFK_C_CarriersLockSingleton_S
   provider contract transactional_query
-  as projection on /DMO/I_CarriersLockSingleton_S
+  as projection on ZTKFK_I_CarriersLockSingleton_S
 {
   key CarrierSingletonID,
 
       @Consumption.hidden: true
       LastChangedAtMax,
       /* Associations */
-      _Airline : redirected to composition child /DMO/C_Carrier_S
+      _Airline : redirected to composition child ZTKFK_C_Carrier_S
 }

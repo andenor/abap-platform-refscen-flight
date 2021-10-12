@@ -6,12 +6,12 @@
 
 @Search.searchable: true
 
-define view entity /DMO/I_Connection_R
-  as select from /dmo/connection as Connection
+define view entity ZTKFK_I_Connection_R
+  as select from ZTKFK_connection as Connection
 
-  association [1..*] to /DMO/I_Flight_R as _Flight  on  $projection.AirlineID    = _Flight.AirlineID
+  association [1..*] to ZTKFK_I_Flight_R as _Flight  on  $projection.AirlineID    = _Flight.AirlineID
                                                     and $projection.ConnectionID = _Flight.ConnectionID
-  association [1]    to /DMO/I_Carrier  as _Airline on  $projection.AirlineID = _Airline.AirlineID
+  association [1]    to ZTKFK_I_Carrier  as _Airline on  $projection.AirlineID = _Airline.AirlineID
 
 {
         @UI.facet: [
@@ -44,7 +44,7 @@ define view entity /DMO/I_Connection_R
         selectionField: [ { position: 10 }  ],
         identification:[ { position: 30, label: 'Departure Airport Code' } ] }
         @EndUserText.label: 'Departure Airport Code'
-        @Consumption.valueHelpDefinition: [{  entity: {   name: '/DMO/I_Airport',
+        @Consumption.valueHelpDefinition: [{  entity: {   name: 'ZTKFK_I_Airport',
                               element:    'AirportID' } }]
         @Search.defaultSearchElement: true
         @Search.fuzzinessThreshold: 0.7
@@ -55,7 +55,7 @@ define view entity /DMO/I_Connection_R
         selectionField: [ { position: 20 }  ],
         identification:[ { position: 40, label: 'Destination Airport Code' } ] }
         @EndUserText.label: 'Destination Airport Code'
-        @Consumption.valueHelpDefinition: [{  entity: {   name: '/DMO/I_Airport' ,
+        @Consumption.valueHelpDefinition: [{  entity: {   name: 'ZTKFK_I_Airport' ,
                                           element: 'AirportID' } }]
         @Search.defaultSearchElement: true
         @Search.fuzzinessThreshold: 0.7

@@ -8,10 +8,10 @@
  dataClass: #MASTER
  }
 @ObjectModel.resultSet.sizeCategory: #XS
-define view entity /DMO/I_Booking_Status_VH_Text
-  as select from /dmo/book_stat_t
+define view entity ZTKFK_I_Booking_Status_VH_Text
+  as select from ZTKFK_book_stat_t
 
-  association [1..1] to /DMO/I_Booking_Status_VH as _BookingStatus on $projection.BookingStatus = _BookingStatus.BookingStatus
+  association [1..1] to ZTKFK_I_Booking_Status_VH as _BookingStatus on $projection.BookingStatus = _BookingStatus.BookingStatus
 
 {
       @ObjectModel.text.element: ['Text']

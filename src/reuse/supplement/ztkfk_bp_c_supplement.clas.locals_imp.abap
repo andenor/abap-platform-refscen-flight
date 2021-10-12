@@ -11,13 +11,13 @@ CLASS lhc_Supplement IMPLEMENTATION.
 
   METHOD augment.
 
-    DATA: suppltext_for_new_suppl      TYPE TABLE FOR CREATE /DMO/I_Supplement\_SupplementText,
-          suppltext_for_existing_suppl TYPE TABLE FOR CREATE /DMO/I_Supplement\_SupplementText,
-          supplementtext_update        TYPE TABLE FOR UPDATE /DMO/I_SupplementText.
+    DATA: suppltext_for_new_suppl      TYPE TABLE FOR CREATE ZTKFK_I_Supplement\_SupplementText,
+          suppltext_for_existing_suppl TYPE TABLE FOR CREATE ZTKFK_I_Supplement\_SupplementText,
+          supplementtext_update        TYPE TABLE FOR UPDATE ZTKFK_I_SupplementText.
     DATA: relates_create TYPE abp_behv_relating_tab,
           relates_update TYPE abp_behv_relating_tab,
           relates_cba    TYPE abp_behv_relating_tab.
-    DATA: suppl_text_tky_link TYPE STRUCTURE FOR READ LINK /DMO/I_Supplement\\Supplement\_SupplementText,
+    DATA: suppl_text_tky_link TYPE STRUCTURE FOR READ LINK ZTKFK_I_Supplement\\Supplement\_SupplementText,
           suppl_text_tky      LIKE suppl_text_tky_link-target.
 
     "Handle create requests including SupplementDescription
@@ -40,7 +40,7 @@ CLASS lhc_Supplement IMPLEMENTATION.
 
     ENDLOOP.
 
-    MODIFY AUGMENTING ENTITIES OF /DMO/I_Supplement
+    MODIFY AUGMENTING ENTITIES OF ZTKFK_I_Supplement
       ENTITY Supplement
         CREATE BY \_SupplementText
         FROM suppltext_for_new_suppl
@@ -48,7 +48,7 @@ CLASS lhc_Supplement IMPLEMENTATION.
 
     IF entities_update IS NOT INITIAL.
 
-      READ ENTITIES OF /DMO/I_Supplement
+      READ ENTITIES OF ZTKFK_I_Supplement
         ENTITY Supplement BY \_SupplementText
         FROM CORRESPONDING #( entities_update )
       LINK DATA(link).
@@ -105,7 +105,7 @@ CLASS lhc_Supplement IMPLEMENTATION.
       ENDLOOP.
     ENDIF.
 
-    MODIFY AUGMENTING ENTITIES OF /DMO/I_Supplement
+    MODIFY AUGMENTING ENTITIES OF ZTKFK_I_Supplement
       ENTITY SupplementText
         UPDATE FROM supplementtext_update
         RELATING TO entities_update BY relates_update

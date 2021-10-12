@@ -22,7 +22,7 @@ ENDCLASS.
 CLASS lhc_Supplement IMPLEMENTATION.
 
   METHOD validatePrice.
-    READ ENTITIES OF /dmo/i_supplement IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_i_supplement IN LOCAL MODE
       ENTITY Supplement
         FIELDS ( Price CurrencyCode )
         WITH CORRESPONDING #( keys )
@@ -38,8 +38,8 @@ CLASS lhc_Supplement IMPLEMENTATION.
         APPEND VALUE #( %tky           = supplement-%tky ) TO failed-supplement.
         APPEND VALUE #( %tky           = supplement-%tky
                         %state_area    = 'VALIDATE_PRICE'
-                        %msg           = NEW /dmo/cx_supplement(
-                                             textid    = /dmo/cx_supplement=>price_required
+                        %msg           = NEW ZTKFK_cx_supplement(
+                                             textid    = ZTKFK_cx_supplement=>price_required
                                              severity  = if_abap_behv_message=>severity-error )
                         %element-Price = if_abap_behv=>mk-on
                       ) TO reported-supplement.
@@ -50,8 +50,8 @@ CLASS lhc_Supplement IMPLEMENTATION.
         APPEND VALUE #( %tky                 = supplement-%tky ) TO failed-supplement.
         APPEND VALUE #( %tky                 = supplement-%tky
                         %state_area          = 'VALIDATE_PRICE'
-                        %msg                 = NEW /dmo/cx_supplement(
-                                                      textid    = /dmo/cx_supplement=>currency_required
+                        %msg                 = NEW ZTKFK_cx_supplement(
+                                                      textid    = ZTKFK_cx_supplement=>currency_required
                                                       severity  = if_abap_behv_message=>severity-error )
                         %element-CurrencyCode = if_abap_behv=>mk-on
                       ) TO reported-supplement.
@@ -60,9 +60,9 @@ CLASS lhc_Supplement IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD earlynumbering_create.
-    DATA: entities_wo_supplementid     TYPE TABLE FOR CREATE /dmo/i_supplement,
-          entities_wo_supplid_filtered TYPE TABLE FOR CREATE /dmo/i_supplement,
-          entity                       TYPE STRUCTURE FOR CREATE /dmo/i_supplement.
+    DATA: entities_wo_supplementid     TYPE TABLE FOR CREATE ZTKFK_i_supplement,
+          entities_wo_supplid_filtered TYPE TABLE FOR CREATE ZTKFK_i_supplement,
+          entity                       TYPE STRUCTURE FOR CREATE ZTKFK_i_supplement.
 
     " Ensure Supplement ID is not set yet
     LOOP AT entities INTO entity WHERE SupplementID IS NOT INITIAL.
@@ -86,7 +86,7 @@ CLASS lhc_Supplement IMPLEMENTATION.
             EXPORTING
               nr_range_nr       = '01'
               subobject         = CONV #( SupplementCategory )
-              object            = '/DMO/SUPPL'
+              object            = 'ZTKFK_SUPPL'
               quantity          = CONV #( lines( entities_wo_supplid_filtered ) )
             IMPORTING
               number            = DATA(number_range_key)
@@ -111,8 +111,8 @@ CLASS lhc_Supplement IMPLEMENTATION.
       CASE number_range_return_code.
         WHEN '1'.
           " 1 - the returned number is in a critical range (specified under “percentage warning” in the object definition)
-          APPEND NEW /dmo/cx_supplement(
-                              textid          = /dmo/cx_supplement=>numbers_left
+          APPEND NEW ZTKFK_cx_supplement(
+                              textid          = ZTKFK_cx_supplement=>numbers_left
                               severity        = if_abap_behv_message=>severity-warning
                               supplement_category = SupplementCategory
                               numbers_left    = CONV i( '9999' - CONV i( number_range_key+2 ) )
@@ -126,8 +126,8 @@ CLASS lhc_Supplement IMPLEMENTATION.
                   %cid      = entity-%cid
                   %is_draft = entity-%is_draft
                   %key      = entity-%key
-                  %msg      = NEW /dmo/cx_supplement(
-                                    textid              = /dmo/cx_supplement=>numbers_last
+                  %msg      = NEW ZTKFK_cx_supplement(
+                                    textid              = ZTKFK_cx_supplement=>numbers_last
                                     severity            = if_abap_behv_message=>severity-error
                                     supplement_category = SupplementCategory )
               ) TO reported-supplement.

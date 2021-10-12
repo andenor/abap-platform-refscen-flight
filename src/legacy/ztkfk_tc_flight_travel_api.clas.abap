@@ -1,4 +1,4 @@
-CLASS /dmo/tc_flight_travel_api DEFINITION
+CLASS ZTKFK_tc_flight_travel_api DEFINITION
   PUBLIC
   ABSTRACT
   CREATE PUBLIC
@@ -10,28 +10,28 @@ CLASS /dmo/tc_flight_travel_api DEFINITION
   PROTECTED SECTION.
     METHODS cuerd_travel FOR TESTING RAISING cx_static_check.
   PRIVATE SECTION.
-    CLASS-DATA gv_agency_id_1         TYPE /dmo/agency_id.
-    CLASS-DATA gv_agency_id_2         TYPE /dmo/agency_id.
-    CLASS-DATA gv_agency_id_unknown   TYPE /dmo/agency_id.
+    CLASS-DATA gv_agency_id_1         TYPE ZTKFK_agency_id.
+    CLASS-DATA gv_agency_id_2         TYPE ZTKFK_agency_id.
+    CLASS-DATA gv_agency_id_unknown   TYPE ZTKFK_agency_id.
 
-    CLASS-DATA gv_customer_id_1       TYPE /dmo/customer_id.
-    CLASS-DATA gv_customer_id_2       TYPE /dmo/customer_id.
-    CLASS-DATA gv_customer_id_unknown TYPE /dmo/customer_id.
+    CLASS-DATA gv_customer_id_1       TYPE ZTKFK_customer_id.
+    CLASS-DATA gv_customer_id_2       TYPE ZTKFK_customer_id.
+    CLASS-DATA gv_customer_id_unknown TYPE ZTKFK_customer_id.
 
     CLASS-METHODS class_setup.
 ENDCLASS.
 
 
 
-CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
+CLASS ZTKFK_TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
 
 
   METHOD class_setup.
-    DATA lt_agency_id TYPE SORTED TABLE OF /dmo/agency_id     WITH UNIQUE KEY table_line.
-    SELECT DISTINCT agency_id FROM /dmo/agency     ORDER BY agency_id   DESCENDING INTO TABLE @lt_agency_id . "#EC CI_NOWHERE
+    DATA lt_agency_id TYPE SORTED TABLE OF ZTKFK_agency_id     WITH UNIQUE KEY table_line.
+    SELECT DISTINCT agency_id FROM ZTKFK_agency     ORDER BY agency_id   DESCENDING INTO TABLE @lt_agency_id . "#EC CI_NOWHERE
 
-    DATA lt_customer_id TYPE SORTED TABLE OF /dmo/customer_id WITH UNIQUE KEY table_line.
-    SELECT DISTINCT customer_id FROM /dmo/customer ORDER BY customer_id DESCENDING INTO TABLE @lt_customer_id . "#EC CI_NOWHERE
+    DATA lt_customer_id TYPE SORTED TABLE OF ZTKFK_customer_id WITH UNIQUE KEY table_line.
+    SELECT DISTINCT customer_id FROM ZTKFK_customer ORDER BY customer_id DESCENDING INTO TABLE @lt_customer_id . "#EC CI_NOWHERE
 
     " Select 2 known agency IDs
     IF lines( lt_agency_id ) < 2.
@@ -72,10 +72,10 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
 
 
   METHOD cuerd_travel.
-    DATA ls_travel_in  TYPE /dmo/s_travel_in.
-    DATA ls_travel_inx TYPE /dmo/s_travel_inx.
-    DATA ls_travel     TYPE /dmo/travel.
-    DATA lt_messages   TYPE /dmo/t_message.
+    DATA ls_travel_in  TYPE ZTKFK_s_travel_in.
+    DATA ls_travel_inx TYPE ZTKFK_s_travel_inx.
+    DATA ls_travel     TYPE ZTKFK_travel.
+    DATA lt_messages   TYPE ZTKFK_t_message.
 
     " Create Travel and Commit
     ls_travel_in-agency_id   = gv_agency_id_1.
@@ -83,7 +83,7 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     ls_travel_in-begin_date  = '20180101'.
     ls_travel_in-end_date    = '20180201'.
     ls_travel_in-description = 'My Test'.
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_CREATE'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_CREATE'
       EXPORTING
         is_travel   = ls_travel_in
       IMPORTING
@@ -92,10 +92,10 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     DATA(lv_travel_id) = ls_travel-travel_id.
     cl_abap_unit_assert=>assert_not_initial( lv_travel_id ).
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_SAVE'.
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_SAVE'.
 
     " DB Check
-    SELECT SINGLE agency_id, customer_id, description FROM /dmo/travel WHERE travel_id = @lv_travel_id INTO ( @DATA(lv_agency_id), @DATA(lv_customer_id), @DATA(lv_description) ).
+    SELECT SINGLE agency_id, customer_id, description FROM ZTKFK_travel WHERE travel_id = @lv_travel_id INTO ( @DATA(lv_agency_id), @DATA(lv_customer_id), @DATA(lv_description) ).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_agency_id    exp = gv_agency_id_1 ).
     cl_abap_unit_assert=>assert_equals( act = lv_customer_id  exp = gv_customer_id_1 ).
@@ -111,7 +111,7 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     ls_travel_inx-agency_id   = abap_true.
     ls_travel_inx-customer_id = abap_true.
     ls_travel_inx-description = abap_true.
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_UPDATE'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_UPDATE'
       EXPORTING
         is_travel   = ls_travel_in
         is_travelx  = ls_travel_inx
@@ -120,7 +120,7 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
     " Action
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_SET_BOOKING'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_SET_BOOKING'
       EXPORTING
         iv_travel_id = lv_travel_id
       IMPORTING
@@ -135,7 +135,7 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     ls_travel_inx-travel_id   = lv_travel_id.
     ls_travel_inx-agency_id   = abap_true.
     ls_travel_inx-customer_id = abap_true.
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_UPDATE'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_UPDATE'
       EXPORTING
         is_travel   = ls_travel_in
         is_travelx  = ls_travel_inx
@@ -152,7 +152,7 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     ls_travel_inx-travel_id   = lv_travel_id.
     ls_travel_inx-agency_id   = abap_true.
     ls_travel_inx-customer_id = abap_true.
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_UPDATE'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_UPDATE'
       EXPORTING
         is_travel   = ls_travel_in
         is_travelx  = ls_travel_inx
@@ -162,7 +162,7 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
 
     " Read DB only
     CLEAR ls_travel.
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_READ'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_READ'
       EXPORTING
         iv_travel_id      = lv_travel_id
         iv_include_buffer = abap_false
@@ -173,12 +173,12 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( act = ls_travel-travel_id    exp = lv_travel_id ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel-agency_id    exp = gv_agency_id_1 ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel-customer_id  exp = gv_customer_id_1 ).
-    cl_abap_unit_assert=>assert_equals( act = ls_travel-status       exp = CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-new ) ).
+    cl_abap_unit_assert=>assert_equals( act = ls_travel-status       exp = CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-new ) ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel-description  exp = 'My Test' ).
 
     " Read with buffer
     CLEAR ls_travel.
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_READ'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_READ'
       EXPORTING
         iv_travel_id      = lv_travel_id
         iv_include_buffer = abap_true
@@ -189,11 +189,11 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( act = ls_travel-travel_id  exp = lv_travel_id ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel-agency_id    exp = gv_agency_id_2 ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel-customer_id  exp = gv_customer_id_2 ).
-    cl_abap_unit_assert=>assert_equals( act = ls_travel-status       exp = CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-booked ) ).
+    cl_abap_unit_assert=>assert_equals( act = ls_travel-status       exp = CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-booked ) ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel-description  exp = 'My New Test' ).
 
     " Delete
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_DELETE'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_DELETE'
       EXPORTING
         iv_travel_id = lv_travel_id
       IMPORTING
@@ -201,13 +201,13 @@ CLASS /DMO/TC_FLIGHT_TRAVEL_API IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
     " Delete again -> Error
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_DELETE'
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_DELETE'
       EXPORTING
         iv_travel_id = lv_travel_id
       IMPORTING
         et_messages  = lt_messages.
     cl_abap_unit_assert=>assert_not_initial( lt_messages ).
 
-    CALL FUNCTION '/DMO/FLIGHT_TRAVEL_SAVE'.
+    CALL FUNCTION 'ZTKFK_FLIGHT_TRAVEL_SAVE'.
   ENDMETHOD.
 ENDCLASS.

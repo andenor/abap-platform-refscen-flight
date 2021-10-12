@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <BDEF>
-    <NAME>/DMO/I_CARRIERSLOCKSINGLETON_S</NAME>
+    <NAME>ZTKFK_I_CARRIERSLOCKSINGLETON_S</NAME>
     <TYPE>BDEF/BDO</TYPE>
     <DESCRIPTION>Carrier Singleton Root View</DESCRIPTION>
     <DESCRIPTION_TEXT_LIMIT>60</DESCRIPTION_TEXT_LIMIT>

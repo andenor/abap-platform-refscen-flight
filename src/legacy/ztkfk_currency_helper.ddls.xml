@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DDLS>
-    <DDLNAME>/DMO/CURRENCY_HELPER</DDLNAME>
+    <DDLNAME>ZTKFK_CURRENCY_HELPER</DDLNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DDTEXT>Help View for Currency Conversion</DDTEXT>
     <SOURCE_TYPE>V</SOURCE_TYPE>

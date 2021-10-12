@@ -8,10 +8,10 @@
  dataClass: #MIXED
 }
 @ObjectModel.resultSet.sizeCategory: #XS
-define view entity /DMO/I_SupplementCategory_VH
-  as select from /dmo/supplcat
+define view entity ZTKFK_I_SupplementCategory_VH
+  as select from ZTKFK_supplcat
 
-  association [0..*] to /DMO/I_SupplementCategory_VH_T as _Text on $projection.SupplementCategory = _Text.SupplementCategory
+  association [0..*] to ZTKFK_I_SupplementCategory_VH_T as _Text on $projection.SupplementCategory = _Text.SupplementCategory
 
 {
       @UI.textArrangement: #TEXT_ONLY

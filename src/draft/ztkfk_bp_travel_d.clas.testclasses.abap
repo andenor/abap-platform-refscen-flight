@@ -1,4 +1,4 @@
-"! @testing BDEF:/DMO/I_TRAVEL_D
+"! @testing BDEF:ZTKFK_I_TRAVEL_D
 CLASS ltc_draft DEFINITION FINAL FOR TESTING
   DURATION SHORT
   RISK LEVEL HARMLESS.
@@ -44,7 +44,7 @@ CLASS ltc_draft IMPLEMENTATION.
 
   METHOD class_setup.
     CREATE OBJECT class_under_test FOR TESTING.
-    cds_test_environment = cl_cds_test_environment=>create( i_for_entity = '/DMO/I_TRAVEL_D' ).
+    cds_test_environment = cl_cds_test_environment=>create( i_for_entity = 'ZTKFK_I_TRAVEL_D' ).
     cds_test_environment->enable_double_redirection(  ).
   ENDMETHOD.
 
@@ -63,12 +63,12 @@ CLASS ltc_draft IMPLEMENTATION.
   METHOD settravelnumber_idempotence.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /DMO/A_Travel_D.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_A_Travel_D.
     travel_mock_data = VALUE #( ( travel_uuid = uuid1 travel_id = '1' ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structure
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /DMO/I_Travel_D.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_I_Travel_D.
 
     " Call the method to be tested
     class_under_test->setTravelNumber(
@@ -83,7 +83,7 @@ CLASS ltc_draft IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( msg = 'reported' act = reported ).
 
     " Read instance data
-    READ ENTITY /DMO/I_Travel_D
+    READ ENTITY ZTKFK_I_Travel_D
        FIELDS ( TravelID ) WITH VALUE #( ( TravelUUID = travel_mock_data[ 1 ]-travel_uuid ) )
        RESULT DATA(read_result).
 
@@ -100,13 +100,13 @@ CLASS ltc_draft IMPLEMENTATION.
   METHOD settravelnumber_newtravelids.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /DMO/A_Travel_D.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_A_Travel_D.
     travel_mock_data = VALUE #( ( travel_uuid = uuid1 )
                                 ( travel_uuid = uuid2 ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structure
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /DMO/I_Travel_D.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_I_Travel_D.
 
     " Call the method to be tested
     class_under_test->setTravelNumber(
@@ -121,7 +121,7 @@ CLASS ltc_draft IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( msg = 'reported' act = reported ).
 
     " Read and sort instance data
-    READ ENTITY /DMO/I_Travel_D
+    READ ENTITY ZTKFK_I_Travel_D
        FIELDS ( TravelID ) WITH VALUE #( FOR key IN travel_mock_data ( TravelUUID = key-travel_uuid ) )
        RESULT DATA(read_result).
 
@@ -141,14 +141,14 @@ CLASS ltc_draft IMPLEMENTATION.
   METHOD settravelnumber_mixed.
 
     " Fill in test data
-    DATA travel_mock_data TYPE STANDARD TABLE OF /DMO/A_Travel_D.
+    DATA travel_mock_data TYPE STANDARD TABLE OF ZTKFK_A_Travel_D.
     travel_mock_data = VALUE #( ( travel_uuid = uuid1 )
                                 ( travel_uuid = uuid2 travel_id = '1' )
                                 ( travel_uuid = uuid3 ) ).
     cds_test_environment->insert_test_data( travel_mock_data ).
 
     " Declare required structure
-    DATA reported TYPE RESPONSE FOR REPORTED LATE  /DMO/I_Travel_D.
+    DATA reported TYPE RESPONSE FOR REPORTED LATE  ZTKFK_I_Travel_D.
 
     " Call the method to be tested
     class_under_test->setTravelNumber(
@@ -163,7 +163,7 @@ CLASS ltc_draft IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( msg = 'reported' act = reported ).
 
     " Read and sort instance data
-    READ ENTITY /DMO/I_Travel_D
+    READ ENTITY ZTKFK_I_Travel_D
        FIELDS ( TravelID ) WITH VALUE #( FOR key IN travel_mock_data ( TravelUUID = key-travel_uuid ) )
        RESULT DATA(read_result).
 

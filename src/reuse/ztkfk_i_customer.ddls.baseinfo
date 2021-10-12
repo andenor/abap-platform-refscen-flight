@@ -3,7 +3,7 @@
 {
 "FROM":
 [
-"/DMO/CUSTOMER"
+"ZTKFK_CUSTOMER"
 ],
 "ASSOCIATED":
 [

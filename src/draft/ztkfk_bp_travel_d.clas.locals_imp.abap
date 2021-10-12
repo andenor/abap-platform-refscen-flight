@@ -65,7 +65,7 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD acceptTravel.
 
     "Modify travel instance
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         UPDATE FIELDS (  OverallStatus )
         WITH VALUE #( FOR key IN keys ( %tky          = key-%tky
@@ -74,7 +74,7 @@ CLASS lhc_travel IMPLEMENTATION.
     REPORTED reported.
 
     "Read changed data for action result
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         ALL FIELDS WITH
         CORRESPONDING #( keys )
@@ -88,7 +88,7 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD rejectTravel.
 
     "Modify travel instance
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         UPDATE FIELDS (  OverallStatus )
         WITH VALUE #( FOR key IN keys ( %tky          = key-%tky
@@ -97,7 +97,7 @@ CLASS lhc_travel IMPLEMENTATION.
     REPORTED reported.
 
     "Read changed data for action result
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         ALL FIELDS WITH
         CORRESPONDING #( keys )
@@ -109,7 +109,7 @@ CLASS lhc_travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD deductDiscount.
-    DATA travels_for_update TYPE TABLE FOR UPDATE /DMO/I_Travel_D.
+    DATA travels_for_update TYPE TABLE FOR UPDATE ZTKFK_I_Travel_D.
     DATA(keys_with_valid_discount) = keys.
 
     LOOP AT keys_with_valid_discount ASSIGNING FIELD-SYMBOL(<key_with_valid_discount>) WHERE %param-discount_percent IS INITIAL
@@ -119,8 +119,8 @@ CLASS lhc_travel IMPLEMENTATION.
       APPEND VALUE #( %tky                = <key_with_valid_discount>-%tky ) TO failed-travel.
 
       APPEND VALUE #( %tky                = <key_with_valid_discount>-%tky
-                      %msg                = NEW /dmo/cm_flight_messages(
-                             textid = /dmo/cm_flight_messages=>discount_invalid
+                      %msg                = NEW ZTKFK_cm_flight_messages(
+                             textid = ZTKFK_cm_flight_messages=>discount_invalid
                              severity = if_abap_behv_message=>severity-error )
                              %element-TotalPrice = if_abap_behv=>mk-on
                     ) TO reported-travel.
@@ -131,7 +131,7 @@ CLASS lhc_travel IMPLEMENTATION.
     CHECK keys_with_valid_discount IS NOT INITIAL.
 
     "get total price
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         FIELDS ( BookingFee )
         WITH CORRESPONDING #( keys_with_valid_discount )
@@ -152,7 +152,7 @@ CLASS lhc_travel IMPLEMENTATION.
     ENDLOOP.
 
     "update total price with reduced price
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
        UPDATE FIELDS ( BookingFee )
        WITH travels_for_update
@@ -160,7 +160,7 @@ CLASS lhc_travel IMPLEMENTATION.
     REPORTED DATA(update_reported).
 
     "Read changed data for action result
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         ALL FIELDS WITH
         CORRESPONDING #( travels )
@@ -173,14 +173,14 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD reCalcTotalPrice.
     TYPES: BEGIN OF ty_amount_per_currencycode,
-             amount        TYPE /dmo/total_price,
-             currency_code TYPE /dmo/currency_code,
+             amount        TYPE ZTKFK_total_price,
+             currency_code TYPE ZTKFK_currency_code,
            END OF ty_amount_per_currencycode.
 
     DATA: amount_per_currencycode TYPE STANDARD TABLE OF ty_amount_per_currencycode.
 
     " Read all relevant travel instances.
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
          ENTITY Travel
             FIELDS ( BookingFee CurrencyCode )
             WITH CORRESPONDING #( keys )
@@ -195,7 +195,7 @@ CLASS lhc_travel IMPLEMENTATION.
                                            currency_code = <travel>-CurrencyCode ) ).
 
       " Read all associated bookings and add them to the total price.
-      READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+      READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
         ENTITY Travel BY \_Booking
           FIELDS ( FlightPrice CurrencyCode )
         WITH VALUE #( ( %tky = <travel>-%tky ) )
@@ -207,7 +207,7 @@ CLASS lhc_travel IMPLEMENTATION.
       ENDLOOP.
 
       " Read all associated booking supplements and add them to the total price.
-      READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+      READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
         ENTITY Booking BY \_BookingSupplement
           FIELDS ( BookSupplPrice CurrencyCode )
         WITH VALUE #( FOR rba_booking IN bookings ( %tky = rba_booking-%tky ) )
@@ -224,7 +224,7 @@ CLASS lhc_travel IMPLEMENTATION.
         IF single_amount_per_currencycode-currency_code = <travel>-CurrencyCode.
           <travel>-TotalPrice += single_amount_per_currencycode-amount.
         ELSE.
-          /dmo/cl_flight_amdp=>convert_currency(
+          ZTKFK_cl_flight_amdp=>convert_currency(
              EXPORTING
                iv_amount                   =  single_amount_per_currencycode-amount
                iv_currency_code_source     =  single_amount_per_currencycode-currency_code
@@ -239,7 +239,7 @@ CLASS lhc_travel IMPLEMENTATION.
     ENDLOOP.
 
     " write back the modified total_price of travels
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY travel
         UPDATE FIELDS ( TotalPrice )
         WITH CORRESPONDING #( travels ).
@@ -248,7 +248,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD setTravelNumber.
     "Ensure idempotence
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         FIELDS ( TravelID )
         WITH CORRESPONDING #( keys )
@@ -258,10 +258,10 @@ CLASS lhc_travel IMPLEMENTATION.
     CHECK travels IS NOT INITIAL.
 
     "Get max travelID
-    SELECT SINGLE FROM /dmo/a_travel_d FIELDS MAX( travel_id ) INTO @DATA(max_travelid).
+    SELECT SINGLE FROM ZTKFK_a_travel_d FIELDS MAX( travel_id ) INTO @DATA(max_travelid).
 
     "update involved instances
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         UPDATE FIELDS ( TravelID )
         WITH VALUE #( FOR ls_travel IN travels INDEX INTO i (
@@ -275,7 +275,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD setStatusToOpen.
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
      ENTITY Travel
        FIELDS ( OverallStatus )
        WITH CORRESPONDING #( keys )
@@ -286,7 +286,7 @@ CLASS lhc_travel IMPLEMENTATION.
     DELETE travels WHERE OverallStatus IS NOT INITIAL.
     CHECK travels IS NOT INITIAL.
 
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         UPDATE FIELDS ( OverallStatus )
         WITH VALUE #( FOR travel IN travels ( %tky          = travel-%tky
@@ -299,7 +299,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD calculateTotalPrice.
 
-    MODIFY ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    MODIFY ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         EXECUTE reCalcTotalPrice
         FROM CORRESPONDING #( keys )
@@ -311,7 +311,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD validateCustomer.
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         FIELDS ( CustomerID )
         WITH CORRESPONDING #( keys )
@@ -320,7 +320,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
     failed =  CORRESPONDING #( DEEP read_failed  ).
 
-    DATA customers TYPE SORTED TABLE OF /dmo/customer WITH UNIQUE KEY customer_id.
+    DATA customers TYPE SORTED TABLE OF ZTKFK_customer WITH UNIQUE KEY customer_id.
 
     " Optimization of DB select: extract distinct non-initial customer IDs
     customers = CORRESPONDING #( travels DISCARDING DUPLICATES MAPPING customer_id = CustomerID EXCEPT * ).
@@ -328,7 +328,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
     IF  customers IS NOT INITIAL.
       " Check if customer ID exists
-      SELECT FROM /dmo/customer FIELDS customer_id
+      SELECT FROM ZTKFK_customer FIELDS customer_id
                                 FOR ALL ENTRIES IN @customers
                                 WHERE customer_id = @customers-customer_id
       INTO TABLE @DATA(valid_customers).
@@ -346,8 +346,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #( %tky                = travel-%tky
                         %state_area         = 'VALIDATE_CUSTOMER'
-                        %msg                = NEW /dmo/cm_flight_messages(
-                                                                textid   = /dmo/cm_flight_messages=>enter_customer_id
+                        %msg                = NEW ZTKFK_cm_flight_messages(
+                                                                textid   = ZTKFK_cm_flight_messages=>enter_customer_id
                                                                 severity = if_abap_behv_message=>severity-error )
                         %element-CustomerID = if_abap_behv=>mk-on
                       ) TO reported-travel.
@@ -357,9 +357,9 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #(  %tky                = travel-%tky
                          %state_area         = 'VALIDATE_CUSTOMER'
-                         %msg                = NEW /dmo/cm_flight_messages(
+                         %msg                = NEW ZTKFK_cm_flight_messages(
                                                                 customer_id = travel-customerid
-                                                                textid      = /dmo/cm_flight_messages=>customer_unkown
+                                                                textid      = ZTKFK_cm_flight_messages=>customer_unkown
                                                                 severity    = if_abap_behv_message=>severity-error )
                          %element-CustomerID = if_abap_behv=>mk-on
                       ) TO reported-travel.
@@ -373,7 +373,7 @@ CLASS lhc_travel IMPLEMENTATION.
     DATA: modification_granted TYPE abap_boolean,
           agency_country_code  TYPE land1.
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         FIELDS ( AgencyID TravelID )
         WITH CORRESPONDING #( keys )
@@ -382,7 +382,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
     failed =  CORRESPONDING #( DEEP read_failed  ).
 
-    DATA agencies TYPE SORTED TABLE OF /dmo/agency WITH UNIQUE KEY agency_id.
+    DATA agencies TYPE SORTED TABLE OF ZTKFK_agency WITH UNIQUE KEY agency_id.
 
     " Optimization of DB select: extract distinct non-initial agency IDs
     agencies = CORRESPONDING #( travels DISCARDING DUPLICATES MAPPING agency_id = AgencyID EXCEPT * ).
@@ -390,7 +390,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
     IF  agencies IS NOT INITIAL.
       " Check if customer ID exists
-      SELECT FROM /dmo/agency FIELDS agency_id, country_code
+      SELECT FROM ZTKFK_agency FIELDS agency_id, country_code
                               FOR ALL ENTRIES IN @agencies
                               WHERE agency_id = @agencies-agency_id
         INTO TABLE @DATA(valid_agencies).
@@ -407,8 +407,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #( %tky                = travel-%tky
                         %state_area         = 'VALIDATE_AGENCY'
-                        %msg                = NEW /dmo/cm_flight_messages(
-                                                          textid   = /dmo/cm_flight_messages=>enter_agency_id
+                        %msg                = NEW ZTKFK_cm_flight_messages(
+                                                          textid   = ZTKFK_cm_flight_messages=>enter_agency_id
                                                           severity = if_abap_behv_message=>severity-error )
                         %element-AgencyID   = if_abap_behv=>mk-on
                        ) TO reported-travel.
@@ -418,9 +418,9 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #(  %tky               = travel-%tky
                          %state_area        = 'VALIDATE_AGENCY'
-                         %msg               = NEW /dmo/cm_flight_messages(
+                         %msg               = NEW ZTKFK_cm_flight_messages(
                                                                 agency_id = travel-agencyid
-                                                                textid    = /dmo/cm_flight_messages=>agency_unkown
+                                                                textid    = ZTKFK_cm_flight_messages=>agency_unkown
                                                                 severity  = if_abap_behv_message=>severity-error )
                          %element-AgencyID  = if_abap_behv=>mk-on
                       ) TO reported-travel.
@@ -439,9 +439,9 @@ CLASS lhc_travel IMPLEMENTATION.
 
           APPEND VALUE #(  %tky               = travel-%tky
                            %state_area        = 'VALIDATE_AGENCY'
-                           %msg               = NEW /dmo/cm_flight_messages(
+                           %msg               = NEW ZTKFK_cm_flight_messages(
                                                                   agency_id = travel-agencyid
-                                                                  textid    = /dmo/cm_flight_messages=>not_authorized_for_agencyid
+                                                                  textid    = ZTKFK_cm_flight_messages=>not_authorized_for_agencyid
                                                                   severity  = if_abap_behv_message=>severity-error )
                            %element-AgencyID  = if_abap_behv=>mk-on
                         ) TO reported-travel.
@@ -453,7 +453,7 @@ CLASS lhc_travel IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD validateDates.
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         FIELDS (  BeginDate EndDate TravelID )
         WITH CORRESPONDING #( keys )
@@ -472,8 +472,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #( %tky               = travel-%tky
                         %state_area        = 'VALIDATE_DATES'
-                         %msg              = NEW /dmo/cm_flight_messages(
-                                                                textid   = /dmo/cm_flight_messages=>enter_begin_date
+                         %msg              = NEW ZTKFK_cm_flight_messages(
+                                                                textid   = ZTKFK_cm_flight_messages=>enter_begin_date
                                                                 severity = if_abap_behv_message=>severity-error )
                         %element-BeginDate = if_abap_behv=>mk-on ) TO reported-travel.
       ENDIF.
@@ -482,8 +482,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #( %tky               = travel-%tky
                         %state_area        = 'VALIDATE_DATES'
-                         %msg                = NEW /dmo/cm_flight_messages(
-                                                                textid   = /dmo/cm_flight_messages=>enter_end_date
+                         %msg                = NEW ZTKFK_cm_flight_messages(
+                                                                textid   = ZTKFK_cm_flight_messages=>enter_end_date
                                                                 severity = if_abap_behv_message=>severity-error )
                         %element-EndDate   = if_abap_behv=>mk-on ) TO reported-travel.
       ENDIF.
@@ -493,8 +493,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #( %tky               = travel-%tky
                         %state_area        = 'VALIDATE_DATES'
-                        %msg               = NEW /dmo/cm_flight_messages(
-                                                                textid     = /dmo/cm_flight_messages=>begin_date_bef_end_date
+                        %msg               = NEW ZTKFK_cm_flight_messages(
+                                                                textid     = ZTKFK_cm_flight_messages=>begin_date_bef_end_date
                                                                 begin_date = travel-BeginDate
                                                                 end_date   = travel-EndDate
                                                                 severity   = if_abap_behv_message=>severity-error )
@@ -506,9 +506,9 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #( %tky               = travel-%tky
                         %state_area        = 'VALIDATE_DATES'
-                         %msg              = NEW /dmo/cm_flight_messages(
+                         %msg              = NEW ZTKFK_cm_flight_messages(
                                                                 begin_date = travel-BeginDate
-                                                                textid     = /dmo/cm_flight_messages=>begin_date_on_or_bef_sysdate
+                                                                textid     = ZTKFK_cm_flight_messages=>begin_date_on_or_bef_sysdate
                                                                 severity   = if_abap_behv_message=>severity-error )
                         %element-BeginDate = if_abap_behv=>mk-on ) TO reported-travel.
       ENDIF.
@@ -519,7 +519,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD get_instance_features.
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         FIELDS ( OverallStatus )
         WITH CORRESPONDING #( keys )
@@ -555,8 +555,8 @@ CLASS lhc_travel IMPLEMENTATION.
         result-%create = if_abap_behv=>auth-allowed.
       ELSE.
         result-%create = if_abap_behv=>auth-unauthorized.
-        APPEND VALUE #( %msg    = NEW /dmo/cm_flight_messages(
-                                       textid   = /dmo/cm_flight_messages=>not_authorized
+        APPEND VALUE #( %msg    = NEW ZTKFK_cm_flight_messages(
+                                       textid   = ZTKFK_cm_flight_messages=>not_authorized
                                        severity = if_abap_behv_message=>severity-error )
                         %global = if_abap_behv=>mk-on ) TO reported-travel.
 
@@ -576,8 +576,8 @@ CLASS lhc_travel IMPLEMENTATION.
         result-%update                =  if_abap_behv=>auth-unauthorized.
         result-%action-Edit           =  if_abap_behv=>auth-unauthorized.
 
-        APPEND VALUE #( %msg    = NEW /dmo/cm_flight_messages(
-                                       textid   = /dmo/cm_flight_messages=>not_authorized
+        APPEND VALUE #( %msg    = NEW ZTKFK_cm_flight_messages(
+                                       textid   = ZTKFK_cm_flight_messages=>not_authorized
                                        severity = if_abap_behv_message=>severity-error )
                         %global = if_abap_behv=>mk-on )
           TO reported-travel.
@@ -591,8 +591,8 @@ CLASS lhc_travel IMPLEMENTATION.
         result-%delete = if_abap_behv=>auth-allowed.
       ELSE.
         result-%delete = if_abap_behv=>auth-unauthorized.
-        APPEND VALUE #( %msg    = NEW /dmo/cm_flight_messages(
-                                       textid   = /dmo/cm_flight_messages=>not_authorized
+        APPEND VALUE #( %msg    = NEW ZTKFK_cm_flight_messages(
+                                       textid   = ZTKFK_cm_flight_messages=>not_authorized
                                        severity = if_abap_behv_message=>severity-error )
                         %global = if_abap_behv=>mk-on ) TO reported-travel.
       ENDIF.
@@ -604,8 +604,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
     "For validation
     IF country_code IS SUPPLIED.
-      AUTHORITY-CHECK OBJECT '/DMO/TRVL'
-        ID '/DMO/CNTRY' FIELD country_code
+      AUTHORITY-CHECK OBJECT 'ZTKFK_TRVL'
+        ID 'ZTKFK_CNTRY' FIELD country_code
         ID 'ACTVT'      FIELD '01'.
       create_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
@@ -624,8 +624,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
       "For global auth
     ELSE.
-      AUTHORITY-CHECK OBJECT '/DMO/TRVL'
-        ID '/DMO/CNTRY' DUMMY
+      AUTHORITY-CHECK OBJECT 'ZTKFK_TRVL'
+        ID 'ZTKFK_CNTRY' DUMMY
         ID 'ACTVT'      FIELD '01'.
       create_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
@@ -640,8 +640,8 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD is_update_granted.
     "For instance auth
     IF country_code IS SUPPLIED.
-      AUTHORITY-CHECK OBJECT '/DMO/TRVL'
-        ID '/DMO/CNTRY' FIELD country_code
+      AUTHORITY-CHECK OBJECT 'ZTKFK_TRVL'
+        ID 'ZTKFK_CNTRY' FIELD country_code
         ID 'ACTVT'      FIELD '02'.
       update_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
@@ -660,8 +660,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
       "For global auth
     ELSE.
-      AUTHORITY-CHECK OBJECT '/DMO/TRVL'
-        ID '/DMO/CNTRY' DUMMY
+      AUTHORITY-CHECK OBJECT 'ZTKFK_TRVL'
+        ID 'ZTKFK_CNTRY' DUMMY
         ID 'ACTVT'      FIELD '02'.
       update_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
@@ -675,8 +675,8 @@ CLASS lhc_travel IMPLEMENTATION.
   METHOD is_delete_granted.
     "For instance auth
     IF country_code IS SUPPLIED.
-      AUTHORITY-CHECK OBJECT '/DMO/TRVL'
-        ID '/DMO/CNTRY' FIELD country_code
+      AUTHORITY-CHECK OBJECT 'ZTKFK_TRVL'
+        ID 'ZTKFK_CNTRY' FIELD country_code
         ID 'ACTVT'      FIELD '06'.
       delete_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
@@ -695,8 +695,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
       "For global auth
     ELSE.
-      AUTHORITY-CHECK OBJECT '/DMO/TRVL'
-        ID '/DMO/CNTRY' DUMMY
+      AUTHORITY-CHECK OBJECT 'ZTKFK_TRVL'
+        ID 'ZTKFK_CNTRY' DUMMY
         ID 'ACTVT'      FIELD '06'.
       delete_granted = COND #( WHEN sy-subrc = 0 THEN abap_true ELSE abap_false ).
 
@@ -715,7 +715,7 @@ CLASS lhc_travel IMPLEMENTATION.
           update_granted   TYPE abap_bool,
           delete_granted   TYPE abap_bool.
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
       ENTITY Travel
         FIELDS ( AgencyID )
         WITH CORRESPONDING #( keys )
@@ -726,7 +726,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
     "Select country_code and agency of corresponding persistent travel instance
     "authorization  only checked against instance that have active persistence
-    SELECT  FROM /dmo/a_travel_d AS travel  INNER JOIN /dmo/agency AS agency
+    SELECT  FROM ZTKFK_a_travel_d AS travel  INNER JOIN ZTKFK_agency AS agency
           ON travel~agency_id = agency~agency_id
           FIELDS travel~travel_uuid , travel~agency_id, agency~country_code
           FOR ALL ENTRIES IN @travels WHERE travel_uuid EQ @travels-TravelUUID
@@ -755,8 +755,8 @@ CLASS lhc_travel IMPLEMENTATION.
           update_granted = is_update_granted( <travel_agency_country_code>-country_code  ).
           IF update_granted = abap_false.
             APPEND VALUE #( %tky = travel-%tky
-                            %msg = NEW /dmo/cm_flight_messages(
-                                                     textid    = /dmo/cm_flight_messages=>not_authorized_for_agencyid
+                            %msg = NEW ZTKFK_cm_flight_messages(
+                                                     textid    = ZTKFK_cm_flight_messages=>not_authorized_for_agencyid
                                                      agency_id = travel-AgencyID
                                                      severity  = if_abap_behv_message=>severity-error )
                             %element-AgencyID = if_abap_behv=>mk-on
@@ -769,8 +769,8 @@ CLASS lhc_travel IMPLEMENTATION.
           delete_granted = is_delete_granted( <travel_agency_country_code>-country_code ).
           IF delete_granted = abap_false.
             APPEND VALUE #( %tky = travel-%tky
-                            %msg = NEW /dmo/cm_flight_messages(
-                                     textid   = /dmo/cm_flight_messages=>not_authorized_for_agencyid
+                            %msg = NEW ZTKFK_cm_flight_messages(
+                                     textid   = ZTKFK_cm_flight_messages=>not_authorized_for_agencyid
                                      agency_id = travel-AgencyID
                                      severity = if_abap_behv_message=>severity-error )
                             %element-AgencyID = if_abap_behv=>mk-on
@@ -784,8 +784,8 @@ CLASS lhc_travel IMPLEMENTATION.
         update_granted = delete_granted = is_create_granted( ).
         IF update_granted = abap_false.
           APPEND VALUE #( %tky = travel-%tky
-                          %msg = NEW /dmo/cm_flight_messages(
-                                   textid   = /dmo/cm_flight_messages=>not_authorized
+                          %msg = NEW ZTKFK_cm_flight_messages(
+                                   textid   = ZTKFK_cm_flight_messages=>not_authorized
                                    severity = if_abap_behv_message=>severity-error )
                           %element-AgencyID = if_abap_behv=>mk-on
                         ) TO reported-travel.
@@ -812,7 +812,7 @@ CLASS lhc_travel IMPLEMENTATION.
     DATA: create_granted      TYPE abap_boolean,
           agency_country_code TYPE land1.
 
-    READ ENTITIES OF /DMO/I_Travel_D IN LOCAL MODE
+    READ ENTITIES OF ZTKFK_I_Travel_D IN LOCAL MODE
     ENTITY Travel
       FIELDS ( AgencyID )
       WITH CORRESPONDING #( keys )
@@ -822,7 +822,7 @@ CLASS lhc_travel IMPLEMENTATION.
     failed = CORRESPONDING #( DEEP read_failed ).
     CHECK travels IS NOT INITIAL.
 
-    SELECT FROM /dmo/agency FIELDS agency_id, country_code
+    SELECT FROM ZTKFK_agency FIELDS agency_id, country_code
       FOR ALL ENTRIES IN @travels
       WHERE agency_id = @travels-AgencyID
       INTO TABLE @DATA(agency_country_codes).
@@ -844,8 +844,8 @@ CLASS lhc_travel IMPLEMENTATION.
 
         APPEND VALUE #( %tky                = travel-%tky
                         %state_area         = 'VALIDATE_AUTHORIZATION'
-                        %msg    = NEW /dmo/cm_flight_messages(
-                                                textid    = /dmo/cm_flight_messages=>not_authorized_for_agencyid
+                        %msg    = NEW ZTKFK_cm_flight_messages(
+                                                textid    = ZTKFK_cm_flight_messages=>not_authorized_for_agencyid
                                                 agency_id = travel-AgencyID
                                                 severity  = if_abap_behv_message=>severity-error )
                         %element-AgencyID   = if_abap_behv=>mk-on

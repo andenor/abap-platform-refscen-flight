@@ -4,7 +4,7 @@
                      typeNamePlural: 'Booking Supplements',
                      title: { type: #STANDARD, label: 'Booking Supplement', value: 'BookingSupplementID' } } }
 
-annotate view /DMO/C_BookingSupplement_U with
+annotate view ZTKFK_C_BookingSupplement_U with
 {
   @UI.facet: [ { id:            'BookingSupplement',
                  purpose:       #STANDARD,

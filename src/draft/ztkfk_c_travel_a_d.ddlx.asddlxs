@@ -5,7 +5,7 @@
                      title: { type: #STANDARD, value: 'TravelID' } },
        presentationVariant: [{ sortOrder: [{ by: 'TravelID', direction: #DESC }] }] }
        
-annotate entity /DMO/C_Travel_A_D
+annotate entity ZTKFK_C_Travel_A_D
   with 
 {
   @UI.facet: [{ id:            'Travel',

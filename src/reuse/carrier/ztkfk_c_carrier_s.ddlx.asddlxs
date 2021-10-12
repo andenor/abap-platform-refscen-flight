@@ -5,7 +5,7 @@
                      title:          { type: #STANDARD,
                                        label: 'Airline',
                                        value: 'AirlineID' } } }
-annotate entity /DMO/C_Carrier_S
+annotate entity ZTKFK_C_Carrier_S
   with 
 {
   @UI.facet: [{ type: #IDENTIFICATION_REFERENCE }]

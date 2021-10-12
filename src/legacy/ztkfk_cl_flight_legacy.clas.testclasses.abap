@@ -1,6 +1,6 @@
 CLASS ltcl_lock_travel DEFINITION DEFERRED.
 
-CLASS /dmo/cl_flight_legacy DEFINITION LOCAL FRIENDS ltcl_lock_travel.
+CLASS ZTKFK_cl_flight_legacy DEFINITION LOCAL FRIENDS ltcl_lock_travel.
 
 CLASS ltcl_lock_travel DEFINITION FINAL FOR TESTING
   DURATION SHORT
@@ -21,25 +21,25 @@ ENDCLASS.
 CLASS ltc_travel DEFINITION FOR TESTING DURATION SHORT RISK LEVEL HARMLESS.
   PROTECTED SECTION.
     CONSTANTS mc_use_sql_doubles           TYPE abap_bool VALUE abap_false.
-    CONSTANTS mc_msgid                     TYPE symsgid   VALUE '/DMO/CM_FLIGHT_LEGAC'.
+    CONSTANTS mc_msgid                     TYPE symsgid   VALUE 'ZTKFK_CM_FLIGHT_LEGAC'.
 
 * SQL doubles currently not available in cloud environment
 *   CLASS-DATA mr_test_environment         TYPE REF TO if_osql_test_environment.
 
-    CLASS-DATA gr_cut                      TYPE REF TO /dmo/cl_flight_legacy.
+    CLASS-DATA gr_cut                      TYPE REF TO ZTKFK_cl_flight_legacy.
 
-    CLASS-DATA gv_agency_id_1              TYPE /dmo/agency_id.
-    CLASS-DATA gv_agency_id_2              TYPE /dmo/agency_id.
-    CLASS-DATA gv_agency_id_unknown        TYPE /dmo/agency_id.
+    CLASS-DATA gv_agency_id_1              TYPE ZTKFK_agency_id.
+    CLASS-DATA gv_agency_id_2              TYPE ZTKFK_agency_id.
+    CLASS-DATA gv_agency_id_unknown        TYPE ZTKFK_agency_id.
 
-    CLASS-DATA gv_customer_id_1            TYPE /dmo/customer_id.
-    CLASS-DATA gv_customer_id_2            TYPE /dmo/customer_id.
-    CLASS-DATA gv_customer_id_unknown      TYPE /dmo/customer_id.
+    CLASS-DATA gv_customer_id_1            TYPE ZTKFK_customer_id.
+    CLASS-DATA gv_customer_id_2            TYPE ZTKFK_customer_id.
+    CLASS-DATA gv_customer_id_unknown      TYPE ZTKFK_customer_id.
 
-    METHODS _create_travel IMPORTING is_travel        TYPE /dmo/s_travel_in
+    METHODS _create_travel IMPORTING is_travel        TYPE ZTKFK_s_travel_in
                                      iv_save          TYPE abap_bool DEFAULT abap_true
-                           RETURNING VALUE(rs_travel) TYPE /dmo/travel.
-    METHODS _delete_existing_travel IMPORTING iv_travel_id TYPE /dmo/travel_id.
+                           RETURNING VALUE(rs_travel) TYPE ZTKFK_travel.
+    METHODS _delete_existing_travel IMPORTING iv_travel_id TYPE ZTKFK_travel_id.
 
   PRIVATE SECTION.
     DATA mv_travel_count             TYPE i.
@@ -110,34 +110,34 @@ CLASS ltc_travel DEFINITION FOR TESTING DURATION SHORT RISK LEVEL HARMLESS.
     METHODS u_status_invalid            FOR TESTING RAISING cx_static_check.
 ENDCLASS.
 
-CLASS /dmo/cl_flight_legacy DEFINITION LOCAL FRIENDS ltc_travel.
+CLASS ZTKFK_cl_flight_legacy DEFINITION LOCAL FRIENDS ltc_travel.
 
 CLASS ltc_travel IMPLEMENTATION.
   METHOD class_setup.
     IF mc_use_sql_doubles = abap_true ##BOOL_OK.
-*     mr_test_environment = cl_osql_test_environment=>create( i_dependency_list = VALUE #( ( '/DMO/TRAVEL' ) ( '/DMO/BOOKING' ) ( '/DMO/BOOK_SUPPL' )
-*                                                                                          ( '/DMO/AGENCY' ) ( '/DMO/CUSTOMER' ) ( '/DMO/FLIGHT' ) ( '/DMO/SUPPLEMENT' ) ) ).
+*     mr_test_environment = cl_osql_test_environment=>create( i_dependency_list = VALUE #( ( 'ZTKFK_TRAVEL' ) ( 'ZTKFK_BOOKING' ) ( 'ZTKFK_BOOK_SUPPL' )
+*                                                                                          ( 'ZTKFK_AGENCY' ) ( 'ZTKFK_CUSTOMER' ) ( 'ZTKFK_FLIGHT' ) ( 'ZTKFK_SUPPLEMENT' ) ) ).
 *     mr_test_environment->clear_doubles( ).
 *     gv_agency_id_1 = '42'.
 *     gv_agency_id_2 = '43'.
-*     DATA lt_agency TYPE STANDARD TABLE OF /dmo/agency.
+*     DATA lt_agency TYPE STANDARD TABLE OF ZTKFK_agency.
 *     lt_agency = VALUE #( ( agency_id = gv_agency_id_1 ) ( agency_id = gv_agency_id_2 ) ).
 *     mr_test_environment->insert_test_data( lt_agency ).
 *
 *     gv_customer_id_1 = '42'.
 *     gv_customer_id_2 = '43'.
-*     DATA lt_customer  TYPE STANDARD TABLE OF /dmo/customer.
+*     DATA lt_customer  TYPE STANDARD TABLE OF ZTKFK_customer.
 *     lt_customer = VALUE #( ( customer_id = gv_customer_id_1 ) ( customer_id = gv_customer_id_2 ) ).
 *     mr_test_environment->insert_test_data( lt_customer ).
 *
 *     gv_agency_id_unknown   = '99'.
 *     gv_customer_id_unknown = '99'.
     ELSE.
-      DATA lt_agency_id TYPE SORTED TABLE OF /dmo/agency_id     WITH UNIQUE KEY table_line.
-      SELECT DISTINCT agency_id FROM /dmo/agency     ORDER BY agency_id   DESCENDING INTO TABLE @lt_agency_id . "#EC CI_NOWHERE
+      DATA lt_agency_id TYPE SORTED TABLE OF ZTKFK_agency_id     WITH UNIQUE KEY table_line.
+      SELECT DISTINCT agency_id FROM ZTKFK_agency     ORDER BY agency_id   DESCENDING INTO TABLE @lt_agency_id . "#EC CI_NOWHERE
 
-      DATA lt_customer_id TYPE SORTED TABLE OF /dmo/customer_id WITH UNIQUE KEY table_line.
-      SELECT DISTINCT customer_id FROM /dmo/customer ORDER BY customer_id DESCENDING INTO TABLE @lt_customer_id . "#EC CI_NOWHERE
+      DATA lt_customer_id TYPE SORTED TABLE OF ZTKFK_customer_id WITH UNIQUE KEY table_line.
+      SELECT DISTINCT customer_id FROM ZTKFK_customer ORDER BY customer_id DESCENDING INTO TABLE @lt_customer_id . "#EC CI_NOWHERE
 
       " Select 2 known agency IDs
       IF lines( lt_agency_id ) < 2.
@@ -181,19 +181,19 @@ CLASS ltc_travel IMPLEMENTATION.
 
 
   METHOD setup.
-    SELECT COUNT( * ) FROM /dmo/travel     INTO @mv_travel_count. "#EC CI_NOWHERE
-    SELECT COUNT( * ) FROM /dmo/booking    INTO @mv_booking_count. "#EC CI_NOWHERE
-    SELECT COUNT( * ) FROM /dmo/book_suppl INTO @mv_booking_supplement_count. "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_travel     INTO @mv_travel_count. "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_booking    INTO @mv_booking_count. "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_book_suppl INTO @mv_booking_supplement_count. "#EC CI_NOWHERE
   ENDMETHOD.
 
 
   METHOD teardown.
     " Ensure proper cleanup of each individual test method
-    SELECT COUNT( * ) FROM /dmo/travel INTO @DATA(lv_travel_count). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_travel INTO @DATA(lv_travel_count). "#EC CI_NOWHERE
     cl_abap_unit_assert=>assert_equals( act = lv_travel_count  exp = mv_travel_count ).
-    SELECT COUNT( * ) FROM /dmo/booking INTO @DATA(lv_booking_count). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_booking INTO @DATA(lv_booking_count). "#EC CI_NOWHERE
     cl_abap_unit_assert=>assert_equals( act = lv_booking_count  exp = mv_booking_count ).
-    SELECT COUNT( * ) FROM /dmo/book_suppl INTO @DATA(lv_booking_supplement_count). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_book_suppl INTO @DATA(lv_booking_supplement_count). "#EC CI_NOWHERE
     cl_abap_unit_assert=>assert_equals( act = lv_booking_supplement_count  exp = mv_booking_supplement_count ).
   ENDMETHOD.
 
@@ -206,7 +206,7 @@ CLASS ltc_travel IMPLEMENTATION.
 
 
   METHOD create.
-    SELECT COUNT( * ) FROM /dmo/travel INTO @DATA(lv_count1). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_travel INTO @DATA(lv_count1). "#EC CI_NOWHERE
 
     DATA lv_start TYPE timestampl.
     GET TIME STAMP FIELD lv_start.
@@ -221,17 +221,17 @@ CLASS ltc_travel IMPLEMENTATION.
     DATA lv_end TYPE timestampl.
     GET TIME STAMP FIELD lv_end.
 
-    SELECT COUNT( * ) FROM /dmo/travel INTO @DATA(lv_count2). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_travel INTO @DATA(lv_count2). "#EC CI_NOWHERE
     cl_abap_unit_assert=>assert_equals( msg = 'create should add a travel'  exp = 1  act = lv_count2 - lv_count1 ).
 
-    SELECT FROM /dmo/travel FIELDS createdby, createdat, status WHERE travel_id = @ls_travel_new-travel_id INTO TABLE @DATA(lt_travel).
+    SELECT FROM ZTKFK_travel FIELDS createdby, createdat, status WHERE travel_id = @ls_travel_new-travel_id INTO TABLE @DATA(lt_travel).
     cl_abap_unit_assert=>assert_equals( msg = 'cannot read created travel' exp = 1 act = lines(  lt_travel ) ).
     DATA(ls_travel) = lt_travel[ 1 ].
 
     cl_abap_unit_assert=>assert_equals( msg = 'createdby' exp = ls_travel-createdby act = sy-uname ).
     cl_abap_unit_assert=>assert_number_between( msg = 'createdat' number = ls_travel-createdat lower = lv_start upper = lv_end ).
 
-    cl_abap_unit_assert=>assert_equals( msg = 'status' act = ls_travel-status exp = CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-new ) ).
+    cl_abap_unit_assert=>assert_equals( msg = 'status' act = ls_travel-status exp = CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-new ) ).
 
     _delete_existing_travel( ls_travel_new-travel_id ).
   ENDMETHOD.
@@ -260,7 +260,7 @@ CLASS ltc_travel IMPLEMENTATION.
     DATA lv_end TYPE timestampl.
     GET TIME STAMP FIELD lv_end.
 
-    SELECT FROM /dmo/travel FIELDS createdby, createdat, status WHERE travel_id = @ls_travel_1-travel_id OR travel_id = @ls_travel_2-travel_id INTO TABLE @DATA(lt_travel) ##SELECT_FAE_WITH_LOB[DESCRIPTION].
+    SELECT FROM ZTKFK_travel FIELDS createdby, createdat, status WHERE travel_id = @ls_travel_1-travel_id OR travel_id = @ls_travel_2-travel_id INTO TABLE @DATA(lt_travel) ##SELECT_FAE_WITH_LOB[DESCRIPTION].
     cl_abap_unit_assert=>assert_equals( msg = 'cannot read created travel'  exp = 2  act = lines( lt_travel ) ).
 
     DATA(ls_travel) = lt_travel[ 1 ]. "#EC CI_NOORDER
@@ -268,7 +268,7 @@ CLASS ltc_travel IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( msg = 'createdby' exp = ls_travel-createdby act = sy-uname ).
     cl_abap_unit_assert=>assert_number_between( msg = 'createdat' number = ls_travel-createdat lower = lv_start upper = lv_end ).
 
-    cl_abap_unit_assert=>assert_equals( msg = 'status' act = ls_travel-status exp = CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-new ) ).
+    cl_abap_unit_assert=>assert_equals( msg = 'status' act = ls_travel-status exp = CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-new ) ).
 
     _delete_existing_travel( ls_travel_1-travel_id ).
     _delete_existing_travel( ls_travel_2-travel_id ).
@@ -276,7 +276,7 @@ CLASS ltc_travel IMPLEMENTATION.
 
 
   METHOD c_agency_unknown.
-    SELECT COUNT( * ) FROM /dmo/travel INTO @DATA(lv_count1). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_travel INTO @DATA(lv_count1). "#EC CI_NOWHERE
 
     gr_cut->create_travel( EXPORTING is_travel   = VALUE #( agency_id = gv_agency_id_unknown  customer_id = gv_customer_id_2 )
                            IMPORTING es_travel   = DATA(ls_travel)
@@ -285,12 +285,12 @@ CLASS ltc_travel IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT COUNT( * ) FROM /dmo/travel INTO @DATA(lv_count2). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_travel INTO @DATA(lv_count2). "#EC CI_NOWHERE
     cl_abap_unit_assert=>assert_equals( msg = 'should not create bad travel'  exp = lv_count1  act = lv_count2 ).
 
     DATA lv_msg_found TYPE abap_bool.
     LOOP AT lt_messages INTO DATA(lr_message) ##INTO_OK.
-      IF lr_message->t100key = /dmo/cx_flight_legacy=>agency_unkown.
+      IF lr_message->t100key = ZTKFK_cx_flight_legacy=>agency_unkown.
         lv_msg_found = abap_true.
       ENDIF.
     ENDLOOP.
@@ -299,7 +299,7 @@ CLASS ltc_travel IMPLEMENTATION.
 
 
   METHOD c_customer_unknown.
-    SELECT COUNT( * ) FROM /dmo/travel INTO @DATA(lv_count1). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_travel INTO @DATA(lv_count1). "#EC CI_NOWHERE
 
     gr_cut->create_travel( EXPORTING is_travel   = VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_unknown )
                            IMPORTING es_travel   = DATA(ls_travel)
@@ -308,12 +308,12 @@ CLASS ltc_travel IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT COUNT( * ) FROM /dmo/travel INTO @DATA(lv_count2). "#EC CI_NOWHERE
+    SELECT COUNT( * ) FROM ZTKFK_travel INTO @DATA(lv_count2). "#EC CI_NOWHERE
     cl_abap_unit_assert=>assert_equals( msg = 'should not create bad travel'  exp = lv_count1  act = lv_count2 ).
 
     DATA lv_msg_found TYPE abap_bool.
     LOOP AT lt_messages INTO DATA(lr_message) ##INTO_OK.
-      IF lr_message->t100key = /dmo/cx_flight_legacy=>customer_unkown.
+      IF lr_message->t100key = ZTKFK_cx_flight_legacy=>customer_unkown.
         lv_msg_found = abap_true.
       ENDIF.
     ENDLOOP.
@@ -325,9 +325,9 @@ CLASS ltc_travel IMPLEMENTATION.
     DATA lv_timestampl TYPE timestampl.
     GET TIME STAMP FIELD lv_timestampl.
 
-    SELECT MAX( travel_id ) FROM /dmo/travel INTO @DATA(lv_travel_id_max). "#EC CI_NOWHERE
-    DATA lv_travel_id_1 TYPE /dmo/travel_id.
-    DATA lv_travel_id_2 TYPE /dmo/travel_id.
+    SELECT MAX( travel_id ) FROM ZTKFK_travel INTO @DATA(lv_travel_id_max). "#EC CI_NOWHERE
+    DATA lv_travel_id_1 TYPE ZTKFK_travel_id.
+    DATA lv_travel_id_2 TYPE ZTKFK_travel_id.
 *    lv_travel_id_1 = lv_travel_id_max + 1.
 *    IF lv_travel_id_1 IS INITIAL.
 *      cl_abap_unit_assert=>abort( msg = 'Travel ID overflow!' ).
@@ -339,26 +339,26 @@ CLASS ltc_travel IMPLEMENTATION.
 *
 *    " Create a travel
 *    cl_abap_unit_assert=>assert_equals( act = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201'
-*                                                                       status = /dmo/if_flight_legacy=>travel_status-booked ) )-travel_id  exp = lv_travel_id_1 ).
+*                                                                       status = ZTKFK_if_flight_legacy=>travel_status-booked ) )-travel_id  exp = lv_travel_id_1 ).
 *
 *    " Create a second travel
 *    cl_abap_unit_assert=>assert_equals( act = _create_travel( VALUE #( agency_id = gv_agency_id_2  customer_id = gv_customer_id_1  begin_date = '20190101'  end_date = '20190201'
-*                                                                       status = /dmo/if_flight_legacy=>travel_status-booked ) )-travel_id  exp = lv_travel_id_2 ).
+*                                                                       status = ZTKFK_if_flight_legacy=>travel_status-booked ) )-travel_id  exp = lv_travel_id_2 ).
 
 *   The Travel ID is now calculated by a number range object - so we can't predict the next number to be used ...
     lv_travel_id_1 = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201'
-                                              status = /dmo/if_flight_legacy=>travel_status-booked ) )-travel_id.
+                                              status = ZTKFK_if_flight_legacy=>travel_status-booked ) )-travel_id.
 
     lv_travel_id_2 = _create_travel( VALUE #( agency_id = gv_agency_id_2  customer_id = gv_customer_id_1  begin_date = '20190101'  end_date = '20190201'
-                                              status = /dmo/if_flight_legacy=>travel_status-booked ) )-travel_id.
+                                              status = ZTKFK_if_flight_legacy=>travel_status-booked ) )-travel_id.
 
     " Select and check the second travel
-    DATA ls_travel_sel TYPE /dmo/travel.
-    SELECT SINGLE * FROM /dmo/travel WHERE travel_id = @lv_travel_id_2 INTO @ls_travel_sel.
+    DATA ls_travel_sel TYPE ZTKFK_travel.
+    SELECT SINGLE * FROM ZTKFK_travel WHERE travel_id = @lv_travel_id_2 INTO @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-agency_id      exp = gv_agency_id_2 ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-customer_id    exp = gv_customer_id_1 ).
-    cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-status         exp = CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-new ) )." Provided status overridden by determination
+    cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-status         exp = CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-new ) )." Provided status overridden by determination
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-createdby      exp = sy-uname ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-lastchangedby  exp = sy-uname ).
     cl_abap_unit_assert=>assert_true( xsdbool( ls_travel_sel-createdat = ls_travel_sel-lastchangedat ) ).
@@ -376,14 +376,14 @@ CLASS ltc_travel IMPLEMENTATION.
     DATA(ls_travel_new) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201'  description = 'My_Description' ) ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_new-description  exp = 'My_Description' ).
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO @DATA(lv_description).
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO @DATA(lv_description).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = ls_travel_new-description ).
 
     _delete_existing_travel( ls_travel_new-travel_id ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @ls_travel_new-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @ls_travel_new-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -394,8 +394,8 @@ CLASS ltc_travel IMPLEMENTATION.
 
     DATA(ls_travel_new) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201'  description = 'My_Text' ) ).
 
-    DATA ls_travel_sel TYPE /dmo/travel.
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    DATA ls_travel_sel TYPE ZTKFK_travel.
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-description  exp = ls_travel_new-description ).
 
@@ -409,7 +409,7 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->save( ).
 
     CLEAR ls_travel_sel.
-    SELECT SINGLE * FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO @ls_travel_sel.
+    SELECT SINGLE * FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-agency_id      exp = ls_travel_new-agency_id   ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-customer_id    exp = ls_travel_new-customer_id ).
@@ -429,11 +429,11 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->delete_travel( EXPORTING iv_travel_id = ls_travel_deleted-travel_id
                            IMPORTING et_messages  = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id  exp = ls_travel_deleted-travel_id ).
   ENDMETHOD.
@@ -446,11 +446,11 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( travel_id = ls_travel_deleted-travel_id  description = abap_true )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id  exp = ls_travel_deleted-travel_id ).
   ENDMETHOD.
@@ -477,17 +477,17 @@ CLASS ltc_travel IMPLEMENTATION.
                            IMPORTING et_messages  = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
-    DATA lv_description TYPE /dmo/description.
+    DATA lv_description TYPE ZTKFK_description.
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new_1-travel_id INTO @lv_description.
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_1-travel_id INTO @lv_description.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = ls_travel_new_1-description ).
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new_2-travel_id INTO @lv_description.
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_2-travel_id INTO @lv_description.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = ls_travel_new_2-description ).
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new_3-travel_id INTO @lv_description.
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_3-travel_id INTO @lv_description.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = ls_travel_new_3-description ).
 
@@ -495,7 +495,7 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->save( ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id IN ( @ls_travel_new_1-travel_id, @ls_travel_new_2-travel_id, @ls_travel_new_3-travel_id ) INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id IN ( @ls_travel_new_1-travel_id, @ls_travel_new_2-travel_id, @ls_travel_new_3-travel_id ) INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -505,17 +505,17 @@ CLASS ltc_travel IMPLEMENTATION.
     DATA(ls_travel_new_2) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201'  description = 'My_Text_2' ) ).
     DATA(ls_travel_new_3) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201'  description = 'My_Text_3' ) ).
 
-    DATA lv_description TYPE /dmo/description.
+    DATA lv_description TYPE ZTKFK_description.
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new_1-travel_id INTO @lv_description.
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_1-travel_id INTO @lv_description.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = ls_travel_new_1-description ).
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new_2-travel_id INTO @lv_description.
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_2-travel_id INTO @lv_description.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = ls_travel_new_2-description ).
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new_3-travel_id INTO @lv_description.
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_3-travel_id INTO @lv_description.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = ls_travel_new_3-description ).
 
@@ -536,24 +536,24 @@ CLASS ltc_travel IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    DATA ls_travel_sel TYPE /dmo/travel.
+    DATA ls_travel_sel TYPE ZTKFK_travel.
 
     CLEAR ls_travel_sel.
-    SELECT SINGLE agency_id, customer_id, description FROM /dmo/travel WHERE travel_id = @ls_travel_new_1-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    SELECT SINGLE agency_id, customer_id, description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_1-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-agency_id    exp = ls_travel_new_1-agency_id   ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-customer_id  exp = ls_travel_new_1-customer_id ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-description  exp = 'My_New_Text_1' ).
 
     CLEAR ls_travel_sel.
-    SELECT SINGLE agency_id, customer_id, description FROM /dmo/travel WHERE travel_id = @ls_travel_new_2-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    SELECT SINGLE agency_id, customer_id, description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_2-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-agency_id    exp = ls_travel_new_2-agency_id   ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-customer_id  exp = ls_travel_new_2-customer_id ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-description  exp = 'My_New_Text_2' ).
 
     CLEAR ls_travel_sel.
-    SELECT SINGLE agency_id, customer_id, description FROM /dmo/travel WHERE travel_id = @ls_travel_new_3-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    SELECT SINGLE agency_id, customer_id, description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new_3-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-agency_id    exp = gv_agency_id_2   ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-customer_id  exp = ls_travel_new_3-customer_id ).
@@ -568,8 +568,8 @@ CLASS ltc_travel IMPLEMENTATION.
   METHOD update_twice.
     DATA(ls_travel_new) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201'  description = 'My_Text' ) ).
 
-    DATA ls_travel_sel TYPE /dmo/travel.
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    DATA ls_travel_sel TYPE ZTKFK_travel.
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-description  exp = ls_travel_new-description ).
 
@@ -586,7 +586,7 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->save( ).
 
     CLEAR ls_travel_sel.
-    SELECT SINGLE agency_id, customer_id, description FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    SELECT SINGLE agency_id, customer_id, description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-agency_id    exp = gv_agency_id_2 ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-customer_id  exp = ls_travel_new-customer_id ).
@@ -601,7 +601,7 @@ CLASS ltc_travel IMPLEMENTATION.
 
     DATA(ls_travel_new) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201'  description = 'My_Text' ) ).
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO @DATA(lv_description).
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO @DATA(lv_description).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = ls_travel_new-description ).
 
@@ -615,7 +615,7 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->save( ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @ls_travel_new-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @ls_travel_new-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -627,11 +627,11 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( travel_id = ls_travel-travel_id  agency_id = abap_true )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>agency_unkown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>agency_unkown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_AGENCY_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_agency_id                   exp = gv_agency_id_unknown ).
 
@@ -646,11 +646,11 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( travel_id = ls_travel-travel_id  customer_id = abap_true )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>customer_unkown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>customer_unkown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_CUSTOMER_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_customer_id                 exp = gv_customer_id_unknown ).
 
@@ -662,11 +662,11 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->delete_travel( EXPORTING iv_travel_id = '0'
                            IMPORTING et_messages  = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -675,11 +675,11 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -690,10 +690,10 @@ CLASS ltc_travel IMPLEMENTATION.
     " Case A: Known travel ID
     DATA(ls_travel_new) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_2  begin_date = '20190101'  end_date = '20190201' ) ).
 
-    DATA ls_travel_sel TYPE /dmo/travel.
-    SELECT SINGLE status FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    DATA ls_travel_sel TYPE ZTKFK_travel.
+    SELECT SINGLE status FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
-    cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-status  exp = CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-new ) ).
+    cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-status  exp = CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-new ) ).
 
     gr_cut->set_status_to_booked( EXPORTING iv_travel_id = ls_travel_new-travel_id
                                   IMPORTING et_messages  = DATA(lt_messages) ).
@@ -701,9 +701,9 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->save( ).
 
     CLEAR ls_travel_sel.
-    SELECT SINGLE status, createdat, lastchangedby, lastchangedat FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    SELECT SINGLE status, createdat, lastchangedby, lastchangedat FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
-    cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-status  exp = CONV /dmo/travel_status( /dmo/if_flight_legacy=>travel_status-booked ) ).
+    cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-status  exp = CONV ZTKFK_travel_status( ZTKFK_if_flight_legacy=>travel_status-booked ) ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-lastchangedby  exp = sy-uname ).
     cl_abap_unit_assert=>assert_differs( act = ls_travel_sel-createdat  exp = ls_travel_sel-lastchangedat ).
     DATA(lv_diff) = cl_abap_tstmp=>subtract( tstmp1 = ls_travel_sel-lastchangedat  tstmp2 = lv_timestampl ).
@@ -713,11 +713,11 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->set_status_to_booked( EXPORTING iv_travel_id = '0'
                                   IMPORTING et_messages  = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
 
     " Case C: Unknown travel ID
     gr_cut->delete_travel( EXPORTING iv_travel_id = ls_travel_new-travel_id
@@ -728,10 +728,10 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->set_status_to_booked( EXPORTING iv_travel_id = ls_travel_new-travel_id
                                   IMPORTING et_messages  = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id  exp = ls_travel_new-travel_id ).
 
@@ -741,10 +741,10 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->set_status_to_booked( EXPORTING iv_travel_id = ls_travel_new-travel_id
                                   IMPORTING et_messages  = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id  exp = ls_travel_new-travel_id ).
   ENDMETHOD.
@@ -757,11 +757,11 @@ CLASS ltc_travel IMPLEMENTATION.
                                         et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( ls_travel-travel_id ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>no_begin_date-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>no_begin_date-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
 
     " Try with initial end date
@@ -770,10 +770,10 @@ CLASS ltc_travel IMPLEMENTATION.
                                         et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_initial( ls_travel-travel_id ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>no_end_date-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>no_end_date-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
 
     " Try to have begin date after end date
@@ -782,10 +782,10 @@ CLASS ltc_travel IMPLEMENTATION.
                                         et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_initial( ls_travel-travel_id ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>end_date_before_begin_date-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>end_date_before_begin_date-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_BEGIN_DATE' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_END_DATE' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_TRAVEL_ID' ).
@@ -802,11 +802,11 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( travel_id = ls_travel-travel_id  begin_date = abap_true )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>no_begin_date-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>no_begin_date-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = ls_travel-travel_id ).
 
@@ -815,10 +815,10 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( travel_id = ls_travel-travel_id  end_date = abap_true )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>no_end_date-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>no_end_date-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = ls_travel-travel_id ).
 
@@ -827,10 +827,10 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( travel_id = ls_travel-travel_id  end_date = abap_true )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>end_date_before_begin_date-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>end_date_before_begin_date-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_BEGIN_DATE' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_END_DATE' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_TRAVEL_ID' ).
@@ -852,7 +852,7 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->initialize( ).
     gr_cut->save( ).
 
-    SELECT SINGLE description FROM /dmo/travel WHERE travel_id = @ls_travel_new-travel_id INTO @DATA(lv_description).
+    SELECT SINGLE description FROM ZTKFK_travel WHERE travel_id = @ls_travel_new-travel_id INTO @DATA(lv_description).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = 'My_Old_Text' ).
 
@@ -874,7 +874,7 @@ CLASS ltc_travel IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT SINGLE agency_id, description FROM /dmo/travel WHERE travel_id = @ls_travel-travel_id INTO ( @DATA(lv_agency_id), @DATA(lv_description) ).
+    SELECT SINGLE agency_id, description FROM ZTKFK_travel WHERE travel_id = @ls_travel-travel_id INTO ( @DATA(lv_agency_id), @DATA(lv_description) ).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_agency_id    exp = gv_agency_id_1 ).
     cl_abap_unit_assert=>assert_equals( act = lv_description  exp = 'My_New_Text' ).
@@ -899,7 +899,7 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->save( ).
 
     CLEAR lv_db_exits.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exits.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exits.
     cl_abap_unit_assert=>assert_false( lv_db_exits ).
   ENDMETHOD.
 
@@ -922,7 +922,7 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->save( ).
 
     CLEAR lv_db_exits.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @lv_travel_id INTO @lv_db_exits.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @lv_travel_id INTO @lv_db_exits.
     cl_abap_unit_assert=>assert_false( lv_db_exits ).
   ENDMETHOD.
 
@@ -941,18 +941,18 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( travel_id = lv_travel_id  description = abap_true )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id  exp = lv_travel_id ).
 
     gr_cut->save( ).
 
     CLEAR lv_db_exits.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @lv_travel_id INTO @lv_db_exits.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @lv_travel_id INTO @lv_db_exits.
     cl_abap_unit_assert=>assert_false( lv_db_exits ).
   ENDMETHOD.
 
@@ -970,18 +970,18 @@ CLASS ltc_travel IMPLEMENTATION.
     gr_cut->delete_travel( EXPORTING iv_travel_id = lv_travel_id
                            IMPORTING et_messages  = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id  exp = lv_travel_id ).
 
     gr_cut->save( ).
 
     CLEAR lv_db_exits.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @lv_travel_id INTO @lv_db_exits.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @lv_travel_id INTO @lv_db_exits.
     cl_abap_unit_assert=>assert_false( lv_db_exits ).
   ENDMETHOD.
 
@@ -994,11 +994,11 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_control-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_control-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = ls_travel-travel_id ).
 
@@ -1007,7 +1007,7 @@ CLASS ltc_travel IMPLEMENTATION.
 
 
   METHOD u_status_invalid.
-    CONSTANTS lc_status_invalid TYPE /dmo/travel_status VALUE 'Z'.
+    CONSTANTS lc_status_invalid TYPE ZTKFK_travel_status VALUE 'Z'.
 
     DATA(ls_travel) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_1  begin_date = '20190101'  end_date = '20190201' ) ).
 
@@ -1016,11 +1016,11 @@ CLASS ltc_travel IMPLEMENTATION.
                                      is_travelx  = VALUE #( travel_id = ls_travel-travel_id  status = abap_true )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_status_invalid-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_status_invalid-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_STATUS' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_status                      exp = lc_status_invalid ).
 
@@ -1053,31 +1053,31 @@ ENDCLASS.
 CLASS ltc_booking DEFINITION FOR TESTING DURATION SHORT RISK LEVEL HARMLESS INHERITING FROM ltc_travel.
   PROTECTED SECTION.
     TYPES: BEGIN OF ts_flight,
-             carrier_id    TYPE /dmo/carrier_id,
-             connection_id TYPE /dmo/connection_id,
-             flight_date   TYPE /dmo/flight_date,
-             price         TYPE /dmo/flight_price,
-             currency_code TYPE /dmo/currency_code,
+             carrier_id    TYPE ZTKFK_carrier_id,
+             connection_id TYPE ZTKFK_connection_id,
+             flight_date   TYPE ZTKFK_flight_date,
+             price         TYPE ZTKFK_flight_price,
+             currency_code TYPE ZTKFK_currency_code,
            END OF ts_flight.
 
     CLASS-DATA gs_flight_1 TYPE ts_flight.
     CLASS-DATA gs_flight_2 TYPE ts_flight.
 
-    CLASS-DATA gv_carrier_id_unknown       TYPE /dmo/carrier_id.
+    CLASS-DATA gv_carrier_id_unknown       TYPE ZTKFK_carrier_id.
 
-    CLASS-DATA gv_currency_code_unknown    TYPE /dmo/currency_code.
+    CLASS-DATA gv_currency_code_unknown    TYPE ZTKFK_currency_code.
 
-    CLASS-DATA gv_booking_date             TYPE /dmo/booking_date.
+    CLASS-DATA gv_booking_date             TYPE ZTKFK_booking_date.
 
-    DATA mv_travel_id         TYPE /dmo/travel_id.
-    DATA mv_travel_id_unknown TYPE /dmo/travel_id.
+    DATA mv_travel_id         TYPE ZTKFK_travel_id.
+    DATA mv_travel_id_unknown TYPE ZTKFK_travel_id.
 
-    METHODS _create_booking IMPORTING iv_travel_id      TYPE /dmo/travel_id
-                                      is_booking        TYPE /dmo/s_booking_in
+    METHODS _create_booking IMPORTING iv_travel_id      TYPE ZTKFK_travel_id
+                                      is_booking        TYPE ZTKFK_s_booking_in
                                       iv_save           TYPE abap_bool DEFAULT abap_true
-                            RETURNING VALUE(rs_booking) TYPE /dmo/booking.
-    METHODS _delete_existing_booking IMPORTING iv_travel_id  TYPE /dmo/travel_id
-                                               iv_booking_id TYPE /dmo/booking_id.
+                            RETURNING VALUE(rs_booking) TYPE ZTKFK_booking.
+    METHODS _delete_existing_booking IMPORTING iv_travel_id  TYPE ZTKFK_travel_id
+                                               iv_booking_id TYPE ZTKFK_booking_id.
 
   PRIVATE SECTION.
     CLASS-METHODS class_setup.
@@ -1148,7 +1148,7 @@ CLASS ltc_booking DEFINITION FOR TESTING DURATION SHORT RISK LEVEL HARMLESS INHE
     METHODS u_currency_code_unknown  FOR TESTING RAISING cx_static_check.
 ENDCLASS.
 
-CLASS /dmo/cl_flight_legacy DEFINITION LOCAL FRIENDS ltc_booking.
+CLASS ZTKFK_cl_flight_legacy DEFINITION LOCAL FRIENDS ltc_booking.
 
 CLASS ltc_booking IMPLEMENTATION.
   METHOD class_setup.
@@ -1156,7 +1156,7 @@ CLASS ltc_booking IMPLEMENTATION.
 *     gs_flight_1 = VALUE #( carrier_id = 'AB'  connection_id = '0001'  flight_date = '20190306'  price = '10818.00'  currency_code = 'SGD' ) ##LITERAL.
 *     gs_flight_2 = value #( carrier_id = 'CD'  connection_id = '0002'  flight_date = '20180510'  price = '5950.00'   currency_code = 'SGD' ) ##LITERAL.
 *
-*     DATA lt_flight TYPE STANDARD TABLE OF /dmo/flight.
+*     DATA lt_flight TYPE STANDARD TABLE OF ZTKFK_flight.
 *     lt_flight = VALUE #( ( carrier_id = gs_flight_1-carrier_id  connection_id = gs_flight_1-connection_id  flight_date = gs_flight_1-flight_date  price = gs_flight_1-price  currency_code = gs_flight_1-currency_code )
 *                          ( carrier_id = gs_flight_2-carrier_id  connection_id = gs_flight_2-connection_id  flight_date = gs_flight_2-flight_date  price = gs_flight_2-price  currency_code = gs_flight_2-currency_code ) ).
 *     mr_test_environment->insert_test_data( lt_flight ).
@@ -1164,12 +1164,12 @@ CLASS ltc_booking IMPLEMENTATION.
 *     gv_currency_code_unknown = 'XYZ'.
     ELSE.
       " Select 2 different Flight Dates with their prices
-      SELECT SINGLE carrier_id, connection_id, flight_date, price, currency_code FROM /dmo/flight
+      SELECT SINGLE carrier_id, connection_id, flight_date, price, currency_code FROM ZTKFK_flight
         INTO CORRESPONDING FIELDS OF @gs_flight_1 ##WARN_OK. "#EC CI_NOORDER
       IF sy-subrc <> 0.
         cl_abap_unit_assert=>abort( |No flight data!| ).
       ENDIF.
-      SELECT SINGLE carrier_id, connection_id, flight_date, price, currency_code FROM /dmo/flight WHERE carrier_id <> @gs_flight_1-carrier_id AND connection_id <> @gs_flight_1-connection_id
+      SELECT SINGLE carrier_id, connection_id, flight_date, price, currency_code FROM ZTKFK_flight WHERE carrier_id <> @gs_flight_1-carrier_id AND connection_id <> @gs_flight_1-connection_id
         INTO CORRESPONDING FIELDS OF @gs_flight_2  ##WARN_OK. "#EC CI_NOORDER
       IF sy-subrc <> 0.
         cl_abap_unit_assert=>abort( |No flight data!| ).
@@ -1177,7 +1177,7 @@ CLASS ltc_booking IMPLEMENTATION.
 
       " Determine an unknown Carrier ID
       gv_carrier_id_unknown = 'XX'.
-      SELECT SINGLE carrier_id FROM /dmo/carrier WHERE carrier_id = @gv_carrier_id_unknown INTO @DATA(lv_dummy_carrier_id).
+      SELECT SINGLE carrier_id FROM ZTKFK_carrier WHERE carrier_id = @gv_carrier_id_unknown INTO @DATA(lv_dummy_carrier_id).
       IF sy-subrc = 0.
         cl_abap_unit_assert=>abort( |Carrier ID { gv_carrier_id_unknown } should not be known!| ).
       ENDIF.
@@ -1202,7 +1202,7 @@ CLASS ltc_booking IMPLEMENTATION.
     mv_travel_id_unknown = mv_travel_id.
     DO.
       mv_travel_id_unknown = mv_travel_id_unknown + 1.
-      SELECT SINGLE travel_id FROM /dmo/travel WHERE travel_id = @mv_travel_id_unknown INTO @DATA(lv_dummy_travel_id).
+      SELECT SINGLE travel_id FROM ZTKFK_travel WHERE travel_id = @mv_travel_id_unknown INTO @DATA(lv_dummy_travel_id).
       IF sy-subrc <> 0.
         EXIT.
       ENDIF.
@@ -1227,8 +1227,8 @@ CLASS ltc_booking IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( act = ls_booking-carrier_id     exp = gs_flight_1-carrier_id ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking-connection_id  exp = gs_flight_1-connection_id ).
 
-    DATA ls_booking_sel TYPE /dmo/booking.
-    SELECT SINGLE customer_id FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
+    DATA ls_booking_sel TYPE ZTKFK_booking.
+    SELECT SINGLE customer_id FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-customer_id  exp = ls_booking-customer_id ).
 
@@ -1236,19 +1236,19 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  booking_date = lv_booking_date ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->save( ).
 
     CLEAR ls_booking_sel.
-    SELECT SINGLE carrier_id, booking_date FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
+    SELECT SINGLE carrier_id, booking_date FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-carrier_id    exp = ls_booking-carrier_id ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-booking_date  exp = lv_booking_date ).
 
     _delete_existing_booking( iv_travel_id = mv_travel_id  iv_booking_id = ls_booking-booking_id ).
-    SELECT SINGLE @abap_true FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_found).
+    SELECT SINGLE @abap_true FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_found).
     cl_abap_unit_assert=>assert_subrc( exp = 4 ).
   ENDMETHOD.
 
@@ -1270,20 +1270,20 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  booking_date = lv_booking_date ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date =  abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date =  abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
     gr_cut->save( ).
 
-    DATA ls_booking_sel TYPE /dmo/booking.
-    SELECT SINGLE carrier_id, booking_date FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
+    DATA ls_booking_sel TYPE ZTKFK_booking.
+    SELECT SINGLE carrier_id, booking_date FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-carrier_id    exp = ls_booking-carrier_id ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-booking_date  exp = lv_booking_date ).
 
     _delete_existing_booking( iv_travel_id = mv_travel_id  iv_booking_id = ls_booking-booking_id ).
-    SELECT SINGLE @abap_true FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_found).
+    SELECT SINGLE @abap_true FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_found).
     cl_abap_unit_assert=>assert_subrc( exp = 4 ).
   ENDMETHOD.
 
@@ -1291,7 +1291,7 @@ CLASS ltc_booking IMPLEMENTATION.
   METHOD cud_single.
     DATA lv_db_exists TYPE abap_bool.
 
-    SELECT SINGLE lastchangedat FROM /dmo/travel WHERE travel_id = @mv_travel_id INTO @DATA(lv_lastchangedat_1).
+    SELECT SINGLE lastchangedat FROM ZTKFK_travel WHERE travel_id = @mv_travel_id INTO @DATA(lv_lastchangedat_1).
 
     DATA(ls_booking) = _create_booking( iv_travel_id = mv_travel_id
                                         is_booking   = VALUE #( booking_id    = '10'
@@ -1302,12 +1302,12 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                 flight_date   = gs_flight_1-flight_date )
                                         iv_save      = abap_false ).
 
-    DATA lv_booking_date TYPE /dmo/booking_date.
+    DATA lv_booking_date TYPE ZTKFK_booking_date.
     lv_booking_date = gv_booking_date + 15.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  booking_date = lv_booking_date ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date = abap_true ) )
                            IMPORTING et_booking  = DATA(lt_booking_updated)
                                      et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
@@ -1319,19 +1319,19 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
     gr_cut->save( ).
 
     " Check that the administrative fields of the root node have been updated
-    SELECT SINGLE lastchangedby, lastchangedat FROM /dmo/travel WHERE travel_id = @mv_travel_id INTO ( @DATA(lv_lastchangedby), @DATA(lv_lastchangedat_2) ).
+    SELECT SINGLE lastchangedby, lastchangedat FROM ZTKFK_travel WHERE travel_id = @mv_travel_id INTO ( @DATA(lv_lastchangedby), @DATA(lv_lastchangedat_2) ).
     cl_abap_unit_assert=>assert_equals( act = lv_lastchangedby  exp = sy-uname ).
     cl_abap_unit_assert=>assert_true( xsdbool( lv_lastchangedat_2 > lv_lastchangedat_1 ) ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -1347,7 +1347,7 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                 connection_id = gs_flight_1-connection_id
                                                                 flight_date   = gs_flight_1-flight_date ) ).
 
-    SELECT SINGLE customer_id FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_customer_id).
+    SELECT SINGLE customer_id FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_customer_id).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_customer_id  exp = ls_booking-customer_id ).
 
@@ -1355,26 +1355,26 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  booking_date = lv_booking_date ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  customer_id = gv_customer_id_2 ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  customer_id = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  customer_id = abap_true ) )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->save( ).
 
-    DATA ls_booking_sel TYPE /dmo/booking.
-    SELECT SINGLE booking_date, customer_id FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
+    DATA ls_booking_sel TYPE ZTKFK_booking.
+    SELECT SINGLE booking_date, customer_id FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-booking_date  exp = lv_booking_date ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-customer_id   exp = gv_customer_id_2 ).
 
     _delete_existing_booking( iv_travel_id = mv_travel_id  iv_booking_id = ls_booking-booking_id ).
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -1383,16 +1383,16 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id_unknown )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id_unknown )
                                      it_booking  = VALUE #( ( booking_id = '10'  booking_date = '20180701'  customer_id = gv_customer_id_1  carrier_id = gs_flight_1-carrier_id  connection_id = gs_flight_1-connection_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = '10'  action_code = /dmo/if_flight_legacy=>action_code-create ) )
+                                     it_bookingx = VALUE #( ( booking_id = '10'  action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking  = DATA(lt_booking)
                                      et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id_unknown ).
   ENDMETHOD.
@@ -1402,16 +1402,16 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( )
                                      is_travelx  = VALUE #( )
                                      it_booking  = VALUE #( ( booking_id = '10'  booking_date = '20180701'  customer_id = gv_customer_id_1  carrier_id = gs_flight_1-carrier_id  connection_id = gs_flight_1-connection_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = '10'  action_code = /dmo/if_flight_legacy=>action_code-create ) )
+                                     it_bookingx = VALUE #( ( booking_id = '10'  action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking  = DATA(lt_booking)
                                      et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -1419,14 +1419,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id_unknown )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id_unknown )
                                      it_booking  = VALUE #( ( booking_id = '2'  booking_date = '20180715' ) )
-                                     it_bookingx = VALUE #( ( booking_id = '2'  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = '2'  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id_unknown ).
   ENDMETHOD.
@@ -1436,14 +1436,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( )
                                      is_travelx  = VALUE #( )
                                      it_booking  = VALUE #( ( booking_id = '2'  booking_date = '20180715' ) )
-                                     it_bookingx = VALUE #( ( booking_id = '2'  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = '2'  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -1451,14 +1451,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id_unknown )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id_unknown )
                                      it_booking  = VALUE #( ( booking_id = '1' ) )
-                                     it_bookingx = VALUE #( ( booking_id = '1'  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = '1'  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id_unknown ).
   ENDMETHOD.
@@ -1468,14 +1468,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( )
                                      is_travelx  = VALUE #( )
                                      it_booking  = VALUE #( ( booking_id = '1' ) )
-                                     it_bookingx = VALUE #( ( booking_id = '1'  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = '1'  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -1483,14 +1483,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = '10'  booking_date = '20180715'  ) )
-                                     it_bookingx = VALUE #( ( booking_id = '10'  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date = abap_true  ) )
+                                     it_bookingx = VALUE #( ( booking_id = '10'  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date = abap_true  ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -1502,14 +1502,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = '10' ) )
-                                     it_bookingx = VALUE #( ( booking_id = '10'  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = '10'  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -1521,14 +1521,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = '0'  booking_date = '20180715' ) )
-                                     it_bookingx = VALUE #( ( booking_id = '0'  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = '0'  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
   ENDMETHOD.
@@ -1538,14 +1538,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = '0' ) )
-                                     it_bookingx = VALUE #( ( booking_id = '0'  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = '0'  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
   ENDMETHOD.
@@ -1581,31 +1581,31 @@ CLASS ltc_booking IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT COUNT( * ) FROM /dmo/booking WHERE travel_id = @ls_travel_1-travel_id INTO @DATA(lv_count).
+    SELECT COUNT( * ) FROM ZTKFK_booking WHERE travel_id = @ls_travel_1-travel_id INTO @DATA(lv_count).
     cl_abap_unit_assert=>assert_equals( act = lv_count  exp = 2 ).
 
     " 2. LUW: Update the first booking
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = ls_booking_1-travel_id )
                                      is_travelx  = VALUE #( travel_id = ls_booking_1-travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking_1-booking_id  customer_id = gv_customer_id_2 ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking_1-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  customer_id = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking_1-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  customer_id = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
     gr_cut->save( ).
 
-    SELECT SINGLE customer_id FROM /dmo/booking WHERE travel_id = @ls_booking_1-travel_id AND booking_id = @ls_booking_1-booking_id INTO @DATA(lv_customer_id).
+    SELECT SINGLE customer_id FROM ZTKFK_booking WHERE travel_id = @ls_booking_1-travel_id AND booking_id = @ls_booking_1-booking_id INTO @DATA(lv_customer_id).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_customer_id  exp = gv_customer_id_2 ).
 
-    SELECT SINGLE customer_id FROM /dmo/booking WHERE travel_id = @ls_booking_2-travel_id AND booking_id = @ls_booking_2-booking_id INTO @lv_customer_id.
+    SELECT SINGLE customer_id FROM ZTKFK_booking WHERE travel_id = @ls_booking_2-travel_id AND booking_id = @ls_booking_2-booking_id INTO @lv_customer_id.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_customer_id  exp = gv_customer_id_1 ).
 
     " 3. LUW: Delete the first booking - check that the second booking is still there
     _delete_existing_booking( iv_travel_id = ls_booking_1-travel_id  iv_booking_id = ls_booking_1-booking_id ).
 
-    SELECT travel_id, booking_id FROM /dmo/booking WHERE travel_id = @ls_travel_1-travel_id INTO TABLE @DATA(lt_booking_key).
+    SELECT travel_id, booking_id FROM ZTKFK_booking WHERE travel_id = @ls_travel_1-travel_id INTO TABLE @DATA(lt_booking_key).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_booking_key )  exp = 1 ).
     cl_abap_unit_assert=>assert_equals( act = lt_booking_key[ 1 ]-booking_id  exp = ls_booking_2-booking_id ).
 
@@ -1614,7 +1614,7 @@ CLASS ltc_booking IMPLEMENTATION.
     _delete_existing_travel( ls_travel_2-travel_id ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @ls_travel_1-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @ls_travel_1-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -1629,16 +1629,16 @@ CLASS ltc_booking IMPLEMENTATION.
                                                               connection_id = gs_flight_1-connection_id
                                                               flight_date   = gs_flight_1-flight_date ) )
                                      it_bookingx = VALUE #( ( booking_id  = '10'
-                                                              action_code = /dmo/if_flight_legacy=>action_code-create ) )
+                                                              action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking  = DATA(lt_booking)
                                      et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>customer_unkown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>customer_unkown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_CUSTOMER_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_customer_id                 exp = gv_customer_id_unknown ).
   ENDMETHOD.
@@ -1656,20 +1656,20 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  customer_id = gv_customer_id_unknown ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  customer_id = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  customer_id = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>customer_unkown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>customer_unkown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_CUSTOMER_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_customer_id                 exp = gv_customer_id_unknown ).
 
     gr_cut->save( ).
 
-    SELECT SINGLE customer_id FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_customer_id).
+    SELECT SINGLE customer_id FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_customer_id).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_customer_id  exp = ls_booking-customer_id ).
 
@@ -1687,16 +1687,16 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                connection_id = gs_flight_1-connection_id
                                                                flight_date   = gs_flight_1-flight_date ) )
                                       it_bookingx = VALUE #( ( booking_id  = '10'
-                                                               action_code = /dmo/if_flight_legacy=>action_code-create ) )
+                                                               action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking  = DATA(lt_booking)
                                      et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_booking_date_invalid-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_booking_date_invalid-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_DATE' ).
@@ -1718,13 +1718,13 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  booking_date = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  booking_date = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_booking_date_invalid-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_booking_date_invalid-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_DATE' ).
@@ -1734,7 +1734,7 @@ CLASS ltc_booking IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT SINGLE booking_date FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_booking_date).
+    SELECT SINGLE booking_date FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_booking_date).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_booking_date  exp = gv_booking_date ).
 
@@ -1752,16 +1752,16 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                connection_id = gs_flight_1-connection_id
                                                                flight_date   = gs_flight_1-flight_date ) )
                                       it_bookingx = VALUE #( ( booking_id    = '10'
-                                                               action_code   = /dmo/if_flight_legacy=>action_code-create ) )
+                                                               action_code   = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking   = DATA(lt_booking)
                                      et_messages  = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>flight_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>flight_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_CARRIER_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_CONNECTION_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_FLIGHT_DATE' ).
@@ -1783,14 +1783,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  flight_date = gs_flight_2-flight_date ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  flight_date = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  flight_date = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_flight_u-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_flight_u-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -1798,7 +1798,7 @@ CLASS ltc_booking IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT SINGLE flight_date FROM /dmo/booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_flight_date).
+    SELECT SINGLE flight_date FROM ZTKFK_booking WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @DATA(lv_flight_date).
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = lv_flight_date  exp = gs_flight_1-flight_date ).
 
@@ -1820,21 +1820,21 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  customer_id = gv_customer_id_2 ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  customer_id = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  customer_id = abap_true ) )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -1842,7 +1842,7 @@ CLASS ltc_booking IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -1861,21 +1861,21 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
     gr_cut->save( ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @ls_booking-booking_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -1886,7 +1886,7 @@ CLASS ltc_booking IMPLEMENTATION.
     " 1. LUW: Create travel
     DATA(ls_travel) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_1  begin_date = '20190101'  end_date = '20190201' ) ).
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_true( lv_db_exists ).
 
     " 2. LUW: Create booking for the new travel, delete the new travel
@@ -1907,11 +1907,11 @@ CLASS ltc_booking IMPLEMENTATION.
 
     "Check that travel and booking are gone
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -1922,7 +1922,7 @@ CLASS ltc_booking IMPLEMENTATION.
     " 1. LUW: Create travel
     DATA(ls_travel) = _create_travel( VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_1  begin_date = '20190101'  end_date = '20190201' ) ).
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_true( lv_db_exists ).
 
     " 2. LUW: Delete the new travel, create booking for the same travel
@@ -1939,16 +1939,16 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                connection_id = gs_flight_1-connection_id
                                                                flight_date   = gs_flight_1-flight_date ) )
                                       it_bookingx = VALUE #( ( booking_id    = '10'
-                                                               action_code   = /dmo/if_flight_legacy=>action_code-create ) )
+                                                               action_code   = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking   = DATA(lt_booking)
                                      et_messages  = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = ls_travel-travel_id ).
 
@@ -1956,11 +1956,11 @@ CLASS ltc_booking IMPLEMENTATION.
 
     "Check that travel and booking are gone
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_travel FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -1975,16 +1975,16 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                connection_id = gs_flight_1-connection_id
                                                                flight_date   = gs_flight_1-flight_date ) )
                                       it_bookingx = VALUE #( ( booking_id    = '0'
-                                                               action_code = /dmo/if_flight_legacy=>action_code-create ) )
+                                                               action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking   = DATA(lt_booking)
                                      et_messages  = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
   ENDMETHOD.
@@ -2010,16 +2010,16 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                connection_id = gs_flight_1-connection_id
                                                                flight_date   = gs_flight_1-flight_date ) )
                                       it_bookingx = VALUE #( ( booking_id    = '10'
-                                                               action_code   = /dmo/if_flight_legacy=>action_code-create ) )
+                                                               action_code   = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking   = DATA(lt_booking)
                                      et_messages  = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_exists-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_exists-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -2038,15 +2038,15 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                connection_id = gs_flight_1-connection_id
                                                                flight_date   = gs_flight_1-flight_date ) )
                                       it_bookingx = VALUE #( ( booking_id    = '10'
-                                                               action_code   = /dmo/if_flight_legacy=>action_code-create ) )
+                                                               action_code   = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking   = lt_booking
                                      et_messages  = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_exists-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_exists-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -2067,8 +2067,8 @@ CLASS ltc_booking IMPLEMENTATION.
 
     " Provide price and currency
     CONSTANTS lc_diff TYPE p VALUE '99.99'.
-    DATA lv_flight_price  TYPE /dmo/flight_price.
-    DATA lv_currency_code TYPE /dmo/currency_code.
+    DATA lv_flight_price  TYPE ZTKFK_flight_price.
+    DATA lv_currency_code TYPE ZTKFK_currency_code.
     lv_flight_price = gs_flight_1-price + lc_diff.
     lv_currency_code = SWITCH #( gs_flight_1-currency_code WHEN 'EUR' THEN 'USD' ELSE 'EUR' ).
     DATA(ls_booking_2) = _create_booking( iv_travel_id = mv_travel_id
@@ -2082,14 +2082,14 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                   currency_code = lv_currency_code )
                                           iv_save      = abap_true ).
 
-    DATA ls_booking_sel TYPE /dmo/booking.
-    SELECT SINGLE flight_price, currency_code FROM /dmo/booking WHERE travel_id = @ls_booking_1-travel_id AND booking_id = @ls_booking_1-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
+    DATA ls_booking_sel TYPE ZTKFK_booking.
+    SELECT SINGLE flight_price, currency_code FROM ZTKFK_booking WHERE travel_id = @ls_booking_1-travel_id AND booking_id = @ls_booking_1-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-flight_price   exp = gs_flight_1-price ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-currency_code  exp = gs_flight_1-currency_code ).
 
     CLEAR ls_booking_sel.
-    SELECT SINGLE flight_price, currency_code FROM /dmo/booking WHERE travel_id = @ls_booking_1-travel_id AND booking_id = @ls_booking_2-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
+    SELECT SINGLE flight_price, currency_code FROM ZTKFK_booking WHERE travel_id = @ls_booking_1-travel_id AND booking_id = @ls_booking_2-booking_id INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-flight_price   exp = lv_flight_price ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-currency_code  exp = lv_currency_code ).
@@ -2112,14 +2112,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = ls_booking-travel_id )
                                      is_travelx  = VALUE #( travel_id = ls_booking-travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  flight_price = '888.88' ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  flight_price = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  flight_price = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_price_currency_u-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_price_currency_u-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = ls_booking-travel_id ).
@@ -2130,13 +2130,13 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = ls_booking-travel_id )
                                      is_travelx  = VALUE #( travel_id = ls_booking-travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  currency_code = 'XXX' ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  currency_code = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  currency_code = abap_true ) )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_price_currency_u-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_price_currency_u-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = ls_booking-travel_id ).
@@ -2156,14 +2156,14 @@ CLASS ltc_booking IMPLEMENTATION.
                                                                flight_price  = '999.99'
                                                                currency_code = gv_currency_code_unknown ) )
                                       it_bookingx = VALUE #( ( booking_id  = '10'
-                                                               action_code = /dmo/if_flight_legacy=>action_code-create ) )
+                                                               action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>currency_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>currency_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_CURRENCY_CODE' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_currency_code               exp = gv_currency_code_unknown ).
   ENDMETHOD.
@@ -2185,14 +2185,14 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = ls_booking-travel_id )
                                      is_travelx  = VALUE #( travel_id = ls_booking-travel_id )
                                      it_booking  = VALUE #( ( booking_id = ls_booking-booking_id  flight_price  = '999.99'  currency_code = gv_currency_code_unknown ) )
-                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  flight_price = abap_true  currency_code = abap_true ) )
+                                     it_bookingx = VALUE #( ( booking_id = ls_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  flight_price = abap_true  currency_code = abap_true ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>currency_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>currency_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_CURRENCY_CODE' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_currency_code               exp = gv_currency_code_unknown ).
   ENDMETHOD.
@@ -2202,7 +2202,7 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = iv_travel_id )
                                      is_travelx  = VALUE #( travel_id = iv_travel_id )
                                      it_booking  = VALUE #( ( is_booking ) )
-                                     it_bookingx = VALUE #( ( booking_id = is_booking-booking_id  action_code = /dmo/if_flight_legacy=>action_code-create ) )
+                                     it_bookingx = VALUE #( ( booking_id = is_booking-booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking  = DATA(lt_booking)
                                      et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
@@ -2220,7 +2220,7 @@ CLASS ltc_booking IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = iv_travel_id )
                                      is_travelx  = VALUE #( travel_id = iv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = iv_booking_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = iv_booking_id  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = iv_booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->save( ).
@@ -2231,18 +2231,18 @@ ENDCLASS.
 CLASS ltc_booking_supplement DEFINITION FINAL FOR TESTING DURATION SHORT RISK LEVEL HARMLESS INHERITING FROM ltc_booking.
   PRIVATE SECTION.
     TYPES: BEGIN OF ts_supplement,
-             supplement_id TYPE /dmo/supplement_id,
-             price         TYPE /dmo/supplement_price,
-             currency_code TYPE /dmo/currency_code,
+             supplement_id TYPE ZTKFK_supplement_id,
+             price         TYPE ZTKFK_supplement_price,
+             currency_code TYPE ZTKFK_currency_code,
            END OF ts_supplement.
 
     CLASS-DATA gs_supplement_1 TYPE ts_supplement.
     CLASS-DATA gs_supplement_2 TYPE ts_supplement.
 
-    CLASS-DATA gv_supplement_id_unknown      TYPE /dmo/supplement_id.
+    CLASS-DATA gv_supplement_id_unknown      TYPE ZTKFK_supplement_id.
 
-    DATA mv_booking_id         TYPE /dmo/booking_id.
-    DATA mv_booking_id_unknown TYPE /dmo/booking_id.
+    DATA mv_booking_id         TYPE ZTKFK_booking_id.
+    DATA mv_booking_id_unknown TYPE ZTKFK_booking_id.
 
     CLASS-METHODS class_setup.
     METHODS setup.
@@ -2329,13 +2329,13 @@ CLASS ltc_booking_supplement DEFINITION FINAL FOR TESTING DURATION SHORT RISK LE
     "! Try to update a booking supplement with an unknown currency code -> ERROR
     METHODS u_currency_code_unknown  FOR TESTING RAISING cx_static_check.
 
-    METHODS _create_booking_suppl IMPORTING iv_travel_id                 TYPE /dmo/travel_id
-                                            is_booking_supplement        TYPE /dmo/s_booking_supplement_in
+    METHODS _create_booking_suppl IMPORTING iv_travel_id                 TYPE ZTKFK_travel_id
+                                            is_booking_supplement        TYPE ZTKFK_s_booking_supplement_in
                                             iv_save                      TYPE abap_bool DEFAULT abap_true
-                                  RETURNING VALUE(rs_booking_supplement) TYPE /dmo/book_suppl.
+                                  RETURNING VALUE(rs_booking_supplement) TYPE ZTKFK_book_suppl.
 ENDCLASS.
 
-CLASS /dmo/cl_flight_legacy DEFINITION LOCAL FRIENDS ltc_booking_supplement.
+CLASS ZTKFK_cl_flight_legacy DEFINITION LOCAL FRIENDS ltc_booking_supplement.
 
 CLASS ltc_booking_supplement IMPLEMENTATION.
   METHOD class_setup.
@@ -2343,7 +2343,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 *     gs_supplement_1 = VALUE #( supplement_id = 'BV-0001'  price = '2.30'  currency_code = 'EUR' ) ##LITERAL.
 *     gs_supplement_2 = VALUE #( supplement_id = 'BV-0002'  price = '7.50'  currency_code = 'EUR' ) ##LITERAL.
 *
-*     DATA lt_supplement TYPE STANDARD TABLE OF /dmo/supplement.
+*     DATA lt_supplement TYPE STANDARD TABLE OF ZTKFK_supplement.
 *     lt_supplement = VALUE #( ( supplement_id = gs_supplement_1-supplement_id  price = gs_supplement_1-price  currency_code = gs_supplement_1-currency_code )
 *                              ( supplement_id = gs_supplement_2-supplement_id  price = gs_supplement_2-price  currency_code = gs_supplement_2-currency_code ) ).
 *     mr_test_environment->insert_test_data( lt_supplement ).
@@ -2351,13 +2351,13 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 *     gv_supplement_id_unknown      = 'XX-999'.
     ELSE.
       " Select any valid combination of Supplement ID, Price, Currency Code
-      SELECT SINGLE supplement_id, price, currency_code FROM /dmo/supplement INTO ( @gs_supplement_1-supplement_id, @gs_supplement_1-price, @gs_supplement_1-currency_code ) ##WARN_OK. "#EC CI_NOORDER
+      SELECT SINGLE supplement_id, price, currency_code FROM ZTKFK_supplement INTO ( @gs_supplement_1-supplement_id, @gs_supplement_1-price, @gs_supplement_1-currency_code ) ##WARN_OK. "#EC CI_NOORDER
       IF sy-subrc <> 0.
         cl_abap_unit_assert=>abort( 'No supplement data!' ).
       ENDIF.
 
       " Select a different valid combination of Supplement ID, Price, Currency Code
-      SELECT SINGLE supplement_id, price, currency_code FROM /dmo/supplement WHERE supplement_id <> @gs_supplement_1-supplement_id
+      SELECT SINGLE supplement_id, price, currency_code FROM ZTKFK_supplement WHERE supplement_id <> @gs_supplement_1-supplement_id
         INTO ( @gs_supplement_2-supplement_id, @gs_supplement_2-price, @gs_supplement_2-currency_code ) ##WARN_OK. "#EC CI_NOORDER
       IF sy-subrc <> 0.
         cl_abap_unit_assert=>abort( 'No supplement data!' ).
@@ -2366,7 +2366,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
       " Determine an unknown Supplement ID
       gv_supplement_id_unknown = 'XX-999'.
-      SELECT SINGLE supplement_id FROM /dmo/supplement WHERE supplement_id = @gv_supplement_id_unknown INTO @DATA(lv_dummy_supplement_id).
+      SELECT SINGLE supplement_id FROM ZTKFK_supplement WHERE supplement_id = @gv_supplement_id_unknown INTO @DATA(lv_dummy_supplement_id).
       IF sy-subrc = 0.
         cl_abap_unit_assert=>abort( |Supplement ID { gv_supplement_id_unknown } should not be known!| ).
       ENDIF.
@@ -2440,12 +2440,12 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT COUNT( * ) FROM /dmo/book_suppl WHERE travel_id = @ls_travel-travel_id INTO @DATA(lv_count).
+    SELECT COUNT( * ) FROM ZTKFK_book_suppl WHERE travel_id = @ls_travel-travel_id INTO @DATA(lv_count).
     cl_abap_unit_assert=>assert_equals( act = lv_count  exp = 3 ).
 
-    DATA ls_book_suppl_sel TYPE /dmo/book_suppl.
+    DATA ls_book_suppl_sel TYPE ZTKFK_book_suppl.
 
-    SELECT SINGLE price, currency_code FROM /dmo/book_suppl WHERE travel_id             = @ls_book_suppl_2_1-travel_id
+    SELECT SINGLE price, currency_code FROM ZTKFK_book_suppl WHERE travel_id             = @ls_book_suppl_2_1-travel_id
                                                               AND booking_id            = @ls_book_suppl_2_1-booking_id
                                                               AND booking_supplement_id = @ls_book_suppl_2_1-booking_supplement_id
                                                             INTO CORRESPONDING FIELDS OF @ls_book_suppl_sel.
@@ -2463,7 +2463,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_book_suppl_2_1-booking_id
                                                                          booking_supplement_id = ls_book_suppl_2_1-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-update
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                                                          price                 = abap_true
                                                                          currency_code         = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
@@ -2478,7 +2478,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = 'EUR' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_book_suppl_2_1-booking_id
                                                                          booking_supplement_id = ls_book_suppl_2_1-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-update
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                                                          price                 = abap_true
                                                                          currency_code         = abap_true ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
@@ -2493,7 +2493,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     gr_cut->save( ).
 
-    SELECT SINGLE price, currency_code FROM /dmo/book_suppl WHERE travel_id             = @ls_book_suppl_2_1-travel_id
+    SELECT SINGLE price, currency_code FROM ZTKFK_book_suppl WHERE travel_id             = @ls_book_suppl_2_1-travel_id
                                                               AND booking_id            = @ls_book_suppl_2_1-booking_id
                                                               AND booking_supplement_id = @ls_book_suppl_2_1-booking_supplement_id
                                                             INTO CORRESPONDING FIELDS OF @ls_book_suppl_sel.
@@ -2501,7 +2501,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( act = ls_book_suppl_sel-price          exp = '22.0' ).
     cl_abap_unit_assert=>assert_equals( act = ls_book_suppl_sel-currency_code  exp = 'EUR' ).
 
-    SELECT SINGLE price, currency_code FROM /dmo/book_suppl WHERE travel_id             = @ls_book_suppl_2_2-travel_id
+    SELECT SINGLE price, currency_code FROM ZTKFK_book_suppl WHERE travel_id             = @ls_book_suppl_2_2-travel_id
                                                               AND booking_id            = @ls_book_suppl_2_2-booking_id
                                                               AND booking_supplement_id = @ls_book_suppl_2_2-booking_supplement_id
                                                             INTO CORRESPONDING FIELDS OF @ls_book_suppl_sel.
@@ -2512,18 +2512,18 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     " 3. Delete the first booking - check that the booking supplement has also been deleted
     _delete_existing_booking( iv_travel_id = ls_booking_1-travel_id  iv_booking_id = ls_booking_1-booking_id ).
 
-    SELECT COUNT( * ) FROM /dmo/book_suppl WHERE travel_id = @ls_travel-travel_id INTO @lv_count.
+    SELECT COUNT( * ) FROM ZTKFK_book_suppl WHERE travel_id = @ls_travel-travel_id INTO @lv_count.
     cl_abap_unit_assert=>assert_equals( act = lv_count  exp = 2 ).
 
-    SELECT COUNT( * ) FROM /dmo/book_suppl WHERE travel_id = @ls_travel-travel_id AND booking_id = @ls_booking_2-booking_id INTO @lv_count.
+    SELECT COUNT( * ) FROM ZTKFK_book_suppl WHERE travel_id = @ls_travel-travel_id AND booking_id = @ls_booking_2-booking_id INTO @lv_count.
     cl_abap_unit_assert=>assert_equals( act = lv_count  exp = 2 ).
 
     " 4. LUW: Delete the second booking supplement of the second booking - here check also travel admin field
-    SELECT SINGLE lastchangedat FROM /dmo/travel WHERE travel_id = @ls_travel-travel_id INTO @DATA(lv_lastchangedat_1).
+    SELECT SINGLE lastchangedat FROM ZTKFK_travel WHERE travel_id = @ls_travel-travel_id INTO @DATA(lv_lastchangedat_1).
     cl_abap_unit_assert=>assert_subrc( ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id             = @ls_book_suppl_2_2-travel_id
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id             = @ls_book_suppl_2_2-travel_id
                                                            AND booking_id            = @ls_book_suppl_2_2-booking_id
                                                            AND booking_supplement_id = @ls_book_suppl_2_2-booking_supplement_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_true( lv_db_exists ).
@@ -2534,34 +2534,34 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          booking_supplement_id = ls_book_suppl_2_2-booking_supplement_id ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_book_suppl_2_2-booking_id
                                                                          booking_supplement_id = ls_book_suppl_2_2-booking_supplement_id
-                                                                         action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                                                         action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->save( ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id             = @ls_book_suppl_2_2-travel_id
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id             = @ls_book_suppl_2_2-travel_id
                                                            AND booking_id            = @ls_book_suppl_2_2-booking_id
                                                            AND booking_supplement_id = @ls_book_suppl_2_2-booking_supplement_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
 
-    SELECT SINGLE lastchangedat FROM /dmo/travel WHERE travel_id = @ls_travel-travel_id INTO @DATA(lv_lastchangedat_2).
+    SELECT SINGLE lastchangedat FROM ZTKFK_travel WHERE travel_id = @ls_travel-travel_id INTO @DATA(lv_lastchangedat_2).
     cl_abap_unit_assert=>assert_subrc( ).
 
     cl_abap_unit_assert=>assert_true( xsdbool( lv_lastchangedat_2 > lv_lastchangedat_1 ) ).
 
-    SELECT COUNT( * ) FROM /dmo/book_suppl WHERE travel_id = @ls_travel-travel_id AND booking_id = @ls_booking_2-booking_id INTO @lv_count.
+    SELECT COUNT( * ) FROM ZTKFK_book_suppl WHERE travel_id = @ls_travel-travel_id AND booking_id = @ls_booking_2-booking_id INTO @lv_count.
     cl_abap_unit_assert=>assert_equals( act = lv_count  exp = 1 ).
 
     " 5. LUW: Delete the travel - check that all booking (supplements) have also been deleted
     _delete_existing_travel( ls_travel-travel_id ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/booking FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_booking FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id = @ls_travel-travel_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -2575,16 +2575,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = 'EUR' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = '1'
                                                                          booking_supplement_id = '1'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id_unknown ).
   ENDMETHOD.
@@ -2599,16 +2599,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = 'EUR' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = '1'
                                                                          booking_supplement_id = '1'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -2616,14 +2616,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id_unknown )
                                      is_travelx             = VALUE #( travel_id = mv_travel_id_unknown )
                                      it_booking_supplement  = VALUE #( ( booking_id = '2'  price = '11.0' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_id = '2'  action_code = /dmo/if_flight_legacy=>action_code-update  price = abap_true ) )
+                                     it_booking_supplementx = VALUE #( ( booking_id = '2'  action_code = ZTKFK_if_flight_legacy=>action_code-update  price = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id_unknown ).
   ENDMETHOD.
@@ -2633,14 +2633,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( )
                                      is_travelx             = VALUE #( )
                                      it_booking_supplement  = VALUE #( ( booking_id = '2'  booking_supplement_id = '1'  price = '11.0' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_id = '2'  booking_supplement_id = '1'  action_code = /dmo/if_flight_legacy=>action_code-update  price = abap_true ) )
+                                     it_booking_supplementx = VALUE #( ( booking_id = '2'  booking_supplement_id = '1'  action_code = ZTKFK_if_flight_legacy=>action_code-update  price = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -2651,14 +2651,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          booking_supplement_id = '1' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = '1'
                                                                          booking_supplement_id = '1'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-delete ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id_unknown ).
   ENDMETHOD.
@@ -2668,14 +2668,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( )
                                      is_travelx             = VALUE #( )
                                      it_booking_supplement  = VALUE #( ( booking_id = '1'  booking_supplement_id = '1' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_id = '1'  booking_supplement_id = '1'  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_booking_supplementx = VALUE #( ( booking_id = '1'  booking_supplement_id = '1'  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -2688,16 +2688,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = 'EUR' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id_unknown
                                                                          booking_supplement_id = '1'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -2709,16 +2709,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_supplement_id = '1' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_supplement_id = '1'  action_code = /dmo/if_flight_legacy=>action_code-create ) )
+                                     it_booking_supplementx = VALUE #( ( booking_supplement_id = '1'  action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
   ENDMETHOD.
@@ -2729,14 +2729,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_id = mv_booking_id_unknown  booking_supplement_id = '1'  price = '11.0' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id_unknown  booking_supplement_id = '1'
-                                                                         action_code = /dmo/if_flight_legacy=>action_code-update  price = abap_true ) )
+                                                                         action_code = ZTKFK_if_flight_legacy=>action_code-update  price = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -2748,14 +2748,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_supplement_id = '1'  price = '11.0' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_supplement_id = '1'  action_code = /dmo/if_flight_legacy=>action_code-update  price = abap_true ) )
+                                     it_booking_supplementx = VALUE #( ( booking_supplement_id = '1'  action_code = ZTKFK_if_flight_legacy=>action_code-update  price = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
   ENDMETHOD.
@@ -2765,14 +2765,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_id = mv_booking_id_unknown  booking_supplement_id = '1' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id_unknown  booking_supplement_id = '1'  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id_unknown  booking_supplement_id = '1'  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -2784,14 +2784,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_supplement_id = '1' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_supplement_id = '1'  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_booking_supplementx = VALUE #( ( booking_supplement_id = '1'  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
   ENDMETHOD.
@@ -2801,14 +2801,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_id = mv_booking_id  booking_supplement_id = '10'  price = '11.0' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id  booking_supplement_id = '10'  action_code = /dmo/if_flight_legacy=>action_code-update  price = abap_true ) )
+                                     it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id  booking_supplement_id = '10'  action_code = ZTKFK_if_flight_legacy=>action_code-update  price = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_SUPPLEMENT_ID' ).
@@ -2822,14 +2822,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_id = mv_booking_id  price = '11.0' ) )
-                                     it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id  action_code = /dmo/if_flight_legacy=>action_code-update  price = abap_true ) )
+                                     it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-update  price = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -2842,14 +2842,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_id = mv_booking_id  booking_supplement_id = '10' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id  booking_supplement_id = '10'
-                                                                         action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                                                         action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_SUPPLEMENT_ID' ).
@@ -2863,14 +2863,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
                                      is_travelx             = VALUE #( travel_id = mv_travel_id )
                                      it_booking_supplement  = VALUE #( ( booking_id = mv_booking_id ) )
-                                     it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_booking_supplementx = VALUE #( ( booking_id = mv_booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -2906,7 +2906,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check that the Booking Supplement was not created
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id             = @ls_booking_supplement-travel_id
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id             = @ls_booking_supplement-travel_id
                                                            AND booking_id            = @ls_booking_supplement-booking_id
                                                            AND booking_supplement_id = @ls_booking_supplement-booking_supplement_id
                                                          INTO @lv_db_exists.
@@ -2943,7 +2943,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check that the Booking Supplement was not created
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id             = @ls_booking_supplement-travel_id
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id             = @ls_booking_supplement-travel_id
                                                            AND booking_id            = @ls_booking_supplement-booking_id
                                                            AND booking_supplement_id = @ls_booking_supplement-booking_supplement_id
                                                          INTO @lv_db_exists.
@@ -2976,16 +2976,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = 'EUR' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_booking-booking_id
                                                                          booking_supplement_id = '1'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = ls_travel-travel_id ).
     gr_cut->save( ).
@@ -2997,7 +2997,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = mv_travel_id )
                                      is_travelx  = VALUE #( travel_id = mv_travel_id )
                                      it_booking  = VALUE #( ( booking_id = mv_booking_id ) )
-                                     it_bookingx = VALUE #( ( booking_id = mv_booking_id  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = mv_booking_id  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
@@ -3008,16 +3008,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = 'EUR' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = '1'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -3041,7 +3041,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check existence of Booking Supplement
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = '22' INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = '22' INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_true( lv_db_exists ).
 
     " Delete, Update Booking Supplement in the same LUW
@@ -3051,7 +3051,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          booking_supplement_id = ls_booking_supplement-booking_supplement_id ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_booking_supplement-booking_id
                                                                          booking_supplement_id = ls_booking_supplement-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-delete ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = ls_booking_supplement-travel_id )
@@ -3061,15 +3061,15 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          price                 = '11.0' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_booking_supplement-booking_id
                                                                          booking_supplement_id = ls_booking_supplement-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-update
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                                                          price                 = abap_true ) )
                            IMPORTING et_messages            = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_SUPPLEMENT_ID' ).
@@ -3080,7 +3080,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check that the Booking Supplement no longer exists
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id             = @ls_booking_supplement-travel_id
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id             = @ls_booking_supplement-travel_id
                                                            AND booking_id            = @ls_booking_supplement-booking_id
                                                            AND booking_supplement_id = @ls_booking_supplement-booking_supplement_id
                                                          INTO @lv_db_exists.
@@ -3089,7 +3089,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
 
   METHOD dd_single.
-    CONSTANTS lc_booking_supplement_id TYPE /dmo/booking_supplement_id VALUE '34'.
+    CONSTANTS lc_booking_supplement_id TYPE ZTKFK_booking_supplement_id VALUE '34'.
     DATA lv_db_exists TYPE abap_bool.
 
     _create_booking_suppl( iv_travel_id          = mv_travel_id
@@ -3102,7 +3102,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check existence of Booking Supplement
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = @lc_booking_supplement_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = @lc_booking_supplement_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_true( lv_db_exists ).
 
     " Delete Booking Supplement twice in the same LUW
@@ -3112,7 +3112,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          booking_supplement_id = lc_booking_supplement_id ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = lc_booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-delete ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->update_travel( EXPORTING is_travel              = VALUE #( travel_id = mv_travel_id )
@@ -3121,14 +3121,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          booking_supplement_id = lc_booking_supplement_id ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = lc_booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-delete ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages            = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
     gr_cut->save( ).
 
     " Check that the Booking Supplement no longer exists
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = @lc_booking_supplement_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = @lc_booking_supplement_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -3151,20 +3151,20 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = 'EUR' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = '1'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create )
                                                                        ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = '2'
                                                                          supplement_id         = gs_supplement_1-supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>supplement_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>supplement_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_SUPPLEMENT_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_supplement_id               exp = gv_supplement_id_unknown ).
 
@@ -3172,7 +3172,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check that no Booking Supplement has been created
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id  = @mv_travel_id AND booking_id = @mv_booking_id INTO @lv_db_exists.
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id  = @mv_travel_id AND booking_id = @mv_booking_id INTO @lv_db_exists.
     cl_abap_unit_assert=>assert_false( lv_db_exists ).
   ENDMETHOD.
 
@@ -3187,16 +3187,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = gs_supplement_1-currency_code ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = '0'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_no_key-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = mv_travel_id ).
@@ -3223,16 +3223,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = gs_supplement_1-currency_code ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = '20'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_exists-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_exists-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_SUPPLEMENT_ID' ).
@@ -3253,15 +3253,15 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = gs_supplement_1-currency_code ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = '20'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = lt_booking_supplement
                                      et_messages            = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_exists-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_exists-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_SUPPLEMENT_ID' ).
@@ -3272,11 +3272,11 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
 
   METHOD c_deep_insert.
-    CONSTANTS lc_booking_id_1 TYPE /dmo/booking_id VALUE '20'.
-    CONSTANTS lc_booking_id_2 TYPE /dmo/booking_id VALUE '21'.
-    CONSTANTS lc_booking_supplement_id_1_1 TYPE /dmo/booking_supplement_id VALUE '10'.
-    CONSTANTS lc_booking_supplement_id_2_1 TYPE /dmo/booking_supplement_id VALUE '10'.
-    CONSTANTS lc_booking_supplement_id_2_2 TYPE /dmo/booking_supplement_id VALUE '20'.
+    CONSTANTS lc_booking_id_1 TYPE ZTKFK_booking_id VALUE '20'.
+    CONSTANTS lc_booking_id_2 TYPE ZTKFK_booking_id VALUE '21'.
+    CONSTANTS lc_booking_supplement_id_1_1 TYPE ZTKFK_booking_supplement_id VALUE '10'.
+    CONSTANTS lc_booking_supplement_id_2_1 TYPE ZTKFK_booking_supplement_id VALUE '10'.
+    CONSTANTS lc_booking_supplement_id_2_2 TYPE ZTKFK_booking_supplement_id VALUE '20'.
     gr_cut->create_travel(
       EXPORTING
         is_travel             = VALUE #( agency_id     = gv_agency_id_1
@@ -3337,7 +3337,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check travel
     DATA(lv_exchange_rate_date) = cl_abap_context_info=>get_system_date( ).
-    /dmo/cl_flight_amdp=>convert_currency(
+    ZTKFK_cl_flight_amdp=>convert_currency(
       EXPORTING
         iv_amount               = '30.00'
         iv_currency_code_source = 'USD'
@@ -3347,8 +3347,8 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
         ev_amount               = DATA(lv_30_usd_as_eur)
     ).
     cl_abap_unit_assert=>assert_not_initial( lv_30_usd_as_eur ).
-    DATA ls_travel_sel TYPE /dmo/travel.
-    SELECT SINGLE agency_id, customer_id, total_price, currency_code, description FROM /dmo/travel WHERE travel_id = @ls_travel-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    DATA ls_travel_sel TYPE ZTKFK_travel.
+    SELECT SINGLE agency_id, customer_id, total_price, currency_code, description FROM ZTKFK_travel WHERE travel_id = @ls_travel-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-agency_id      exp = gv_agency_id_1 ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-customer_id    exp = gv_customer_id_1 ).
@@ -3357,10 +3357,10 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-description    exp = 'My_Deep_Insert' ).
 
     " Check booking count, Check one of the bookings
-    SELECT COUNT( * ) FROM /dmo/booking WHERE travel_id = @ls_travel-travel_id INTO @DATA(lv_count).
+    SELECT COUNT( * ) FROM ZTKFK_booking WHERE travel_id = @ls_travel-travel_id INTO @DATA(lv_count).
     cl_abap_unit_assert=>assert_equals( act = lv_count  exp = 2 ).
-    DATA ls_booking_sel TYPE /dmo/booking.
-    SELECT SINGLE customer_id, flight_date FROM /dmo/booking WHERE travel_id  = @ls_travel-travel_id
+    DATA ls_booking_sel TYPE ZTKFK_booking.
+    SELECT SINGLE customer_id, flight_date FROM ZTKFK_booking WHERE travel_id  = @ls_travel-travel_id
                                                                AND booking_id = @lc_booking_id_2
                                                              INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
@@ -3369,10 +3369,10 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check booking supplement count, Check one of the booking supplements
     lv_count = 0.
-    SELECT COUNT( * ) FROM /dmo/book_suppl WHERE travel_id = @ls_travel-travel_id INTO @lv_count.
+    SELECT COUNT( * ) FROM ZTKFK_book_suppl WHERE travel_id = @ls_travel-travel_id INTO @lv_count.
     cl_abap_unit_assert=>assert_equals( act = lv_count  exp = 3 ).
-    DATA ls_book_suppl_sel TYPE /dmo/book_suppl.
-    SELECT SINGLE price, currency_code FROM /dmo/book_suppl WHERE travel_id             = @ls_travel-travel_id
+    DATA ls_book_suppl_sel TYPE ZTKFK_book_suppl.
+    SELECT SINGLE price, currency_code FROM ZTKFK_book_suppl WHERE travel_id             = @ls_travel-travel_id
                                                               AND booking_id            = @lc_booking_id_2
                                                               AND booking_supplement_id = @lc_booking_supplement_id_2_1
                                                             INTO CORRESPONDING FIELDS OF @ls_book_suppl_sel.
@@ -3390,9 +3390,9 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                       iv_save   = abap_false ).
 
     " Now try to put a second travel with a faulty booking supplement into the buffer
-    CONSTANTS lc_booking_id_1 TYPE /dmo/booking_id VALUE '20'.
-    CONSTANTS lc_booking_id_2 TYPE /dmo/booking_id VALUE '21'.
-    CONSTANTS lc_booking_supplement_id_2_1 TYPE /dmo/booking_supplement_id VALUE '10'.
+    CONSTANTS lc_booking_id_1 TYPE ZTKFK_booking_id VALUE '20'.
+    CONSTANTS lc_booking_id_2 TYPE ZTKFK_booking_id VALUE '21'.
+    CONSTANTS lc_booking_supplement_id_2_1 TYPE ZTKFK_booking_supplement_id VALUE '10'.
     gr_cut->create_travel(
       EXPORTING
         is_travel             = VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_1  begin_date = '20190101'  end_date = '20190201'  description = 'My_Deep_Insert_Fail' )
@@ -3422,11 +3422,11 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( lt_booking ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>supplement_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>supplement_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_SUPPLEMENT_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_supplement_id               exp = gv_supplement_id_unknown ).
 
@@ -3441,10 +3441,10 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     DATA lv_db_exists TYPE abap_bool.
 
     " Create and persis a travel with 1 booking and 3 booking supplements
-    CONSTANTS lc_booking_id_1 TYPE /dmo/booking_id VALUE '20'.
-    CONSTANTS lc_booking_supplement_id_1_1 TYPE /dmo/booking_supplement_id VALUE '10'.
-    CONSTANTS lc_booking_supplement_id_1_2 TYPE /dmo/booking_supplement_id VALUE '20'.
-    CONSTANTS lc_booking_supplement_id_1_3 TYPE /dmo/booking_supplement_id VALUE '30'.
+    CONSTANTS lc_booking_id_1 TYPE ZTKFK_booking_id VALUE '20'.
+    CONSTANTS lc_booking_supplement_id_1_1 TYPE ZTKFK_booking_supplement_id VALUE '10'.
+    CONSTANTS lc_booking_supplement_id_1_2 TYPE ZTKFK_booking_supplement_id VALUE '20'.
+    CONSTANTS lc_booking_supplement_id_1_3 TYPE ZTKFK_booking_supplement_id VALUE '30'.
     gr_cut->create_travel(
       EXPORTING
         is_travel             = VALUE #( agency_id     = gv_agency_id_1
@@ -3488,7 +3488,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->save( ).
 
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id             = @ls_travel-travel_id
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id             = @ls_travel-travel_id
                                                            AND booking_id            = @lc_booking_id_1
                                                            AND booking_supplement_id = @lc_booking_supplement_id_1_2
                                                          INTO @lv_db_exists.
@@ -3502,11 +3502,11 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     " -- Delete a Booking Supplement
     " -- Create a Booking Supplement for an existing Booking
     " -- Create a new Booking Supplement for the new Booking
-    CONSTANTS lc_booking_id_2 TYPE /dmo/booking_id VALUE '10'.
-    CONSTANTS lc_booking_supplement_id_2_1 TYPE /dmo/booking_supplement_id VALUE '10'.
-    CONSTANTS lc_booking_supplement_id_1_4 TYPE /dmo/booking_supplement_id VALUE '40'.
-    CONSTANTS lc_diff TYPE /dmo/supplement_price VALUE '123.00'.
-    DATA lv_new_price TYPE /dmo/supplement_price.
+    CONSTANTS lc_booking_id_2 TYPE ZTKFK_booking_id VALUE '10'.
+    CONSTANTS lc_booking_supplement_id_2_1 TYPE ZTKFK_booking_supplement_id VALUE '10'.
+    CONSTANTS lc_booking_supplement_id_1_4 TYPE ZTKFK_booking_supplement_id VALUE '40'.
+    CONSTANTS lc_diff TYPE ZTKFK_supplement_price VALUE '123.00'.
+    DATA lv_new_price TYPE ZTKFK_supplement_price.
     lv_new_price = ls_booking_supplement_1_1-price + lc_diff.
     gr_cut->update_travel(
       EXPORTING
@@ -3521,8 +3521,8 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                             flight_date   = gs_flight_2-flight_date
                                             flight_price  = '200.00'
                                             currency_code = 'EUR' ) )
-        it_bookingx            = VALUE #( ( booking_id = lc_booking_id_1  action_code = /dmo/if_flight_legacy=>action_code-update  customer_id = abap_true )
-                                          ( booking_id = lc_booking_id_2  action_code = /dmo/if_flight_legacy=>action_code-create ) )
+        it_bookingx            = VALUE #( ( booking_id = lc_booking_id_1  action_code = ZTKFK_if_flight_legacy=>action_code-update  customer_id = abap_true )
+                                          ( booking_id = lc_booking_id_2  action_code = ZTKFK_if_flight_legacy=>action_code-create ) )
         it_booking_supplement  = VALUE #( ( booking_id            = lc_booking_id_1
                                             booking_supplement_id = lc_booking_supplement_id_1_1
                                             price                 = lv_new_price
@@ -3541,18 +3541,18 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                             currency_code         = 'EUR' ) )
         it_booking_supplementx = VALUE #( ( booking_id            = lc_booking_id_1
                                             booking_supplement_id = lc_booking_supplement_id_1_1
-                                            action_code           = /dmo/if_flight_legacy=>action_code-update
+                                            action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                             price                 = abap_true
                                             currency_code         = 'EUR' )
                                           ( booking_id            = lc_booking_id_1
                                             booking_supplement_id = lc_booking_supplement_id_1_2
-                                            action_code           = /dmo/if_flight_legacy=>action_code-delete )
+                                            action_code           = ZTKFK_if_flight_legacy=>action_code-delete )
                                           ( booking_id            = lc_booking_id_1
                                             booking_supplement_id = lc_booking_supplement_id_1_4
-                                            action_code           = /dmo/if_flight_legacy=>action_code-create )
+                                            action_code           = ZTKFK_if_flight_legacy=>action_code-create )
                                           ( booking_id            = lc_booking_id_2
                                             booking_supplement_id = lc_booking_supplement_id_2_1
-                                            action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                            action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
        IMPORTING
         es_travel              = DATA(ls_travel_aft_update)
         et_booking             = DATA(lt_booking_aft_update)
@@ -3574,8 +3574,8 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->save( ).
 
     " Check Travel
-    DATA ls_travel_sel TYPE /dmo/travel.
-    SELECT SINGLE total_price, currency_code, description FROM /dmo/travel WHERE travel_id = @ls_travel-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
+    DATA ls_travel_sel TYPE ZTKFK_travel.
+    SELECT SINGLE total_price, currency_code, description FROM ZTKFK_travel WHERE travel_id = @ls_travel-travel_id INTO CORRESPONDING FIELDS OF @ls_travel_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-total_price    exp = '100.00' + '200.00' + lv_new_price + '30.00' + '40.00' + '50.00' ) ##LITERAL.
     cl_abap_unit_assert=>assert_equals( act = ls_travel_sel-currency_code  exp = 'EUR' ).
@@ -3583,23 +3583,23 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " Check Booking(s)
     " -- Updated Booking
-    DATA ls_booking_sel TYPE /dmo/booking.
-    SELECT SINGLE booking_date, customer_id FROM /dmo/booking WHERE travel_id = @ls_travel-travel_id AND booking_id = @lc_booking_id_1 INTO CORRESPONDING FIELDS OF @ls_booking_sel.
+    DATA ls_booking_sel TYPE ZTKFK_booking.
+    SELECT SINGLE booking_date, customer_id FROM ZTKFK_booking WHERE travel_id = @ls_travel-travel_id AND booking_id = @lc_booking_id_1 INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-booking_date  exp = gv_booking_date ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-customer_id   exp = gv_customer_id_2 ).
 
     " -- New Booking
     CLEAR ls_booking_sel.
-    SELECT SINGLE customer_id, flight_date FROM /dmo/booking WHERE travel_id = @ls_travel-travel_id AND booking_id = @lc_booking_id_2 INTO CORRESPONDING FIELDS OF @ls_booking_sel.
+    SELECT SINGLE customer_id, flight_date FROM ZTKFK_booking WHERE travel_id = @ls_travel-travel_id AND booking_id = @lc_booking_id_2 INTO CORRESPONDING FIELDS OF @ls_booking_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-customer_id  exp = gv_customer_id_1 ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_sel-flight_date  exp = gs_flight_2-flight_date ).
 
     " Check Booking Supplement(s)
     " -- Updated Booking Supplement
-    DATA ls_booking_supplement_sel TYPE /dmo/book_suppl.
-    SELECT SINGLE supplement_id, price FROM /dmo/book_suppl WHERE travel_id             = @ls_travel-travel_id
+    DATA ls_booking_supplement_sel TYPE ZTKFK_book_suppl.
+    SELECT SINGLE supplement_id, price FROM ZTKFK_book_suppl WHERE travel_id             = @ls_travel-travel_id
                                                               AND booking_id            = @lc_booking_id_1
                                                               AND booking_supplement_id = @lc_booking_supplement_id_1_1
                                                             INTO CORRESPONDING FIELDS OF @ls_booking_supplement_sel.
@@ -3609,7 +3609,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " -- Deleted Booking Supplement
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id             = @ls_travel-travel_id
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id             = @ls_travel-travel_id
                                                            AND booking_id            = @lc_booking_id_1
                                                            AND booking_supplement_id = @lc_booking_supplement_id_1_2
                                                          INTO @lv_db_exists.
@@ -3617,7 +3617,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " -- Unchanged Booking Supplement
     CLEAR lv_db_exists.
-    SELECT SINGLE FROM /dmo/book_suppl FIELDS @abap_true WHERE travel_id             = @ls_travel-travel_id
+    SELECT SINGLE FROM ZTKFK_book_suppl FIELDS @abap_true WHERE travel_id             = @ls_travel-travel_id
                                                            AND booking_id            = @lc_booking_id_1
                                                            AND booking_supplement_id = @lc_booking_supplement_id_1_3
                                                          INTO @lv_db_exists.
@@ -3625,7 +3625,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " -- Created Booking Supplement for the existing Booking
     CLEAR ls_booking_supplement_sel.
-    SELECT SINGLE supplement_id FROM /dmo/book_suppl WHERE travel_id             = @ls_travel-travel_id
+    SELECT SINGLE supplement_id FROM ZTKFK_book_suppl WHERE travel_id             = @ls_travel-travel_id
                                                        AND booking_id            = @lc_booking_id_1
                                                        AND booking_supplement_id = @lc_booking_supplement_id_1_4
                                                      INTO CORRESPONDING FIELDS OF @ls_booking_supplement_sel.
@@ -3634,7 +3634,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
 
     " -- Created Booking Supplement for the new Booking
     CLEAR ls_booking_supplement_sel.
-    SELECT SINGLE supplement_id FROM /dmo/book_suppl WHERE travel_id             = @ls_travel-travel_id
+    SELECT SINGLE supplement_id FROM ZTKFK_book_suppl WHERE travel_id             = @ls_travel-travel_id
                                                        AND booking_id            = @lc_booking_id_2
                                                        AND booking_supplement_id = @lc_booking_supplement_id_2_1
                                                      INTO CORRESPONDING FIELDS OF @ls_booking_supplement_sel.
@@ -3719,22 +3719,22 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( lt_booking_read ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement_read ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_travel_id                   exp = ls_travel-travel_id ).
   ENDMETHOD.
 
 
   METHOD read_buffer.
-    CONSTANTS lc_booking_id_1 TYPE /dmo/booking_id VALUE '20'.
-    CONSTANTS lc_booking_id_2 TYPE /dmo/booking_id VALUE '21'.
-    CONSTANTS lc_booking_supplement_id_1_1 TYPE /dmo/booking_supplement_id VALUE '10'.
-    CONSTANTS lc_booking_supplement_id_2_1 TYPE /dmo/booking_supplement_id VALUE '10'.
-    CONSTANTS lc_booking_supplement_id_2_2 TYPE /dmo/booking_supplement_id VALUE '20'.
+    CONSTANTS lc_booking_id_1 TYPE ZTKFK_booking_id VALUE '20'.
+    CONSTANTS lc_booking_id_2 TYPE ZTKFK_booking_id VALUE '21'.
+    CONSTANTS lc_booking_supplement_id_1_1 TYPE ZTKFK_booking_supplement_id VALUE '10'.
+    CONSTANTS lc_booking_supplement_id_2_1 TYPE ZTKFK_booking_supplement_id VALUE '10'.
+    CONSTANTS lc_booking_supplement_id_2_2 TYPE ZTKFK_booking_supplement_id VALUE '20'.
     gr_cut->create_travel(
       EXPORTING
         is_travel             = VALUE #( agency_id = gv_agency_id_1  customer_id = gv_customer_id_1  begin_date = '20190101'  end_date = '20190201'  description = 'My_Deep_Insert' )
@@ -3779,7 +3779,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->update_travel( EXPORTING is_travel   = VALUE #( travel_id = ls_travel-travel_id )
                                      is_travelx  = VALUE #( travel_id = ls_travel-travel_id )
                                      it_booking  = VALUE #( ( booking_id = lc_booking_id_1 ) )
-                                     it_bookingx = VALUE #( ( booking_id = lc_booking_id_1  action_code = /dmo/if_flight_legacy=>action_code-delete ) )
+                                     it_bookingx = VALUE #( ( booking_id = lc_booking_id_1  action_code = ZTKFK_if_flight_legacy=>action_code-delete ) )
                            IMPORTING et_messages = lt_messages ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
 
@@ -3812,11 +3812,11 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     cl_abap_unit_assert=>assert_initial( lt_booking_read ).
     cl_abap_unit_assert=>assert_initial( lt_booking_supplement_read ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>travel_no_key-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>travel_no_key-msgno ).
   ENDMETHOD.
 
 
@@ -3837,7 +3837,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          supplement_id         = gs_supplement_1-supplement_id ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_booking_supplement-booking_id
                                                                          booking_supplement_id = ls_booking_supplement-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-update
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                                                          supplement_id         = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).
@@ -3851,16 +3851,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          price                 = '11.0' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_booking_supplement-booking_id
                                                                          booking_supplement_id = ls_booking_supplement-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-update
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                                                          supplement_id         = abap_true
                                                                          price                 = abap_true ) )
                            IMPORTING et_messages            = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_suppl_id_u-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_suppl_id_u-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_SUPPLEMENT_ID' ).
@@ -3871,7 +3871,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
     gr_cut->save( ).
 
     " Check that nothing has changed
-    SELECT SINGLE supplement_id, price FROM /dmo/book_suppl WHERE travel_id             = @ls_booking_supplement-travel_id
+    SELECT SINGLE supplement_id, price FROM ZTKFK_book_suppl WHERE travel_id             = @ls_booking_supplement-travel_id
                                                               AND booking_id            = @ls_booking_supplement-booking_id
                                                               AND booking_supplement_id = @ls_booking_supplement-booking_supplement_id
                                                          INTO ( @DATA(lv_supplement_id), @DATA(lv_price) ).
@@ -3890,9 +3890,9 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                            iv_save               = abap_false ).
 
     " Provide price and currency
-    CONSTANTS lc_diff TYPE /dmo/supplement_price VALUE '9.99'.
-    DATA lv_price         TYPE /dmo/supplement_price.
-    DATA lv_currency_code TYPE /dmo/currency_code.
+    CONSTANTS lc_diff TYPE ZTKFK_supplement_price VALUE '9.99'.
+    DATA lv_price         TYPE ZTKFK_supplement_price.
+    DATA lv_currency_code TYPE ZTKFK_currency_code.
     lv_price = gs_supplement_1-price + lc_diff.
     lv_currency_code = SWITCH #( gs_supplement_1-currency_code WHEN 'USD' THEN 'EUR' ELSE 'USD' ).
     _create_booking_suppl( iv_travel_id          = mv_travel_id
@@ -3903,14 +3903,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                             currency_code         = lv_currency_code )
                            iv_save               = abap_true ).
 
-    DATA ls_booking_supplement_sel TYPE /dmo/book_suppl.
-    SELECT SINGLE price, currency_code FROM /dmo/book_suppl WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = '10' INTO CORRESPONDING FIELDS OF @ls_booking_supplement_sel.
+    DATA ls_booking_supplement_sel TYPE ZTKFK_book_suppl.
+    SELECT SINGLE price, currency_code FROM ZTKFK_book_suppl WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = '10' INTO CORRESPONDING FIELDS OF @ls_booking_supplement_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_supplement_sel-price          exp = gs_supplement_1-price ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_supplement_sel-currency_code  exp = gs_supplement_1-currency_code ).
 
     CLEAR ls_booking_supplement_sel.
-    SELECT SINGLE price, currency_code FROM /dmo/book_suppl WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = '20' INTO CORRESPONDING FIELDS OF @ls_booking_supplement_sel.
+    SELECT SINGLE price, currency_code FROM ZTKFK_book_suppl WHERE travel_id = @mv_travel_id AND booking_id = @mv_booking_id AND booking_supplement_id = '20' INTO CORRESPONDING FIELDS OF @ls_booking_supplement_sel.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_supplement_sel-price          exp = lv_price ).
     cl_abap_unit_assert=>assert_equals( act = ls_booking_supplement_sel-currency_code  exp = lv_currency_code ).
@@ -3932,15 +3932,15 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          price                 = '11.0' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_booking_supplement-booking_id
                                                                          booking_supplement_id = ls_booking_supplement-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-update
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                                                          price                 = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_pri_curr_u-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_pri_curr_u-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_SUPPLEMENT_ID' ).
@@ -3957,14 +3957,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = 'XXX' ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_booking_supplement-booking_id
                                                                          booking_supplement_id = ls_booking_supplement-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-update
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                                                          currency_code         = abap_true ) )
                            IMPORTING et_messages            = lt_messages ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>booking_supplement_pri_curr_u-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>booking_supplement_pri_curr_u-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_TRAVEL_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr2  exp = 'MV_BOOKING_ID' ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr3  exp = 'MV_BOOKING_SUPPLEMENT_ID' ).
@@ -3984,14 +3984,14 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = gv_currency_code_unknown ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = mv_booking_id
                                                                          booking_supplement_id = '10'
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>currency_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>currency_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_CURRENCY_CODE' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_currency_code               exp = gv_currency_code_unknown ).
   ENDMETHOD.
@@ -4012,16 +4012,16 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                                                          currency_code         = gv_currency_code_unknown ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = ls_booking_supplement-booking_id
                                                                          booking_supplement_id = ls_booking_supplement-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-update
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-update
                                                                          price                 = abap_true
                                                                          currency_code         = abap_true ) )
                            IMPORTING et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_equals( act = lines( lt_messages )  exp = 1 ).
-    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF /dmo/cx_flight_legacy ) ).
-    DATA lx TYPE REF TO /dmo/cx_flight_legacy.
+    cl_abap_unit_assert=>assert_true( xsdbool( lt_messages[ 1 ] IS INSTANCE OF ZTKFK_cx_flight_legacy ) ).
+    DATA lx TYPE REF TO ZTKFK_cx_flight_legacy.
     lx ?= lt_messages[ 1 ].
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgid  exp = mc_msgid ).
-    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = /dmo/cx_flight_legacy=>currency_unknown-msgno ).
+    cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-msgno  exp = ZTKFK_cx_flight_legacy=>currency_unknown-msgno ).
     cl_abap_unit_assert=>assert_equals( act = lx->if_t100_message~t100key-attr1  exp = 'MV_CURRENCY_CODE' ).
     cl_abap_unit_assert=>assert_equals( act = lx->mv_currency_code               exp = gv_currency_code_unknown ).
   ENDMETHOD.
@@ -4033,7 +4033,7 @@ CLASS ltc_booking_supplement IMPLEMENTATION.
                                      it_booking_supplement  = VALUE #( ( is_booking_supplement ) )
                                      it_booking_supplementx = VALUE #( ( booking_id            = is_booking_supplement-booking_id
                                                                          booking_supplement_id = is_booking_supplement-booking_supplement_id
-                                                                         action_code           = /dmo/if_flight_legacy=>action_code-create ) )
+                                                                         action_code           = ZTKFK_if_flight_legacy=>action_code-create ) )
                            IMPORTING et_booking_supplement  = DATA(lt_booking_supplement)
                                      et_messages            = DATA(lt_messages) ).
     cl_abap_unit_assert=>assert_initial( lt_messages ).

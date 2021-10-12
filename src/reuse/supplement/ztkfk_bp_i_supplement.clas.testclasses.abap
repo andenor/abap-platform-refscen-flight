@@ -1,4 +1,4 @@
-"! @testing BDEF:/DMO/I_Supplement
+"! @testing BDEF:ZTKFK_I_Supplement
 CLASS ltc_supplement DEFINITION FINAL FOR TESTING
   DURATION SHORT
   RISK LEVEL HARMLESS.
@@ -12,11 +12,11 @@ CLASS ltc_supplement DEFINITION FINAL FOR TESTING
       class_teardown.
 
     DATA:
-      mapped        TYPE RESPONSE FOR MAPPED   EARLY /dmo/i_supplement,
-      failed        TYPE RESPONSE FOR FAILED   EARLY /dmo/i_supplement,
-      reported      TYPE RESPONSE FOR REPORTED EARLY /dmo/i_supplement,
-      failed_late   TYPE RESPONSE FOR FAILED   LATE  /dmo/i_supplement,
-      reported_late TYPE RESPONSE FOR REPORTED LATE  /dmo/i_supplement.
+      mapped        TYPE RESPONSE FOR MAPPED   EARLY ZTKFK_i_supplement,
+      failed        TYPE RESPONSE FOR FAILED   EARLY ZTKFK_i_supplement,
+      reported      TYPE RESPONSE FOR REPORTED EARLY ZTKFK_i_supplement,
+      failed_late   TYPE RESPONSE FOR FAILED   LATE  ZTKFK_i_supplement,
+      reported_late TYPE RESPONSE FOR REPORTED LATE  ZTKFK_i_supplement.
 
 
     METHODS:
@@ -58,7 +58,7 @@ CLASS ltc_supplement IMPLEMENTATION.
 
   METHOD class_setup.
     CREATE OBJECT class_under_test FOR TESTING.
-    cds_test_environment = cl_cds_test_environment=>create( i_for_entity = '/DMO/I_SUPPLEMENT' ).
+    cds_test_environment = cl_cds_test_environment=>create( i_for_entity = 'ZTKFK_I_SUPPLEMENT' ).
   ENDMETHOD.
 
   METHOD setup.
@@ -82,10 +82,10 @@ CLASS ltc_supplement IMPLEMENTATION.
 
   METHOD validate_price_success.
     DATA:
-      supplement  TYPE /dmo/supplement,
-      supplements TYPE STANDARD TABLE OF /dmo/supplement.
+      supplement  TYPE ZTKFK_supplement,
+      supplements TYPE STANDARD TABLE OF ZTKFK_supplement.
 
-    supplement = VALUE /dmo/supplement(
+    supplement = VALUE ZTKFK_supplement(
         supplement_id       = 'XX123'
         supplement_category = 'XX'
         price               = '42'
@@ -124,14 +124,14 @@ CLASS ltc_supplement IMPLEMENTATION.
   METHOD validate_price_failed.
     TYPES:
       BEGIN OF check_table,
-        supplement_id    TYPE /dmo/supplement_id,
+        supplement_id    TYPE ZTKFK_supplement_id,
         clear_state_area TYPE abap_bool,
         message_price    TYPE abap_bool,
         message_currency TYPE abap_bool,
       END OF check_table.
 
     DATA:
-      supplements     TYPE STANDARD TABLE OF /dmo/supplement WITH KEY supplement_id,
+      supplements     TYPE STANDARD TABLE OF ZTKFK_supplement WITH KEY supplement_id,
       exp_check_table TYPE STANDARD TABLE OF check_table     WITH KEY supplement_id,
       act_check_table TYPE STANDARD TABLE OF check_table     WITH KEY supplement_id.
 
@@ -232,7 +232,7 @@ CLASS ltc_supplement IMPLEMENTATION.
 
   METHOD earlynumbering_idempotency.
     DATA:
-      entity          TYPE STRUCTURE FOR CREATE /dmo/i_supplement\\supplement,
+      entity          TYPE STRUCTURE FOR CREATE ZTKFK_i_supplement\\supplement,
       act_mapped_line LIKE LINE OF mapped-supplement,
       exp_mapped_line LIKE LINE OF mapped-supplement.
 
@@ -266,7 +266,7 @@ CLASS ltc_supplement IMPLEMENTATION.
           EXPORTING
                     nr_range_nr1       = '01'
                     subobject         = CONV #( 'BV' )
-                    object            = '/DMO/SUPPL'
+                    object            = 'ZTKFK_SUPPL'
           IMPORTING
             interval     = DATA(interval)
         ).
@@ -279,7 +279,7 @@ CLASS ltc_supplement IMPLEMENTATION.
     ENDTRY.
 
     DATA:
-      entity          TYPE STRUCTURE FOR CREATE /dmo/i_supplement\\supplement,
+      entity          TYPE STRUCTURE FOR CREATE ZTKFK_i_supplement\\supplement,
       act_mapped_line LIKE LINE OF mapped-supplement,
       exp_mapped_line LIKE LINE OF mapped-supplement.
 
@@ -316,7 +316,7 @@ CLASS ltc_supplement IMPLEMENTATION.
           EXPORTING
                     nr_range_nr1       = '01'
                     subobject         = CONV #( 'XX' )
-                    object            = '/DMO/SUPPL'
+                    object            = 'ZTKFK_SUPPL'
           IMPORTING
             interval     = DATA(interval)
         ).
@@ -326,7 +326,7 @@ CLASS ltc_supplement IMPLEMENTATION.
     ENDTRY.
 
     DATA:
-      entity          TYPE STRUCTURE FOR CREATE /dmo/i_supplement\\supplement,
+      entity          TYPE STRUCTURE FOR CREATE ZTKFK_i_supplement\\supplement,
       act_mapped_line LIKE LINE OF mapped-supplement,
       exp_mapped_line LIKE LINE OF mapped-supplement.
 
@@ -369,9 +369,9 @@ CLASS ltc_supplement IMPLEMENTATION.
 
   METHOD get_global_authorizations.
     DATA:
-      requested_authorizations TYPE STRUCTURE FOR GLOBAL AUTHORIZATION REQUEST /dmo/i_supplement\\supplement,
-      result                   TYPE STRUCTURE FOR GLOBAL AUTHORIZATION RESULT /dmo/i_supplement\\supplement,
-      reported                 TYPE RESPONSE  FOR REPORTED EARLY /dmo/i_supplement.
+      requested_authorizations TYPE STRUCTURE FOR GLOBAL AUTHORIZATION REQUEST ZTKFK_i_supplement\\supplement,
+      result                   TYPE STRUCTURE FOR GLOBAL AUTHORIZATION RESULT ZTKFK_i_supplement\\supplement,
+      reported                 TYPE RESPONSE  FOR REPORTED EARLY ZTKFK_i_supplement.
 
     requested_authorizations-%create = if_abap_behv=>mk-on.
 

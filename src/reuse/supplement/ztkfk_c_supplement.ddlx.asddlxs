@@ -6,7 +6,7 @@
                                        label: 'Supplement',
                                        value: 'SupplementID' } } }
 
-annotate view /DMO/C_Supplement with
+annotate view ZTKFK_C_Supplement with
 {
   @UI.facet: [ { id:              'Supplement',
                  purpose:         #STANDARD,

@@ -8,10 +8,10 @@
  dataClass: #MIXED
 }
 @ObjectModel.resultSet.sizeCategory: #XS
-define view entity /DMO/I_SupplementCategory_VH_T
-  as select from /dmo/supplcat_t
+define view entity ZTKFK_I_SupplementCategory_VH_T
+  as select from ZTKFK_supplcat_t
 
-  association [1..1] to /DMO/I_SupplementCategory_VH as _SupplmentCategory on $projection.SupplementCategory = _SupplmentCategory.SupplementCategory
+  association [1..1] to ZTKFK_I_SupplementCategory_VH as _SupplmentCategory on $projection.SupplementCategory = _SupplmentCategory.SupplementCategory
 
 {
       @ObjectModel.foreignKey.association: '_SupplmentCategory'
