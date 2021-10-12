@@ -1,0 +1,3 @@
+FUNCTION-POOL /TKFK/TRAVEL_UPDATE_TASK.      "MESSAGE-ID ..
+
+* INCLUDE /TKFK/LTRAVEL_UPDATE_TASKD...       " Local class definition

@@ -1,0 +1,10 @@
+@EndUserText.label: 'Service definition for managing travels'
+define service /TKFK/UI_TRAVEL_Approver_M {
+  expose /TKFK/C_Travel_Approver_M as Travel;
+  expose /TKFK/C_Booking_Approver_M as Booking;
+  expose /TKFK/I_Customer as Passenger;
+  expose /TKFK/I_Agency as TravelAgency;
+  expose I_Currency as Currency;
+  expose /TKFK/I_Overall_Status_VH as OverallStatusVH;
+  expose /TKFK/I_Booking_Status_VH as BookingStatusVH;
+}

@@ -1,0 +1,4 @@
+@EndUserText.label: 'Supplement Maintenance'
+define service /DMO/UI_Supplement {
+  expose /DMO/C_Supplement as Supplement;
+}
