@@ -1,0 +1,13 @@
+projection;
+strict;
+
+define behavior for ZTK_C_Travel_Approver_M alias Approver
+use etag
+{
+  field ( readonly ) BeginDate, EndDate, TotalPrice, CustomerID;
+
+  use update;
+
+  use action acceptTravel;
+  use action rejectTravel;
+}

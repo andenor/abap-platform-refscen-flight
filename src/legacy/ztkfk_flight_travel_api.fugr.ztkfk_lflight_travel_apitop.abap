@@ -1,3 +1,0 @@
-FUNCTION-POOL ZTKFK_FLIGHT_TRAVEL_API.       "MESSAGE-ID ..
-
-* INCLUDE ZTKFK_LFLIGHT_TRAVEL_APID...        " Local class definition

@@ -1,0 +1,5 @@
+@EndUserText.label: 'Multi-Inline-Edit Scenario'
+define service ZTK_UI_Carriers_S {
+  expose ZTK_C_CarriersLockSingleton_S as CarriersSingleton;
+  expose ZTK_C_Carrier_S as Carrier;
+}

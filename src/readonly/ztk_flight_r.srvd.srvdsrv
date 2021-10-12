@@ -1,0 +1,7 @@
+@EndUserText.label: 'Service Definition for Managing Flights'
+define service ZTK_FLIGHT_R {
+  expose ZTK_I_Connection_R as Connection;
+  expose ZTK_I_Flight_R as Flight;
+  expose ZTK_I_Carrier as Airline;
+  expose ZTK_I_Airport as Airport;
+}

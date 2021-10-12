@@ -1,0 +1,4 @@
+@EndUserText.label: 'Supplement Maintenance'
+define service ZTK_UI_Supplement {
+  expose ZTK_C_Supplement as Supplement;
+}

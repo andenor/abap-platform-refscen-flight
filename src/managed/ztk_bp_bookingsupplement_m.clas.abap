@@ -1,0 +1,8 @@
+CLASS ZTK_bp_bookingsupplement_m DEFINITION PUBLIC ABSTRACT FINAL FOR BEHAVIOR OF ZTK_i_travel_m.
+ENDCLASS.
+
+
+CLASS ZTK_bp_bookingsupplement_m IMPLEMENTATION.
+
+
+ENDCLASS.

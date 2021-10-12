@@ -1,0 +1,18 @@
+@EndUserText.label: 'Travel Draft Scenario(active projection)'
+define service ZTK_UI_TRAVEL_A_D {
+  expose ZTK_C_Travel_A_D as Travel;
+  expose ZTK_C_Booking_A_D as Booking;
+  expose ZTK_C_BookingSupplement_A_D as BookingSupplement;
+  expose ZTK_I_Supplement as Supplement;
+  expose ZTK_I_SupplementText as SupplementText;
+  expose ZTK_I_Customer as Passenger;
+  expose ZTK_I_Agency as TravelAgency;
+  expose ZTK_I_Carrier as Airline;
+  expose ZTK_I_Connection as FlightConnection;
+  expose ZTK_I_Flight as Flight;
+  expose ZTK_I_Airport as Airport;
+  expose ZTK_I_Overall_Status_VH as OverallStatusVH;
+  expose ZTK_I_Booking_Status_VH as BookingStatusVH;
+  expose I_Currency as Currency;
+  expose I_Country as Country;
+}
